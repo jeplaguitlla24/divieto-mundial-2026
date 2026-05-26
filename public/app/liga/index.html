@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DIVIETO · Liga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;background:#000;}
+body{display:flex;justify-content:center;}
+
+.bg-layer{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:0;}
+
+.app{
+  width:100%;max-width:430px;height:100dvh;
+  display:flex;flex-direction:column;
+  background:transparent;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  position:relative;z-index:1;
+  padding-top:108px;
+}
+
+/* ── SUBTABS ── */
+.subtab-bar-liga{
+  position:fixed;top:64px;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;height:44px;
+  background:#000;border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;z-index:90;
+}
+.stb{
+  flex:1;background:none;border:none;border-bottom:2px solid transparent;
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:color .15s,border-color .15s;padding:0;
+}
+.stb.active{color:#c8a84b;border-bottom-color:#c8a84b;}
+
+/* ── EDITAR NOMBRE LIGA ── */
+.liga-hero__edit{
+  display:inline-flex;align-items:center;gap:6px;margin-top:4px;
+  background:none;border:none;cursor:pointer;padding:0;
+  font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;
+  color:rgba(200,168,75,0.5);text-transform:uppercase;transition:color .15s;
+}
+.liga-hero__edit:hover{color:#c8a84b;}
+.liga-hero__edit svg{width:12px;height:12px;}
+.edit-nombre-wrap{
+  display:none;margin-top:8px;flex-direction:column;gap:6px;
+  position:relative;z-index:1;
+}
+.edit-nombre-wrap.visible{display:flex;}
+.edit-nombre-input{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(200,168,75,0.4);
+  border-radius:8px;padding:8px 12px;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  outline:none;width:100%;
+}
+.edit-nombre-input::placeholder{color:rgba(255,255,255,0.25);}
+.edit-nombre-btns{display:flex;gap:6px;}
+.edit-btn-ok{
+  flex:1;background:#c8a84b;color:#1a1000;border:none;border-radius:7px;
+  padding:7px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;
+}
+.edit-btn-cancel{
+  padding:7px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);border-radius:7px;font-family:'Bebas Neue',sans-serif;
+  font-size:14px;letter-spacing:1px;cursor:pointer;
+}
+
+/* ── SIN LIGA PRIVADA ── */
+.sin-liga{
+  margin:16px;padding:24px 20px;border-radius:14px;
+  border:1px dashed rgba(255,255,255,0.12);
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
+}
+.sin-liga__icon{font-size:1.8rem;opacity:0.3;}
+.sin-liga__title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:18px;color:rgba(255,255,255,0.5);letter-spacing:1px;}
+.sin-liga__sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.2);text-transform:uppercase;}
+.sin-liga__btn{
+  margin-top:4px;padding:10px 20px;background:#c8a84b;color:#1a1000;border:none;border-radius:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;
+}
+.sin-liga__btn:hover{background:#f0cc60;}
+
+/* LP HEADER */
+.lp-header{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;z-index:100;height:64px;
+  background:#000;border-bottom:none;
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 8px;
+}
+.lp-header-logo{display:flex;align-items:center;gap:0px;text-decoration:none;}
+.lp-logo-divieto{height:52px;width:auto;}
+.lp-header-right{display:flex;align-items:center;gap:10px;position:relative;}
+.lp-bell{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.1);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;color:#ffffff;
+}
+.lp-bell svg{width:18px;height:18px;}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:#111;border:1.5px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:1;
+}
+.umenu{
+  display:none;position:absolute;top:46px;right:0;
+  background:#111;border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;min-width:170px;z-index:200;overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.umenu-item{padding:11px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,0.85);cursor:pointer;letter-spacing:0.5px;}
+.umenu-item:active{background:rgba(200,168,75,0.08);}
+.umenu-sep{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0;}
+.umenu-danger{color:#ef4444;}
+
+/* SCROLL */
+.scroll-area{
+  flex:1;min-height:0;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding-bottom:140px;
+}
+.scroll-area::-webkit-scrollbar{display:none;}
+
+/* ── HERO DE LIGA ── */
+.liga-hero{
+  margin:16px 16px 0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.45);
+  border-radius:18px;padding:20px 20px 18px;
+  position:relative;overflow:hidden;
+}
+.liga-hero::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,168,75,0.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.liga-hero__label{
+  font-family:'Barlow Condensed',sans-serif;font-size:9px;
+  letter-spacing:3px;color:rgba(200,168,75,0.7);text-transform:uppercase;
+  display:block;margin-bottom:3px;position:relative;z-index:1;
+}
+.liga-hero__title{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:26px;
+  color:#fff;letter-spacing:2px;line-height:1;
+  display:block;margin-bottom:14px;position:relative;z-index:1;
+}
+.liga-hero__stats{
+  display:flex;gap:20px;position:relative;z-index:1;
+}
+.liga-hero__stat{display:flex;flex-direction:column;gap:1px;}
+.liga-hero__stat-val{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:22px;
+  color:#c8a84b;letter-spacing:0.5px;line-height:1;
+}
+.liga-hero__stat-lbl{
+  font-family:'Barlow Condensed',sans-serif;font-size:8px;
+  letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;
+}
+
+/* ── COLUMNAS HEADER ── */
+.tabla-header{
+  display:flex;align-items:center;
+  padding:14px 20px 8px;
+  gap:0;
+}
+.th-pos{
+  font-family:'Barlow Condensed',sans-serif;font-size:8px;
+  letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  width:32px;flex-shrink:0;
+}
+.th-nombre{
+  font-family:'Barlow Condensed',sans-serif;font-size:8px;
+  letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  flex:1;
+}
+.th-pts{
+  font-family:'Barlow Condensed',sans-serif;font-size:8px;
+  letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  width:44px;text-align:right;flex-shrink:0;
+}
+
+/* ── TABLA CLASIFICACIÓN ── */
+.tabla-wrap{
+  margin:0 16px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.45);
+}
+
+.tabla-row{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.03);
+  transition:background 0.15s;
+}
+.tabla-row:last-child{border-bottom:none;}
+.tabla-row--self{
+  background:rgba(200,168,75,0.08);
+  border-bottom:1px solid rgba(200,168,75,0.12);
+}
+.tabla-row--top1{background:rgba(200,168,75,0.07);}
+.tabla-row--top2{background:rgba(180,180,180,0.05);}
+.tabla-row--top3{background:rgba(180,83,9,0.06);}
+
+/* Posición */
+.tr-pos{
+  width:24px;flex-shrink:0;
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:15px;
+  color:rgba(255,255,255,0.2);letter-spacing:1px;text-align:center;
+}
+.tr-pos--1{color:#c8a84b;}
+.tr-pos--2{color:#9ca3af;}
+.tr-pos--3{color:#b45309;}
+
+/* Badge de posición para top 3 */
+.tr-pos-badge{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:12px;
+  flex-shrink:0;
+}
+.tr-pos-badge--1{background:#c8a84b;color:#1a1000;}
+.tr-pos-badge--2{background:#6b7280;color:#fff;}
+.tr-pos-badge--3{background:#b45309;color:#fff;}
+
+/* Avatar */
+.tr-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:11px;
+  color:rgba(255,255,255,0.5);flex-shrink:0;
+}
+.tabla-row--self .tr-avatar{
+  border-color:rgba(200,168,75,0.5);
+  background:rgba(200,168,75,0.1);
+  color:#c8a84b;
+}
+.tabla-row--top1 .tr-avatar{border-color:rgba(200,168,75,0.4);color:#c8a84b;}
+
+/* Nombre */
+.tr-nombre{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+  color:rgba(255,255,255,0.85);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:0.3px;
+}
+.tabla-row--self .tr-nombre{color:#c8a84b;}
+
+/* Tag TÚ */
+.tr-tu{
+  font-family:'Barlow Condensed',sans-serif;font-size:7px;
+  letter-spacing:2px;color:#c8a84b;text-transform:uppercase;
+  font-weight:700;flex-shrink:0;
+}
+
+/* Puntos */
+.tr-pts{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:20px;
+  color:#ffffff;letter-spacing:1px;text-align:right;
+  flex-shrink:0;width:40px;
+}
+.tabla-row--top1 .tr-pts{color:#c8a84b;}
+
+/* ── STICKY BAR ── */
+.user-sticky-bar{
+  position:fixed;bottom:72px;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:#0d0d0d;border-top:1px solid rgba(255,255,255,0.08);
+  padding:10px 20px;
+  display:none;align-items:center;gap:12px;
+  z-index:90;
+}
+.usb-pos{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:26px;
+  color:#c8a84b;letter-spacing:1px;flex-shrink:0;line-height:1;
+}
+.usb-sep{width:1px;height:28px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+.usb-nombre{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  color:#ffffff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.usb-tu{
+  font-family:'Barlow Condensed',sans-serif;font-size:7px;
+  letter-spacing:2px;color:#c8a84b;text-transform:uppercase;font-weight:700;flex-shrink:0;
+}
+.usb-right{display:flex;flex-direction:column;align-items:flex-end;gap:0;flex-shrink:0;}
+.usb-pts{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:22px;
+  color:#ffffff;letter-spacing:1px;line-height:1;
+}
+.usb-pts-lbl{
+  font-family:'Barlow Condensed',sans-serif;font-size:7px;
+  color:rgba(255,255,255,0.3);letter-spacing:1.5px;text-transform:uppercase;
+}
+
+/* ESTADOS */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 24px;text-align:center;}
+.empty-icon{font-size:2rem;opacity:0.25;}
+.empty-text{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.25);text-transform:uppercase;}
+.loading{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-align:center;padding:60px 16px;text-transform:uppercase;}
+
+/* ── TORNEO: GRUPOS ── */
+.torneo-section-lbl{font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:14px 16px 8px;display:block;}
+.grupos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;}
+.grupo-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;}
+.grupo-card-title{font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;color:rgba(200,168,75,0.6);text-transform:uppercase;padding:6px 8px 5px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(200,168,75,0.04);}
+.grupo-row{display:flex;align-items:center;gap:5px;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.grupo-row:last-child{border-bottom:none;}
+.gr-pos{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:10px;color:rgba(255,255,255,0.2);width:10px;text-align:center;flex-shrink:0;}
+.gr-flag{font-size:0.75rem;flex-shrink:0;line-height:1;}
+.gr-name{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.75);letter-spacing:.2px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gr-pts{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:12px;color:rgba(255,255,255,0.4);flex-shrink:0;width:12px;text-align:right;}
+
+/* ── TORNEO: BRACKET ── */
+.bracket-scroll{overflow-x:auto;padding:8px 16px 24px;display:flex;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.bracket-scroll::-webkit-scrollbar{display:none;}
+.bracket-round{flex-shrink:0;width:106px;display:flex;flex-direction:column;}
+.bracket-round-hdr{font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;text-align:center;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:8px;}
+.bracket-matches{display:flex;flex-direction:column;gap:6px;}
+.b-match{display:flex;flex-direction:column;gap:1px;}
+.b-team{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:3px 6px;height:22px;}
+.b-team.winner{background:rgba(200,168,75,0.08);border-color:rgba(200,168,75,0.3);}
+.b-team-name{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+
+@media(min-width:768px){.app{max-width:100%;}.lp-header{max-width:100%;}.subtab-bar-liga{max-width:100%;}.user-sticky-bar{max-width:100%;}}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="app">
+
+  <header class="lp-header">
+    <a href="/app/" class="lp-header-logo">
+      <img src="/assets/img/divieto-texto.webp" class="lp-logo-divieto" alt="DIVIETO">
+    </a>
+    <div class="lp-header-right">
+      <button class="lp-bell" aria-label="Notificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <div class="avatar" id="avatar-btn"><img src="/assets/img/divieto-x.webp" style="width:32px;height:32px;object-fit:contain;pointer-events:none;" alt=""></div>
+      <div id="user-menu" class="umenu">
+        <div class="umenu-item" onclick="window.location.href='/app/reglamento/'">📖 Reglamento</div>
+        <hr class="umenu-sep">
+        <div class="umenu-item umenu-danger" id="umenu-logout">→ Cerrar sesión</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="scroll-area">
+    <div id="panel-privada"><div class="loading">Cargando...</div></div>
+    <div id="panel-general" style="display:none"><div class="loading">Cargando...</div></div>
+  </div>
+
+</div>
+
+<div class="subtab-bar-liga">
+  <button class="stb active" data-st="privada" id="stb-privada">LIGA PRIVADA</button>
+  <button class="stb" data-st="general" id="stb-general">LIGA GENERAL</button>
+</div>
+
+<div id="user-sticky-bar" class="user-sticky-bar"></div>
+
+<script src="/shared/nav.js"></script>
+<script type="module">
+import { auth, db } from '/js/config.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { doc, getDoc, onSnapshot, updateDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const LIGA_GENERAL_ID = 'mundial-2026-general';
+let currentUid = null;
+let ligaPrivadaId = null;
+let tabActivo = 'privada';
+let unsubPrivada = null;
+let unsubGeneral = null;
+
+// ── Avatar / menú ──────────────────────────────────────────────────────────
+document.getElementById('avatar-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const m = document.getElementById('user-menu');
+  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', () => { const m = document.getElementById('user-menu'); if (m) m.style.display = 'none'; });
+document.getElementById('umenu-logout').addEventListener('click', async () => {
+  try { await signOut(auth); } catch(e) {}
+  window.location.href = '/';
+});
+
+// ── Subtabs ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.stb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.stb').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tabActivo = btn.dataset.st;
+    document.getElementById('panel-privada').style.display = tabActivo === 'privada' ? '' : 'none';
+    document.getElementById('panel-general').style.display = tabActivo === 'general' ? '' : 'none';
+    renderStickyBarActivo();
+  });
+});
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function iniciales(n) { const w=n.trim().split(/\s+/); return w.length>=2?(w[0][0]+w[1][0]).toUpperCase():n.slice(0,2).toUpperCase(); }
+function rowTopBadge(pos) {
+  if (pos > 3) return `<div class="tr-pos">${pos}</div>`;
+  return `<div class="tr-pos-badge tr-pos-badge--${pos}">${pos}</div>`;
+}
+function rowClass(pos, isSelf) {
+  let c = 'tabla-row';
+  if (isSelf) c += ' tabla-row--self';
+  else if (pos===1) c += ' tabla-row--top1';
+  else if (pos===2) c += ' tabla-row--top2';
+  else if (pos===3) c += ' tabla-row--top3';
+  return c;
+}
+
+let _stickyPrivada = null;
+let _stickyGeneral = null;
+
+function renderStickyBar(pos, m) {
+  const bar = document.getElementById('user-sticky-bar');
+  if (!m || pos===null) { bar.style.display='none'; return; }
+  bar.style.display='flex';
+  bar.innerHTML=`<span class="usb-pos">#${pos}</span><div class="usb-sep"></div><span class="usb-nombre">${esc(m.nombre)}</span><span class="usb-tu">TÚ</span><div class="usb-right"><span class="usb-pts">${m.pts}</span><span class="usb-pts-lbl">PTS</span></div>`;
+}
+function renderStickyBarActivo() {
+  const d = tabActivo === 'privada' ? _stickyPrivada : _stickyGeneral;
+  if (d) renderStickyBar(d.pos, d.m);
+  else renderStickyBar(null, null);
+}
+function setStickyData(tipo, pos, m) {
+  if (tipo==='privada') _stickyPrivada = pos!==null ? {pos,m} : null;
+  else _stickyGeneral = pos!==null ? {pos,m} : null;
+  if (tabActivo===tipo) renderStickyBarActivo();
+}
+
+// ── Render clasificación ───────────────────────────────────────────────────
+function renderClasificacion(panelId, ligaId, nombreLiga, managers, esPrivada) {
+  const panel = document.getElementById(panelId);
+  const esCreador = esPrivada && managers.length > 0 && managers[0]?.uid === currentUid;
+  const puedeEditar = esPrivada;
+
+  let html = `<div class="liga-hero">
+    <span class="liga-hero__label">${esPrivada ? 'Liga privada' : 'Liga general'}</span>
+    <span class="liga-hero__title" id="hero-title-${panelId}">${esc(nombreLiga)}</span>`;
+
+  if (esPrivada) {
+    html += `<button class="liga-hero__edit" id="btn-edit-nombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Editar nombre
+    </button>
+    <div class="edit-nombre-wrap" id="edit-nombre-wrap">
+      <input class="edit-nombre-input" id="edit-nombre-input" type="text" placeholder="Nombre de la liga" maxlength="30">
+      <div class="edit-nombre-btns">
+        <button class="edit-btn-ok" id="edit-nombre-ok">Guardar</button>
+        <button class="edit-btn-cancel" id="edit-nombre-cancel">Cancelar</button>
+      </div>
+    </div>`;
+  }
+
+  html += `<div class="liga-hero__stats">
+      <div class="liga-hero__stat"><span class="liga-hero__stat-val">${managers.length}</span><span class="liga-hero__stat-lbl">Managers</span></div>
+      <div class="liga-hero__stat"><span class="liga-hero__stat-val">—</span><span class="liga-hero__stat-lbl">Jornada</span></div>
+      <div class="liga-hero__stat"><span class="liga-hero__stat-val">${managers[0]?.pts ?? '—'}</span><span class="liga-hero__stat-lbl">Líder pts</span></div>
+    </div>
+  </div>
+  <div class="tabla-header">
+    <div class="th-pos">POS</div>
+    <div style="width:32px;flex-shrink:0;"></div>
+    <div class="th-nombre" style="padding-left:12px;">Manager</div>
+    <div class="th-pts">PTS</div>
+  </div>
+  <div class="tabla-wrap">`;
+
+  managers.forEach((m, i) => {
+    const pos = i+1, isSelf = m.uid===currentUid;
+    html += `<div class="${rowClass(pos,isSelf)}">${rowTopBadge(pos)}<div class="tr-avatar">${iniciales(m.nombre)}</div><span class="tr-nombre">${esc(m.nombre)}</span>${isSelf?`<span class="tr-tu">TÚ</span>`:''}<span class="tr-pts">${m.pts}</span></div>`;
+  });
+  html += `</div>`;
+  panel.innerHTML = html;
+
+  const selfIdx = managers.findIndex(m => m.uid===currentUid);
+  setStickyData(panelId==='panel-privada'?'privada':'general', selfIdx!==-1?selfIdx+1:null, selfIdx!==-1?managers[selfIdx]:null);
+
+  if (esPrivada) {
+    document.getElementById('btn-edit-nombre').addEventListener('click', () => {
+      const wrap = document.getElementById('edit-nombre-wrap');
+      const input = document.getElementById('edit-nombre-input');
+      wrap.classList.toggle('visible');
+      if (wrap.classList.contains('visible')) { input.value = document.getElementById(`hero-title-${panelId}`).textContent; input.focus(); }
+    });
+    document.getElementById('edit-nombre-cancel').addEventListener('click', () => {
+      document.getElementById('edit-nombre-wrap').classList.remove('visible');
+    });
+    document.getElementById('edit-nombre-ok').addEventListener('click', async () => {
+      const nuevoNombre = document.getElementById('edit-nombre-input').value.trim();
+      if (!nuevoNombre) return;
+      try {
+        await updateDoc(doc(db, 'ligas', ligaId), { nombre: nuevoNombre });
+        document.getElementById(`hero-title-${panelId}`).textContent = nuevoNombre;
+        document.getElementById('edit-nombre-wrap').classList.remove('visible');
+      } catch(e) { console.error(e); }
+    });
+  }
+}
+
+function renderSinLiga(panel) {
+  panel.innerHTML = `<div class="sin-liga">
+    <div class="sin-liga__icon">⚽</div>
+    <div class="sin-liga__title">Sin liga privada</div>
+    <div class="sin-liga__sub">No estás en ninguna liga privada</div>
+    <button class="sin-liga__btn" onclick="window.location.href='/app/setup/'">Crear o unirse</button>
+  </div>`;
+}
+
+function buildManagers(data) {
+  const info = data.managersInfo || {};
+  return (data.managers || []).map((uid,i) => ({
+    uid, nombre: info[uid]?.nombre || `Usuario ${i+1}`, pts: info[uid]?.pts || 0
+  })).sort((a,b) => b.pts-a.pts || a.nombre.localeCompare(b.nombre));
+}
+
+// ── Firebase ───────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user || !user.email?.endsWith('@divieto.app')) { window.location.href='/'; return; }
+  currentUid = user.uid;
+
+  const userSnap = await getDoc(doc(db,'users',user.uid));
+  if (!userSnap.exists() || !userSnap.data().nombre) { window.location.href='/app/setup/'; return; }
+
+  ligaPrivadaId = userSnap.data().ligaPrivadaId || null;
+
+  // ── LIGA PRIVADA ──
+  const panelPrivada = document.getElementById('panel-privada');
+  if (ligaPrivadaId) {
+    unsubPrivada = onSnapshot(doc(db,'ligas',ligaPrivadaId), snap => {
+      if (!snap.exists()) { renderSinLiga(panelPrivada); return; }
+      const data = snap.data();
+      renderClasificacion('panel-privada', ligaPrivadaId, data.nombre || 'Liga Privada', buildManagers(data), true);
+    });
+  } else {
+    renderSinLiga(panelPrivada);
+  }
+
+  // ── LIGA GENERAL ──
+  unsubGeneral = onSnapshot(doc(db,'ligas',LIGA_GENERAL_ID), snap => {
+    const panelGeneral = document.getElementById('panel-general');
+    if (!snap.exists()) { panelGeneral.innerHTML='<div class="loading">Sin datos</div>'; return; }
+    const data = snap.data();
+    renderClasificacion('panel-general', LIGA_GENERAL_ID, data.nombre || 'Liga General · Mundial 2026', buildManagers(data), false);
+  });
+});
+</script>
+</body>
+</html>

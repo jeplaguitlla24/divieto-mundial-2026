@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DIVIETO · Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;background:#000;}
+body{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+
+.wrap{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+
+.logo{margin-bottom:28px;}
+.logo img{width:200px;height:auto;opacity:0.92;}
+
+.card{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);border-radius:20px;
+  padding:28px 28px 32px;display:flex;flex-direction:column;align-items:center;
+}
+
+.tabs{
+  display:flex;width:100%;margin-bottom:28px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:3px;gap:3px;
+}
+.tab{
+  flex:1;padding:10px;border:none;background:transparent;
+  color:rgba(255,255,255,0.35);font-family:'Bebas Neue',sans-serif;
+  font-size:0.9rem;letter-spacing:3px;border-radius:8px;cursor:pointer;transition:all 0.2s;
+}
+.tab.active{background:rgba(200,168,75,0.15);color:#c8a84b;}
+
+.form{display:none;width:100%;flex-direction:column;}
+.form.active{display:flex;}
+
+.field-label{
+  font-family:'JetBrains Mono',monospace;font-size:0.48rem;letter-spacing:2px;
+  color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:5px;
+}
+
+input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:13px 16px;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:1px;
+  outline:none;transition:border-color 0.2s;margin-bottom:14px;
+  -webkit-user-select:text;user-select:text;
+}
+input::placeholder{color:rgba(255,255,255,0.25);}
+input:focus{border-color:#c8a84b;}
+
+.divider{width:100%;height:1px;background:rgba(255,255,255,0.07);margin:0 0 18px;}
+
+.btn{
+  width:100%;background:#c8a84b;color:#1a1000;border:none;
+  border-radius:10px;padding:15px;cursor:pointer;margin-top:2px;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:4px;
+  transition:background 0.2s,transform 0.1s;
+}
+.btn:hover{background:#f0cc60;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+
+.error{
+  display:none;font-family:'JetBrains Mono',monospace;font-size:0.55rem;
+  letter-spacing:1px;color:#ef4444;text-align:center;margin-top:12px;
+  padding:10px 14px;background:rgba(239,68,68,0.08);border-radius:8px;
+  border:1px solid rgba(239,68,68,0.2);width:100%;
+}
+.error.visible{display:block;}
+
+.spinner{
+  display:none;width:20px;height:20px;border:2px solid rgba(255,255,255,0.15);
+  border-top-color:#c8a84b;border-radius:50%;animation:spin 0.7s linear infinite;margin:12px auto 0;
+}
+.spinner.visible{display:block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.remember-row{display:flex;align-items:center;gap:10px;margin:12px 0 4px;cursor:pointer;width:100%;}
+.remember-row input[type=checkbox]{display:none;}
+.toggle-pill{width:34px;height:18px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:9px;position:relative;transition:all 0.2s;flex-shrink:0;}
+.toggle-pill::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:rgba(255,255,255,0.35);border-radius:50%;transition:all 0.2s;}
+.remember-row input:checked + .toggle-pill{background:rgba(200,168,75,0.25);border-color:rgba(200,168,75,0.4);}
+.remember-row input:checked + .toggle-pill::after{transform:translateX(16px);background:#c8a84b;}
+.remember-label{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div id="splash" style="position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+  <video id="splash-vid" src="/assets/logo/splash-divieto.mp4" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+</div>
+<script>
+(function(){
+  var vid=document.getElementById('splash-vid');
+  function hide(){var s=document.getElementById('splash');if(!s)return;s.style.transition='opacity 0.5s';s.style.opacity='0';setTimeout(function(){s.remove();},500);}
+  vid.addEventListener('ended',hide);vid.addEventListener('error',hide);setTimeout(hide,10000);
+})();
+</script>
+
+<div class="wrap">
+  <div class="logo">
+    <img src="/assets/img/divieto-completo.webp" alt="DIVIETO">
+  </div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tabEntrar" onclick="setTab('entrar')">Entrar</button>
+      <button class="tab" id="tabRegistrar" onclick="setTab('registrar')">Registrarse</button>
+    </div>
+
+    <!-- ENTRAR -->
+    <div class="form active" id="formEntrar">
+      <label class="field-label" for="loginUser">Usuario</label>
+      <input type="text" id="loginUser" placeholder="nombre de usuario" autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="none">
+      <label class="field-label" for="loginPass">Contraseña</label>
+      <input type="password" id="loginPass" placeholder="contraseña" autocomplete="current-password">
+      <button class="btn" id="btnLogin">Entrar</button>
+      <label class="remember-row">
+        <input type="checkbox" id="chkRecordar" checked>
+        <span class="toggle-pill"></span>
+        <span class="remember-label">Recordar sesión</span>
+      </label>
+      <div class="spinner" id="spinLogin"></div>
+      <div class="error" id="errLogin"></div>
+    </div>
+
+    <!-- REGISTRARSE -->
+    <div class="form" id="formRegistrar">
+      <label class="field-label" for="claveReg">Clave de acceso</label>
+      <input type="text" id="claveReg" placeholder="clave de registro" autocomplete="off" spellcheck="false" autocapitalize="none" autocorrect="off">
+      <div class="divider"></div>
+      <label class="field-label" for="regUser">Elige tu usuario</label>
+      <input type="text" id="regUser" placeholder="nombre de usuario" maxlength="20" autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="none">
+      <label class="field-label" for="regPass">Contraseña</label>
+      <input type="password" id="regPass" placeholder="mínimo 6 caracteres" autocomplete="new-password">
+      <label class="field-label" for="regPassConf">Confirmar contraseña</label>
+      <input type="password" id="regPassConf" placeholder="repite la contraseña" autocomplete="new-password">
+      <button class="btn" id="btnRegister">Crear cuenta</button>
+      <div class="spinner" id="spinReg"></div>
+      <div class="error" id="errReg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function setTab(tab) {
+  document.getElementById('tabEntrar').classList.toggle('active', tab === 'entrar');
+  document.getElementById('tabRegistrar').classList.toggle('active', tab === 'registrar');
+  document.getElementById('formEntrar').classList.toggle('active', tab === 'entrar');
+  document.getElementById('formRegistrar').classList.toggle('active', tab === 'registrar');
+  document.getElementById('errLogin').classList.remove('visible');
+  document.getElementById('errReg').classList.remove('visible');
+}
+</script>
+
+<script type="module">
+import { auth, db } from '/js/config.js';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import {
+  doc, getDoc, setDoc, runTransaction, arrayUnion
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const LIGA_GENERAL_ID = 'mundial-2026-general';
+const DOMAIN = '@divieto.app';
+
+onAuthStateChanged(auth, async user => {
+  // Solo aceptar cuentas del dominio de la app (email/contraseña)
+  if (!user || !user.email?.endsWith('@divieto.app')) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    window.location.href = (snap.exists() && snap.data().nombre) ? '/app/' : '/app/setup/';
+  } catch(e) {
+    window.location.href = '/app/';
+  }
+});
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+const loginUser = document.getElementById('loginUser');
+const loginPass = document.getElementById('loginPass');
+const btnLogin  = document.getElementById('btnLogin');
+const errLogin  = document.getElementById('errLogin');
+const spinLogin = document.getElementById('spinLogin');
+const chkRecordar = document.getElementById('chkRecordar');
+
+// Pre-rellenar usuario guardado
+(function() {
+  const saved = localStorage.getItem('lp_saved_user');
+  if (saved) {
+    loginUser.value = saved;
+    chkRecordar.checked = true;
+    loginPass.focus();
+  }
+})();
+
+[loginUser, loginPass].forEach(el => el.addEventListener('input', () => errLogin.classList.remove('visible')));
+loginPass.addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+btnLogin.addEventListener('click', entrar);
+
+async function entrar() {
+  const user = loginUser.value.trim().toLowerCase();
+  const pass = loginPass.value;
+  const recordar = chkRecordar.checked;
+  errLogin.classList.remove('visible');
+  if (!user || !pass) { showErr(errLogin, 'Rellena todos los campos.'); return; }
+  setLoading(btnLogin, spinLogin, true, 'Entrando…');
+  try {
+    await setPersistence(auth, recordar ? browserLocalPersistence : browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, user + DOMAIN, pass);
+    if (recordar) localStorage.setItem('lp_saved_user', user);
+    else localStorage.removeItem('lp_saved_user');
+  } catch(e) {
+    let msg = 'Error al iniciar sesión.';
+    if (['auth/invalid-credential','auth/user-not-found','auth/wrong-password'].includes(e.code))
+      msg = 'Usuario o contraseña incorrectos.';
+    else if (e.code === 'auth/too-many-requests')
+      msg = 'Demasiados intentos. Espera un momento.';
+    showErr(errLogin, msg);
+    setLoading(btnLogin, spinLogin, false, 'Entrar');
+  }
+}
+
+// ── REGISTER ──────────────────────────────────────────────────────────────────
+const claveReg    = document.getElementById('claveReg');
+const regUser     = document.getElementById('regUser');
+const regPass     = document.getElementById('regPass');
+const regPassConf = document.getElementById('regPassConf');
+const btnReg      = document.getElementById('btnRegister');
+const errReg      = document.getElementById('errReg');
+const spinReg     = document.getElementById('spinReg');
+
+[claveReg, regUser, regPass, regPassConf].forEach(el =>
+  el.addEventListener('input', () => errReg.classList.remove('visible'))
+);
+regPassConf.addEventListener('keydown', e => { if (e.key === 'Enter') registrarse(); });
+btnReg.addEventListener('click', registrarse);
+
+async function registrarse() {
+  const clave = claveReg.value.trim();
+  const user  = regUser.value.trim();
+  const pass  = regPass.value;
+  const conf  = regPassConf.value;
+  errReg.classList.remove('visible');
+
+  if (!clave || !user || !pass || !conf) { showErr(errReg, 'Rellena todos los campos.'); return; }
+  if (user.length < 2) { showErr(errReg, 'El nombre de usuario debe tener al menos 2 caracteres.'); return; }
+  if (!/^[a-zA-Z0-9_.\-]+$/.test(user)) { showErr(errReg, 'Solo letras, números, guiones y puntos.'); return; }
+  if (pass.length < 6) { showErr(errReg, 'La contraseña debe tener al menos 6 caracteres.'); return; }
+  if (pass !== conf) { showErr(errReg, 'Las contraseñas no coinciden.'); return; }
+
+  setLoading(btnReg, spinReg, true, 'Verificando…');
+
+  try {
+    // 1. Validar clave de registro
+    const registroSnap = await getDoc(doc(db, 'config', 'registro'));
+    if (!registroSnap.exists() || registroSnap.data().clave?.toLowerCase() !== clave.toLowerCase()) {
+      showErr(errReg, 'Clave de acceso incorrecta.');
+      setLoading(btnReg, spinReg, false, 'Crear cuenta'); return;
+    }
+
+    // 2. Comprobar disponibilidad del nombre de usuario
+    const usernameKey  = user.toLowerCase();
+    const usernameSnap = await getDoc(doc(db, 'usernames', usernameKey));
+    if (usernameSnap.exists()) {
+      showErr(errReg, 'Ese nombre de usuario ya está en uso. Elige otro.');
+      setLoading(btnReg, spinReg, false, 'Crear cuenta'); return;
+    }
+
+    // 3. Crear cuenta Firebase Auth
+    btnReg.textContent = 'Creando cuenta…';
+    let cred;
+    try {
+      cred = await createUserWithEmailAndPassword(auth, usernameKey + DOMAIN, pass);
+    } catch(authErr) {
+      let msg = 'Error al crear la cuenta. Inténtalo de nuevo.';
+      if (authErr.code === 'auth/email-already-in-use') msg = 'Ese nombre de usuario ya está en uso.';
+      else if (authErr.code === 'auth/weak-password') msg = 'La contraseña debe tener al menos 6 caracteres.';
+      showErr(errReg, msg);
+      setLoading(btnReg, spinReg, false, 'Crear cuenta'); return;
+    }
+
+    const uid = cred.user.uid;
+    btnReg.textContent = 'Configurando…';
+
+    // 4. Crear perfil y unirse a liga general (transacción)
+    const userRef    = doc(db, 'users', uid);
+    const generalRef = doc(db, 'ligas', LIGA_GENERAL_ID);
+    let numero;
+    await runTransaction(db, async tx => {
+      const [userSnap, ligaSnap] = await Promise.all([tx.get(userRef), tx.get(generalRef)]);
+      const managers = ligaSnap.exists() ? (ligaSnap.data().managers || []) : [];
+      numero = managers.length + 1;
+      if (!ligaSnap.exists()) {
+        tx.set(generalRef, {
+          nombre: 'Liga General · Mundial 2026',
+          esGeneral: true,
+          managers: [uid],
+          managersInfo: { [uid]: { nombre: user, numero } }
+        });
+      } else if (!managers.includes(uid)) {
+        tx.update(generalRef, {
+          managers: arrayUnion(uid),
+          [`managersInfo.${uid}`]: { nombre: user, numero }
+        });
+      }
+      const existingData = userSnap.exists() ? userSnap.data() : {};
+      tx.set(userRef, {
+        ...existingData,
+        uid,
+        nombre: user,
+        username: usernameKey,
+        numero: existingData.numero || numero,
+        ligaGeneralId: LIGA_GENERAL_ID
+      }, { merge: true });
+    });
+
+    // 5. Registrar nombre de usuario como índice único
+    await setDoc(doc(db, 'usernames', usernameKey), {
+      uid,
+      nombre: user,
+      creadoAt: new Date().toISOString()
+    });
+
+    window.location.href = '/app/';
+
+  } catch(e) {
+    console.error(e);
+    showErr(errReg, e.message || 'Error inesperado. Inténtalo de nuevo.');
+    setLoading(btnReg, spinReg, false, 'Crear cuenta');
+  }
+}
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+function setLoading(btn, spin, on, label) {
+  btn.disabled = on;
+  spin.classList.toggle('visible', on);
+  if (label) btn.textContent = label;
+}
+</script>
+</body>
+</html>

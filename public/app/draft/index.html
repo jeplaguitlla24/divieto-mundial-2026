@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DIVIETO · Draft</title>
+<style>body{visibility:hidden}</style>
+<script>
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  var f = p.get('formacion');
+  if (!f) {
+    var fs = ['4-4-2','4-3-3','3-4-3'];
+    for (var i = 0; i < fs.length; i++) {
+      if (localStorage.getItem('lp_draft_' + fs[i])) { f = fs[i]; break; }
+    }
+  }
+  if (!f) {
+    window.location.replace('/app/draft/formacion');
+  } else {
+    // Reescribir URL con formación si vino sin param
+    if (!p.get('formacion')) {
+      history.replaceState(null, '', '/app/draft?formacion=' + f);
+    }
+    document.addEventListener('DOMContentLoaded', function(){ document.body.style.visibility='visible'; });
+  }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+html,body{background:#000;min-height:100%;overflow-y:auto;}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:430px;background:#000;padding-top:64px;padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+
+/* ── LP HEADER ── */
+.lp-header{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;z-index:50;background:#000;border-bottom:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 8px;}
+.lp-header-logo{display:flex;align-items:center;gap:0px;text-decoration:none;}
+.lp-logo-divieto{height:52px;width:auto;}
+.lp-header-right{display:flex;align-items:center;gap:10px;position:relative;}
+.lp-bell{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#ffffff;}
+.lp-bell svg{width:18px;height:18px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#111;border:1.5px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:1;}
+.umenu{display:none;position:absolute;top:46px;right:0;background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;min-width:170px;z-index:200;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.umenu-item{padding:11px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#fff;cursor:pointer;letter-spacing:0.5px;}
+.umenu-item:active{background:rgba(200,168,75,0.1);}
+.umenu-sep{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0;}
+.umenu-danger{color:#ef4444;}
+/* ── OVERALL BADGE (hueco derecho del área inferior) ── */
+#overall-badge{
+  position:absolute;
+  right:4%;bottom:10.5%;
+  width:22%;height:auto;
+  z-index:15;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:none;border:none;
+  pointer-events:none;gap:1px;transition:opacity 0.2s;
+}
+#overall-badge.over{}
+.overall-badge-label{font-family:'Barlow Condensed',sans-serif;font-size:min(2.1vw,9px);letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.4);}
+#overall-counter{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:min(11vw,45px);line-height:1;color:#f0cc60;letter-spacing:0;transition:color 0.2s;text-shadow:0 2px 6px rgba(0,0,0,0.5);}
+#overall-counter.over{color:#ef4444;}
+.overall-chem-legend{font-family:'Barlow Condensed',sans-serif;font-size:min(1.9vw,8px);letter-spacing:0.5px;color:rgba(255,255,255,0.65);text-shadow:0 1px 3px rgba(0,0,0,0.4);white-space:nowrap;}
+/* ── RESET (esquina inferior izquierda, pequeño) ── */
+#btn-reset{
+  position:absolute;
+  left:3%;bottom:3%;
+  width:auto;height:28px;
+  z-index:15;display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;
+  color:rgba(255,255,255,0.55);background:rgba(0,0,0,0.30);
+  border:1px solid rgba(255,255,255,0.14);border-radius:14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:0 12px;cursor:pointer;text-transform:uppercase;
+}
+#overall-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(224,82,82,0.97);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;padding:10px 22px;border-radius:6px;display:none;z-index:600;text-align:center;white-space:nowrap;pointer-events:none;}
+#guardar-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;padding:10px 22px;border-radius:6px;display:none;z-index:600;text-align:center;white-space:nowrap;pointer-events:none;}
+#guardar-toast.ok{background:rgba(34,197,94,0.97);color:#040d1f;}
+#guardar-toast.err{background:rgba(224,82,82,0.97);color:#fff;}
+
+/* ── GUARDAR ── */
+.guardar-section{width:100%;background:#000;padding:10px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.btn-guardar{width:100%;max-width:380px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;color:#1a1000;background:#f0cc60;border:none;border-radius:8px;padding:12px 0;cursor:pointer;transition:opacity 0.2s;}
+.guardar-estado{font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:1.5px;color:rgba(255,255,255,0.55);text-align:center;text-transform:uppercase;}
+
+/* ── SQUAD LIST ── */
+#squad-list{width:100%;background:#000;padding:0 16px 16px;flex-direction:column;display:none;}
+.squad-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.squad-row:last-child{border-bottom:none;}
+.squad-row-sel{width:20px;height:20px;flex-shrink:0;object-fit:contain;}
+.squad-row-pos{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.45);text-transform:uppercase;flex-shrink:0;width:22px;text-align:center;}
+.squad-row-name-wrap{flex:1;display:flex;align-items:center;gap:5px;min-width:0;}
+.squad-row-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;}
+.squad-row-pct{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;}
+.squad-row-pct.green{color:#22c55e;}
+.squad-row-pct.orange{color:#f59e0b;}
+.squad-row-badges{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.squad-row-badge{width:16px;height:16px;object-fit:contain;}
+.squad-row-badge[src*="LIGUE 1"]{filter:brightness(0) invert(1);}
+.squad-row-ovr{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:17px;color:#f0cc60;line-height:1;flex-shrink:0;}
+.squad-row-bonus{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;line-height:1;width:22px;text-align:left;flex-shrink:0;}
+.squad-row-bonus.green{color:#22c55e;}
+.squad-row-bonus.orange{color:#f59e0b;}
+
+/* ── FIELD ── */
+.field-wrap{position:relative;width:100%;aspect-ratio:940/1180;overflow:hidden;}
+.field-svg{width:100%;height:100%;object-fit:fill;display:block;}
+
+/* ── FORMATION ── */
+.formation{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+.row{pointer-events:auto;}
+#row-dl{position:absolute;top:5%;left:0;right:0;display:flex;justify-content:space-evenly;padding:0 10px;}
+#row-mc{position:absolute;top:29%;left:0;right:0;display:flex;justify-content:space-evenly;padding:0 10px;}
+#row-df{position:absolute;top:55%;left:0;right:0;display:flex;justify-content:space-evenly;padding:0 10px;}
+#row-pt{position:absolute;top:77%;left:0;right:0;display:flex;justify-content:center;}
+
+/* ── SLOT ── */
+.slot{width:65px;height:99px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;position:relative;transition:filter 0.35s ease;}
+.slot.chem-green  { filter:drop-shadow(0 0 2px #22c55e) drop-shadow(0 0 2px #22c55e) drop-shadow(0 0 2px #22c55e) drop-shadow(0 0 10px rgba(34,197,94,0.8)); }
+.slot.chem-orange { filter:drop-shadow(0 0 2px #f59e0b) drop-shadow(0 0 2px #f59e0b) drop-shadow(0 0 2px #f59e0b) drop-shadow(0 0 9px rgba(245,158,11,0.75)); }
+
+/* ── EMPTY SLOT ── */
+.empty-slot-img{width:100%;height:100%;object-fit:contain;animation:emptyPulse 2.4s ease-in-out infinite;pointer-events:none;}
+@keyframes emptyPulse{
+  0%,100%{opacity:0.65;filter:drop-shadow(0 0 0px rgba(200,168,75,0));}
+  50%{opacity:1;filter:drop-shadow(0 0 9px rgba(200,168,75,0.45));}
+}
+
+
+/* ── MINI SLOT ── */
+.slot-mini{width:48px;height:72px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+
+/* ── PICKER ── */
+#picker{position:fixed;top:0;bottom:0;left:50%;-webkit-transform:translateX(-50%);transform:translateX(-50%);width:100%;max-width:430px;z-index:500;background:#000 url('/assets/img/banquillo.webp') 0px bottom / 1300px auto no-repeat;display:none;flex-direction:column;align-items:center;}
+#picker.open{display:flex;}
+.picker-header{flex-shrink:0;width:100%;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(0,0,0,0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);}
+#picker-pos-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#f0cc60;letter-spacing:3px;}
+#picker-counter{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);letter-spacing:1px;}
+.picker-carousel{flex:1;width:100%;position:relative;overflow:hidden;display:flex;align-items:center;touch-action:pan-x;background:transparent;}
+.carousel-track{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;gap:16px;-webkit-transition:-webkit-transform 0.3s cubic-bezier(0.4,0,0.2,1);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);will-change:transform;}
+.carousel-item{flex-shrink:0;width:200px;height:305px;perspective:800px;-webkit-transition:opacity 0.3s ease,transform 0.3s ease;transition:opacity 0.3s ease,transform 0.3s ease;cursor:pointer;position:relative;overflow:visible;}
+.ci-info{position:absolute;top:100%;left:0;right:0;padding-top:10px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;}
+.ci-info-name{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:26px;color:#fff;letter-spacing:0.5px;text-align:center;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,0.8);}
+.ci-info-sel{font-family:'Barlow Condensed',sans-serif;font-size:15px;color:rgba(255,255,255,0.85);letter-spacing:1.5px;text-align:center;text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.7);}
+.ci-info-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);letter-spacing:0.5px;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,0.7);white-space:nowrap;}
+.picker-footer{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:12px 0 calc(56px + 14px);background:transparent;}
+.picker-btn-choose{font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:3px;color:#1a1000;background:#f0cc60;border:none;border-radius:6px;padding:12px 48px;cursor:pointer;}
+
+/* ── FLIP CARTA 3D ── */
+.card-flipper{width:100%;height:100%;position:relative;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-transition:-webkit-transform 0.55s cubic-bezier(0.4,0,0.2,1);transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);}
+.card-flipper.revealed{-webkit-transform:rotateY(-180deg);transform:rotateY(-180deg);}
+.card-face{position:absolute;top:0;left:0;width:100%;height:100%;-webkit-backface-visibility:hidden;backface-visibility:hidden;}
+.card-face.front{-webkit-transform:rotateY(-180deg);transform:rotateY(-180deg);}
+.card-face.back{-webkit-transform:rotateY(0deg);transform:rotateY(0deg);}
+.ci-info{opacity:0;-webkit-transition:opacity 0.3s ease;transition:opacity 0.3s ease;}
+.ci-info.revealed{opacity:1;}
+
+/* ── CONFIRM ── */
+#picker-confirm{position:fixed;top:0;bottom:0;left:50%;-webkit-transform:translateX(-50%);transform:translateX(-50%);width:100%;max-width:430px;z-index:501;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;}
+#picker-confirm.open{display:flex;}
+.confirm-card-wrap{width:160px;height:244px;}
+.confirm-info{text-align:center;}
+.confirm-info-name{display:block;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:1.8rem;color:#fff;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.confirm-info-sub{display:block;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:2px;margin-top:4px;}
+.confirm-btns{display:flex;gap:12px;}
+.btn-confirm-ok{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:#1a1000;background:#f0cc60;border:none;border-radius:6px;padding:12px 32px;cursor:pointer;}
+.btn-confirm-cancel{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 32px;cursor:pointer;}
+
+/* ── iPAD LAYOUT ── */
+@media (min-width:768px) {
+  .app                { max-width:100%; }
+  .lp-header          { max-width:100%; }
+  .slot               { width:var(--slot-w,100px); height:var(--slot-h,152px); }
+  #picker             { max-width:100%; }
+  #picker-confirm     { max-width:100%; }
+  .carousel-item      { width:260px; height:395px; }
+  .confirm-card-wrap  { width:220px; height:335px; }
+  #row-dl, #row-mc,
+  #row-df, #row-pt    { padding:0 28px; }
+}
+/* ── DRAG SWAP ── */
+.slot.drag-target{border-radius:4px;animation:dragTargetPulse 0.8s ease-in-out infinite;}
+@keyframes dragTargetPulse{0%,100%{box-shadow:0 0 0 2px rgba(240,204,96,0.3);}50%{box-shadow:0 0 0 2px rgba(240,204,96,0.85),0 0 8px rgba(240,204,96,0.35);}}
+#drag-ghost{position:fixed;pointer-events:none;z-index:600;transform:translate(-50%,-50%) scale(1.1);opacity:0.88;}
+.slot img,#drag-ghost img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+
+/* ── JORNADA BLOQUEADA ── */
+.btn-guardar.locked{background:rgba(26,16,0,0.06);color:rgba(26,16,0,0.35);border:1px solid rgba(26,16,0,0.10);cursor:default;}
+.btn-guardar.over-limit{background:#ef4444;color:#fff;cursor:not-allowed;}
+.btn-guardar.practica{background:rgba(200,168,75,0.1);color:rgba(200,168,75,0.55);border:1px solid rgba(200,168,75,0.2);cursor:default;}
+#modo-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:3px 12px;border-radius:8px;z-index:20;white-space:nowrap;display:none;}
+#modo-banner.practica{background:rgba(200,168,75,0.1);color:rgba(200,168,75,0.7);border:1px solid rgba(200,168,75,0.2);}
+#modo-banner.real{background:rgba(34,197,94,0.12);color:rgba(34,197,94,0.85);border:1px solid rgba(34,197,94,0.3);}
+#picker.locked .picker-btn-choose{display:none;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="lp-header">
+    <a href="/app/" class="lp-header-logo">
+      <img src="/assets/img/divieto-texto.webp" class="lp-logo-divieto" alt="DIVIETO">
+    </a>
+    <div class="lp-header-right">
+      <button class="lp-bell" aria-label="Notificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <div class="avatar" id="avatar-btn"><img src="/assets/img/divieto-x.webp" style="width:32px;height:32px;object-fit:contain;pointer-events:none;" alt=""></div>
+      <div id="user-menu" class="umenu">
+        <div class="umenu-item" onclick="window.location.href='/app/reglamento/'">📖 Reglamento</div>
+        <hr class="umenu-sep">
+        <div class="umenu-item umenu-danger" id="umenu-logout">→ Cerrar sesión</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CAMPO -->
+  <div class="field-wrap">
+    <img class="field-svg" src="/assets/img/campo-draft.webp" alt="">
+
+    <!-- overall badge -->
+    <div id="overall-badge">
+      <span class="overall-badge-label">OVERALL</span>
+      <span id="overall-counter">0</span>
+    </div>
+    <!-- leyenda química -->
+    <div id="chem-legend" style="position:absolute;left:9%;bottom:12%;z-index:15;display:flex;flex-direction:column;gap:5px;">
+      <div style="display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,0.7);">
+        <span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.8);flex-shrink:0;"></span>
+        <span>+50% &nbsp;+2 OVR</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,0.7);">
+        <span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,0.8);flex-shrink:0;"></span>
+        <span>+25% &nbsp;+1 OVR</span>
+      </div>
+    </div>
+    <!-- reset button -->
+    <button id="btn-reset">RESET</button>
+    <div id="modo-banner"></div>
+
+    <div class="formation">
+      <div class="row" id="row-dl"></div>
+      <div class="row" id="row-mc"></div>
+      <div class="row" id="row-df"></div>
+      <div class="row" id="row-pt"></div>
+    </div>
+    <!-- chemistry lines overlay -->
+  </div>
+
+  <!-- GUARDAR ALINEACIÓN -->
+  <div class="guardar-section">
+    <button class="btn-guardar" id="btn-guardar">GUARDAR ALINEACIÓN</button>
+    <span class="guardar-estado" id="guardar-estado">0 / 11 titulares</span>
+  </div>
+
+  <!-- SQUAD LIST -->
+  <div id="squad-list"></div>
+
+  <!-- PICKER -->
+  <div id="picker">
+    <div class="picker-header">
+      <span id="picker-pos-label">ELIGE TU DL</span>
+      <span id="picker-counter">1 / 5</span>
+      <button id="picker-close" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:rgba(255,255,255,0.7);background:transparent;border:none;cursor:pointer;padding:4px 0 4px 8px;line-height:1;">✕</button>
+    </div>
+    <div class="picker-carousel" id="picker-carousel">
+      <div class="carousel-track" id="carousel-track"></div>
+    </div>
+    <div class="picker-footer">
+      <button class="picker-btn-choose" id="picker-btn-choose">ELEGIR</button>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="guardar-toast"></div>
+
+  <!-- CONFIRM -->
+  <div id="picker-confirm">
+    <div class="confirm-card-wrap" id="confirm-card-preview"></div>
+    <div class="confirm-info">
+      <span class="confirm-info-name" id="confirm-name"></span>
+      <span class="confirm-info-sub">¿Confirmas esta elección?</span>
+    </div>
+    <div class="confirm-btns">
+      <button class="btn-confirm-ok" id="btn-confirm-ok">ELEGIR</button>
+      <button class="btn-confirm-cancel" id="btn-confirm-cancel">CANCELAR</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const FORMACIONES = {
+  '4-4-2': { df:4, mc:4, dl:2 },
+  '4-3-3': { df:4, mc:3, dl:3 },
+  '3-4-3': { df:3, mc:4, dl:3 },
+};
+
+const params = new URLSearchParams(window.location.search);
+const formKey = params.get('formacion') || '4-3-3';
+const form = FORMACIONES[formKey] || FORMACIONES['4-3-3'];
+
+// ── SISTEMA DE CARRUSEL PONDERADO ─────────────────────────────────────────
+
+// Pool completo con teamRank pre-calculado — lazy init (jugadores.js?v=12 carga después)
+let _pool = null;
+function getPool() {
+  if (_pool) return _pool;
+  _pool = JUGADORES_MUNDIAL.flatMap(equipo => {
+    const sorted = [...equipo.jugadores].filter(j => !j.suplente).sort((a, b) => b.overall - a.overall);
+    return sorted.map((j, idx) => ({
+      id:        j.nombre,
+      nombre:    j.nombre,
+      overall:   j.overall,
+      tier:      j.tier,
+      posDraft:  j.posDraft,
+      club:      j.club,
+      seleccion: equipo.seleccion,
+      teamRank:  idx + 1,
+      isIf:      false,
+      foto:      FOTOS_JUGADORES[j.nombre] || null,
+    }));
+  });
+  return _pool;
+}
+
+// Estado del draft — persiste toda la sesión
+const draftState = {
+  selectedCards:    new Set(),  // ids elegidos → no pueden volver a otro carrusel
+  seenCards:        new Set(),  // ids mostrados → penalizados si vuelven (peso ×0.25)
+  carouselPlayers:  new Set(),  // ids asignados a algún carrusel → excluidos de nuevos carruseles
+  teamAppearances:  {},         // seleccion → nº cartas mostradas
+  teamOverallStats: {},         // seleccion → { sum, count } de overalls mostrados
+  globalOverallSum: 0,
+  globalOverallCount: 0,
+};
+
+// Caché de carruseles por slot: slotEl → Card[]  (fijado en la primera apertura)
+const slotCarousels = new Map();
+
+// Carta guardada por slot: slotEl → card object
+const slotCards = new Map();
+
+// Lista de slots titulares (se llena al crear slots)
+const titularSlots = [];
+
+function getFactorRank(rank) {
+  if (rank <= 5)  return 1.00;
+  if (rank <= 11) return 0.80;
+  if (rank <= 16) return 0.65;
+  if (rank <= 21) return 0.50;
+  return 0.35;
+}
+
+function getFactorOverall(overall) {
+  if (overall >= 85) return 1.00;
+  if (overall >= 78) return 0.90;
+  if (overall >= 70) return 0.75;
+  if (overall >= 65) return 0.55;
+  return 0.35;
+}
+
+function getPesoCarta(tier, isIf) {
+  if (isIf)                     return 1.10;
+  const metal = tier.startsWith('oro') ? 1.00 : tier.startsWith('plata') ? 0.80 : 0.60;
+  const shine = tier.endsWith('brillante') ? 1.00 : 0.35;
+  return metal * shine;
+}
+
+function getFactorSeleccion(sel) {
+  const n = draftState.teamAppearances[sel] || 0;
+  return 1 / (1 + 0.20 * n);
+}
+
+function getFactorNivel(sel) {
+  const stats = draftState.teamOverallStats[sel];
+  const globalAvg = draftState.globalOverallCount > 0
+    ? draftState.globalOverallSum / draftState.globalOverallCount : 0;
+  if (!stats || stats.count === 0 || globalAvg === 0) return 1;
+  const exceso = Math.max(0, stats.sum / stats.count - globalAvg);
+  return 1 / (1 + 0.03 * exceso);
+}
+
+function getFactorRepeticion(id) {
+  if (draftState.selectedCards.has(id)) return 0;
+  return 1.00;
+}
+
+function getPesoTotal(card) {
+  const factorLiga = (card.posDraft === 'DF' && typeof CLUB_LIGA !== 'undefined' && CLUB_LIGA[card.club] === 'PREMIER LEAGUE.webp') ? 0.80 : 1.00;
+  return getFactorRank(card.teamRank)
+       * getFactorOverall(card.overall)
+       * getPesoCarta(card.tier, card.isIf)
+       * getFactorSeleccion(card.seleccion)
+       * getFactorNivel(card.seleccion)
+       * getFactorRepeticion(card.id)
+       * factorLiga;
+}
+
+function weightedPick(eligible) {
+  const entries = eligible.map(c => ({ c, w: getPesoTotal(c) })).filter(e => e.w > 0);
+  if (!entries.length) return null;
+  const total = entries.reduce((s, e) => s + e.w, 0);
+  let roll = Math.random() * total;
+  for (const e of entries) { roll -= e.w; if (roll <= 0) return e.c; }
+  return entries[entries.length - 1].c;
+}
+
+function buildCarousel(pos, size = 5) {
+  const eliminados = window._equiposEliminados || new Set();
+  const pool = getPool().filter(c =>
+    c.posDraft === pos &&
+    !draftState.selectedCards.has(c.id) &&
+    !draftState.carouselPlayers.has(c.id) &&
+    !eliminados.has(c.seleccion) &&
+    !(c.tier === 'bronce-mate') &&
+    !(c.tier.endsWith('mate') && c.overall < 70)
+  );
+  const result = [];
+  const usedIds = new Set();
+
+  if (pos === 'PT') {
+    // Porteros: aleatorio puro entre brillantes únicamente (titulares = cartas brillantes)
+    const brillantes = pool.filter(c => c.tier.endsWith('brillante'));
+    const src = brillantes.length >= size ? brillantes : pool; // fallback a todo el pool si no hay suficientes brillantes
+    const shuffled = [...src].sort(() => Math.random() - 0.5);
+    for (const card of shuffled.slice(0, size)) {
+      result.push(card);
+      usedIds.add(card.id);
+    }
+  } else {
+    while (result.length < size && pool.length > 0) {
+      const eligible = pool.filter(c => !usedIds.has(c.id));
+      if (!eligible.length) break;
+      const picked = weightedPick(eligible);
+      if (!picked) break;
+      result.push(picked);
+      usedIds.add(picked.id);
+    }
+  }
+
+  // Registrar las cartas generadas: fijadas en este carrusel
+  for (const card of result) {
+    draftState.seenCards.add(card.id);
+    draftState.carouselPlayers.add(card.id);
+    draftState.teamAppearances[card.seleccion] = (draftState.teamAppearances[card.seleccion] || 0) + 1;
+    if (!draftState.teamOverallStats[card.seleccion])
+      draftState.teamOverallStats[card.seleccion] = { sum: 0, count: 0 };
+    draftState.teamOverallStats[card.seleccion].sum   += card.overall;
+    draftState.teamOverallStats[card.seleccion].count += 1;
+    draftState.globalOverallSum   += card.overall;
+    draftState.globalOverallCount += 1;
+  }
+
+  return result;
+}
+
+
+
+
+
+
+const TIER_MULT = {
+  'oro-if': 1,          'oro-brillante': 1,    'oro-mate': 1,
+  'plata-if': 1.25,     'plata-brillante': 1.25, 'plata-mate': 1.25,
+  'bronce-if': 1.5,     'bronce-brillante': 1.5, 'bronce-mate': 1.5,
+};
+
+// ── CHEMISTRY ─────────────────────────────────────────────────────────────
+const CHEM_CONNS = {
+  '4-4-2': [
+    ['T-DL-0','T-DL-1'],
+    ['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],['T-MC-2','T-MC-3'],
+    ['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],['T-DF-2','T-DF-3'],
+    ['T-DL-0','T-MC-0'],['T-DL-0','T-MC-1'],['T-DL-1','T-MC-2'],['T-DL-1','T-MC-3'],
+    ['T-MC-0','T-DF-0'],['T-MC-1','T-DF-1'],
+    ['T-MC-2','T-DF-2'],['T-MC-3','T-DF-3'],
+    ['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0'],
+  ],
+  '4-3-3': [
+    ['T-DL-0','T-DL-1'],['T-DL-1','T-DL-2'],
+    ['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],
+    ['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],['T-DF-2','T-DF-3'],
+    ['T-DL-0','T-MC-0'],['T-DL-1','T-MC-1'],['T-DL-2','T-MC-2'],
+    ['T-MC-0','T-DF-0'],['T-MC-0','T-DF-1'],
+    ['T-MC-1','T-DF-1'],['T-MC-1','T-DF-2'],
+    ['T-MC-2','T-DF-2'],['T-MC-2','T-DF-3'],
+    ['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0'],
+  ],
+  '3-4-3': [
+    // horizontal
+    ['T-DL-0','T-DL-1'],['T-DL-1','T-DL-2'],
+    ['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],['T-MC-2','T-MC-3'],
+    ['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],
+    // DL→MC: laterales con su MC lateral, centro con los 2 MC centrales
+    ['T-DL-0','T-MC-0'],
+    ['T-DL-1','T-MC-1'],['T-DL-1','T-MC-2'],
+    ['T-DL-2','T-MC-3'],
+    // MC→DF: MC laterales con su DF lateral, MC centrales con DF centro
+    ['T-MC-0','T-DF-0'],
+    ['T-MC-1','T-DF-1'],['T-MC-2','T-DF-1'],
+    ['T-MC-3','T-DF-2'],
+    // DF→PT
+    ['T-DF-0','T-PT-0'],['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0'],
+  ],
+};
+
+const chemOptMode = 'A';
+
+function chemScore(k1, k2) {
+  const c1 = slotCards.get(k1), c2 = slotCards.get(k2);
+  if (!c1 || !c2) return -1;
+  if (c1.club && c2.club && c1.club === c2.club) return 2;
+  const liga1 = (typeof CLUB_LIGA !== 'undefined') ? CLUB_LIGA[c1.club] : null;
+  const liga2 = (typeof CLUB_LIGA !== 'undefined') ? CLUB_LIGA[c2.club] : null;
+  let f = 0;
+  if (c1.seleccion && c1.seleccion === c2.seleccion) f++;
+  if (liga1 && liga2 && liga1 === liga2) f++;
+  return Math.min(f, 2);
+}
+
+function getChemMult(slotKey) {
+  const conns = (CHEM_CONNS[formKey] || []).filter(([a,b]) => a===slotKey || b===slotKey);
+  if (conns.length === 0) return 1;
+  let total = 0;
+  for (const [a,b] of conns) {
+    const s = chemScore(a,b);
+    if (s > 0) total += s;
+  }
+  if (total >= conns.length) return 1.5;
+  if (total >= 1) return 1.25;
+  return 1;
+}
+
+function getChemSources(slotKey) {
+  const card = slotCards.get(slotKey);
+  if (!card || getChemMult(slotKey) <= 1) return [];
+  const conns = (CHEM_CONNS[formKey] || []).filter(([a,b]) => a===slotKey || b===slotKey);
+  let hasSel = false, hasLiga = false, hasClub = false;
+  for (const [a,b] of conns) {
+    const c1 = slotCards.get(a), c2 = slotCards.get(b);
+    if (!c1 || !c2 || chemScore(a,b) <= 0) continue;
+    if (c1.club && c2.club && c1.club === c2.club) { hasClub = true; hasLiga = true; }
+    const l1 = typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[c1.club] : null;
+    const l2 = typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[c2.club] : null;
+    if (l1 && l2 && l1 === l2) hasLiga = true;
+    if (c1.seleccion && c1.seleccion === c2.seleccion) hasSel = true;
+  }
+  const imgs = [];
+  if (hasSel) { const f = typeof ESCUDOS_SEL !== 'undefined' ? ESCUDOS_SEL[card.seleccion] : null; if (f) imgs.push('/assets/img/escudos/selecciones/' + f); }
+  if (hasLiga) { const f = typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[card.club] : null; if (f) imgs.push('/assets/img/escudos/ligas/' + f); }
+  if (hasClub) { const f = typeof CLUB_ESCUDO !== 'undefined' ? CLUB_ESCUDO[card.club] : null; if (f) imgs.push('/assets/img/escudos/' + f); }
+  return imgs;
+}
+
+function updateSquadList() {
+  const list = document.getElementById('squad-list');
+  if (!list) return;
+  const posOrder = ['PT','DF','MC','DL'];
+  const sorted = [...titularSlots].sort((a,b) => {
+    const pa = posOrder.indexOf((a.dataset.slotKey||'').split('-')[1]);
+    const pb = posOrder.indexOf((b.dataset.slotKey||'').split('-')[1]);
+    if (pa !== pb) return pa - pb;
+    return parseInt((a.dataset.slotKey||'').split('-')[2]||0) - parseInt((b.dataset.slotKey||'').split('-')[2]||0);
+  });
+  let html = '';
+  let hasAny = false;
+  for (const slot of sorted) {
+    const key = slot.dataset.slotKey;
+    const card = slotCards.get(key);
+    if (!card) continue;
+    hasAny = true;
+    const m = getChemMult(key);
+    const bonus = m >= 1.5 ? '+2' : m >= 1.25 ? '+1' : '';
+    const bonusCls = m >= 1.5 ? 'green' : m >= 1.25 ? 'orange' : '';
+    const sources = getChemSources(key);
+    const selFile = typeof ESCUDOS_SEL !== 'undefined' ? ESCUDOS_SEL[card.seleccion] : null;
+    const selImg = selFile ? `<img class="squad-row-sel" src="/assets/img/escudos/selecciones/${selFile}" onerror="this.style.display='none'">` : `<span style="width:20px;height:20px;flex-shrink:0;display:inline-block;"></span>`;
+    const badges = sources.map(src => `<img class="squad-row-badge" src="${src}" onerror="this.style.display='none'">`).join('');
+    const pos = card.posDraft || '';
+    const pct = m >= 1.5 ? '+50%' : m >= 1.25 ? '+25%' : '';
+    const pctHtml = pct ? `<span class="squad-row-pct ${bonusCls}">${pct}</span>` : '';
+    html += `<div class="squad-row">${selImg}<span class="squad-row-pos">${pos}</span><div class="squad-row-name-wrap"><span class="squad-row-name">${card.nombre||''}</span>${pctHtml}</div><div class="squad-row-badges">${badges}</div><span class="squad-row-ovr">${card.overall}</span><span class="squad-row-bonus ${bonusCls}">${bonus}</span></div>`;
+  }
+  list.style.display = hasAny ? 'flex' : 'none';
+  list.innerHTML = html;
+}
+
+function renderChemistry() {
+  const fieldWrap = document.querySelector('.field-wrap');
+  if (!fieldWrap) return;
+  const fRect = fieldWrap.getBoundingClientRect();
+
+  // SVG overlay de líneas — DOM API (Safari no soporta innerHTML en SVG)
+  const NS = 'http://www.w3.org/2000/svg';
+  let chemSvg = document.getElementById('chem-svg');
+  if (!chemSvg) {
+    chemSvg = document.createElementNS(NS,'svg');
+    chemSvg.id = 'chem-svg';
+    chemSvg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;overflow:visible;shape-rendering:geometricPrecision;';
+    fieldWrap.querySelector('.formation').appendChild(chemSvg);
+  }
+  // Borrar líneas anteriores (conservar defs)
+  chemSvg.querySelectorAll('line').forEach(l => l.remove());
+
+  const COLS = {2:'#2dd55e', 1:'#fba733', 0:'#f05555'};
+  const conns = CHEM_CONNS[formKey] || [];
+  for (const [k1,k2] of conns) {
+    const c1 = slotCards.get(k1), c2 = slotCards.get(k2);
+    if (!c1 && !c2) continue; // ambos vacíos: no dibujar nada
+    const el1 = document.querySelector('[data-slot-key="'+k1+'"]');
+    const el2 = document.querySelector('[data-slot-key="'+k2+'"]');
+    if (!el1 || !el2) continue;
+    const r1 = el1.getBoundingClientRect();
+    const r2 = el2.getBoundingClientRect();
+    const x1 = Math.round(r1.left + r1.width/2  - fRect.left);
+    const y1 = Math.round(r1.top  + r1.height/2 - fRect.top);
+    const x2 = Math.round(r2.left + r2.width/2  - fRect.left);
+    const y2 = Math.round(r2.top  + r2.height/2 - fRect.top);
+    const ln = document.createElementNS(NS,'line');
+    ln.setAttribute('x1',x1); ln.setAttribute('y1',y1);
+    ln.setAttribute('x2',x2); ln.setAttribute('y2',y2);
+    ln.setAttribute('stroke-linecap','round');
+    if (!c1 || !c2) {
+      // un slot vacío: línea gris tenue punteada (conexión potencial)
+      ln.setAttribute('stroke','rgba(255,255,255,0.22)');
+      ln.setAttribute('stroke-width','2');
+      ln.setAttribute('opacity','1');
+      ln.setAttribute('stroke-dasharray','4,5');
+    } else {
+      const s = chemScore(k1,k2);
+      ln.setAttribute('stroke', COLS[s]);
+      ln.setAttribute('stroke-width','3.5');
+      ln.setAttribute('opacity', s===2 ? '1.0' : s===1 ? '0.95' : '0.70');
+      if (s === 2) ln.style.filter = 'drop-shadow(0 0 5px rgba(45,213,94,0.65)) drop-shadow(0 0 12px rgba(45,213,94,0.25))';
+      else if (s === 1) ln.style.filter = 'drop-shadow(0 0 4px rgba(251,167,51,0.60)) drop-shadow(0 0 10px rgba(251,167,51,0.22))';
+      else ln.style.filter = 'drop-shadow(0 0 3px rgba(240,85,85,0.45))';
+    }
+    chemSvg.appendChild(ln);
+  }
+
+  // Química: glow en la forma de la carta
+  titularSlots.forEach(slot => {
+    const key = slot.dataset.slotKey;
+    const card = slotCards.get(key);
+    const m = card ? getChemMult(key) : 0;
+    const shouldGreen  = m >= 1.5;
+    const shouldOrange = !shouldGreen && m >= 1.25;
+    const isGreen  = slot.classList.contains('chem-green');
+    const isOrange = slot.classList.contains('chem-orange');
+    if (shouldGreen === isGreen && shouldOrange === isOrange) return;
+    // Estado cambia: limpiar filtro sin transición, forzar reflow, luego animar entrada
+    slot.style.transition = 'none';
+    slot.classList.remove('chem-green', 'chem-orange');
+    slot.offsetHeight; // fuerza reflow para que el navegador aplique filter:none antes de re-activar la transición
+    slot.style.transition = '';
+    if (shouldGreen)       slot.classList.add('chem-green');
+    else if (shouldOrange) slot.classList.add('chem-orange');
+  });
+
+  // Actualizar contador overall con bonus química
+  updateOverallDisplay();
+  updateGuardar();
+  updateSquadList();
+}
+
+function aplicarMultiplicador(puntos, tier) {
+  const mult = TIER_MULT[tier] || 1;
+  const resultado = puntos * mult;
+  const entero = Math.floor(resultado);
+  const decimal = resultado - entero;
+  return decimal <= 0.5 ? entero : entero + 1;
+}
+
+// ── OVERALL COUNTER ───────────────────────────────────────────────────────
+// Calculado siempre desde los dataset.overall reales de los slots — nunca puede acumularse
+function getTitularOverallSum() {
+  return titularSlots.reduce((s, slot) => s + (parseInt(slot.dataset.overall) || 0), 0);
+}
+
+function getChemBonus() {
+  let bonus = 0;
+  for (const slot of titularSlots) {
+    const key = slot.dataset.slotKey;
+    if (!slotCards.has(key)) continue;
+    const m = getChemMult(key);
+    if (m >= 1.5) bonus += 2;
+    else if (m >= 1.25) bonus += 1;
+  }
+  return bonus;
+}
+
+function updateOverallDisplay() {
+  const el = document.getElementById('overall-counter');
+  const badge = document.getElementById('overall-badge');
+  if (!el) return;
+  const sum = getTitularOverallSum() + getChemBonus();
+  el.textContent = sum;
+  el.classList.toggle('over', sum > 900);
+  if (badge) badge.classList.toggle('over', sum > 900);
+}
+
+function updateGuardar() {
+  const btn    = document.getElementById('btn-guardar');
+  const estado = document.getElementById('guardar-estado');
+  if (!btn || !estado) return;
+
+  // Bloqueo de emergencia por admin
+  if (_jornadaBloqueada) {
+    btn.textContent = 'DRAFT BLOQUEADO';
+    btn.disabled = true;
+    btn.className = 'btn-guardar locked';
+    btn.style.opacity = '1';
+    btn.style.cursor = 'default';
+    estado.textContent = 'Bloqueado por el administrador';
+    return;
+  }
+
+  // Modo práctica: GUARDAR visible pero sin efecto real
+  if (!_modoReal) {
+    btn.textContent = 'GUARDAR ALINEACIÓN';
+    btn.disabled = false;
+    btn.className = 'btn-guardar practica';
+    btn.style.opacity = '1';
+    btn.style.cursor = 'default';
+    if (_deadline && Date.now() >= _deadline) {
+      estado.textContent = 'Jornada en curso · modo práctica';
+    } else if (_apertura) {
+      const d = new Date(_apertura);
+      const fmt = d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Europe/Madrid' });
+      estado.textContent = 'Draft real abre el ' + fmt;
+    } else {
+      estado.textContent = 'Modo práctica · no válido para la jornada';
+    }
+    return;
+  }
+
+  // Modo real: validación activa
+  btn.className = 'btn-guardar';
+  btn.textContent = 'GUARDAR ALINEACIÓN';
+  const rellenos = titularSlots.filter(s => slotCards.has(s.dataset.slotKey)).length;
+  const total    = titularSlots.length;
+  const sum      = getTitularOverallSum() + getChemBonus();
+  const over     = sum > 900;
+  const incompleto = rellenos < total;
+  btn.disabled      = over || incompleto;
+  btn.style.opacity = '1';
+  btn.style.cursor  = (over || incompleto) ? 'not-allowed' : 'pointer';
+  btn.classList.toggle('over-limit', over);
+  if (over) {
+    estado.textContent = 'Overall supera 900 · ajusta tu alineación';
+  } else if (!incompleto) {
+    estado.textContent = _alignmentSaved
+      ? '✓ Alineación presentada · puedes modificarla'
+      : '✓ Alineación lista · pulsa para presentarla';
+  } else {
+    estado.textContent = rellenos + ' / ' + total + ' titulares';
+  }
+}
+
+// ── PERSISTENCIA ─────────────────────────────────────────────────────────
+const LS_KEY = 'lp_draft_' + formKey;
+
+function saveState() {
+  try {
+    const data = {
+      formacion: formKey,
+      jornada: _jornadaActual || null,
+      savedAt: Date.now(),
+      slotCards:    Object.fromEntries(slotCards),
+      slotCarousels: Object.fromEntries(slotCarousels),
+      selectedCards:   [...draftState.selectedCards],
+      seenCards:       [...draftState.seenCards],
+      carouselPlayers: [...draftState.carouselPlayers],
+      teamAppearances:  draftState.teamAppearances,
+      teamOverallStats: draftState.teamOverallStats,
+      globalOverallSum:   draftState.globalOverallSum,
+      globalOverallCount: draftState.globalOverallCount,
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    if (_modoReal) _alignmentSaved = false; // cambio de slot invalida la confirmación anterior
+    if (window._saveToFirestore) window._saveToFirestore(data);
+  } catch(e) { /* localStorage lleno o bloqueado */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.formacion !== formKey) return;
+    if (_jornadaActual && data.jornada && data.jornada !== _jornadaActual) {
+      localStorage.removeItem(LS_KEY);
+      return;
+    }
+
+    // Restaurar draftState
+    draftState.selectedCards   = new Set(data.selectedCards   || []);
+    draftState.seenCards       = new Set(data.seenCards       || []);
+    draftState.carouselPlayers = new Set(data.carouselPlayers || []);
+    draftState.teamAppearances  = data.teamAppearances  || {};
+    draftState.teamOverallStats = data.teamOverallStats || {};
+    draftState.globalOverallSum   = data.globalOverallSum   || 0;
+    draftState.globalOverallCount = data.globalOverallCount || 0;
+
+    // Restaurar carruseles cacheados
+    for (const [key, cards] of Object.entries(data.slotCarousels || {})) {
+      slotCarousels.set(key, cards);
+    }
+
+    // Restaurar cartas en slots y pintarlas
+    for (const [key, card] of Object.entries(data.slotCards || {})) {
+      slotCards.set(key, card);
+      const slotEl = document.querySelector('[data-slot-key="' + key + '"]');
+      if (!slotEl) continue;
+      slotEl.innerHTML = miniCardSVG({
+        nombre:    card.nombre,
+        overall:   card.overall,
+        tier:      card.tier,
+        foto:      card.foto,
+        posicion:  card.posDraft,
+        seleccion: card.seleccion,
+        club:      card.club,
+      }, CARD_W, CARD_H);
+      slotEl.dataset.slotKey    = key;
+      slotEl.dataset.selectedId = card.id;
+      slotEl.dataset.overall    = card.overall;
+    }
+
+    updateOverallDisplay();
+    updateGuardar();
+    requestAnimationFrame(renderChemistry);
+  } catch(e) { /* JSON inválido u otro error */ }
+}
+
+
+
+
+
+// ── CARD DIMENSIONS (responsive) ─────────────────────────────────────────
+const IS_IPAD = window.innerWidth >= 768;
+const CARD_W      = IS_IPAD ? Math.min(120, Math.floor((window.innerWidth - 96) / 4)) : 65;
+const CARD_H      = IS_IPAD ? Math.round(CARD_W * 1.52) : 99;
+if (IS_IPAD) {
+  document.documentElement.style.setProperty('--slot-w', CARD_W + 'px');
+  document.documentElement.style.setProperty('--slot-h', CARD_H + 'px');
+}
+
+// ── DRAG SWAP ─────────────────────────────────────────────────────────────
+const dragState = { active: false, sourceSlot: null, ghost: null };
+
+const EMPTY_SLOT_HTML = `<img src="/assets/img/carta-vacia.webp" class="empty-slot-img" alt="">`;
+
+function renderSlotContent(slotEl, card) {
+  const key = slotEl.dataset.slotKey;
+  if (card) {
+    slotEl.innerHTML = miniCardSVG({
+      nombre:    card.nombre,
+      overall:   card.overall,
+      tier:      card.tier,
+      foto:      card.foto,
+      posicion:  card.posDraft,
+      seleccion: card.seleccion,
+      club:      card.club,
+    }, CARD_W, CARD_H);
+    slotEl.dataset.selectedId = card.id;
+    slotEl.dataset.overall    = card.overall;
+  } else {
+    slotEl.innerHTML = EMPTY_SLOT_HTML;
+    delete slotEl.dataset.selectedId;
+    delete slotEl.dataset.overall;
+  }
+  slotEl.dataset.slotKey = key;
+}
+
+function startDrag(slotEl, x, y) {
+  if (dragState.active) return;
+  if (_jornadaBloqueada) return;
+  const card = slotCards.get(slotEl.dataset.slotKey);
+  if (!card) return;
+  dragState.active = true;
+  dragState.sourceSlot = slotEl;
+  const ghost = document.createElement('div');
+  ghost.id = 'drag-ghost';
+  ghost.style.cssText = `width:${CARD_W}px;height:${CARD_H}px;left:${x}px;top:${y}px;`;
+  ghost.innerHTML = miniCardSVG({ nombre:card.nombre, overall:card.overall, tier:card.tier, foto:card.foto, posicion:card.posDraft, seleccion:card.seleccion, club:card.club }, CARD_W, CARD_H);
+  document.body.appendChild(ghost);
+  dragState.ghost = ghost;
+  slotEl.style.opacity = '0.35';
+  const pos = slotEl.dataset.slotKey.split('-')[1];
+  titularSlots.forEach(s => { if (s !== slotEl && s.dataset.slotKey.split('-')[1] === pos) s.classList.add('drag-target'); });
+}
+
+function moveDrag(x, y) {
+  if (!dragState.ghost) return;
+  dragState.ghost.style.left = x + 'px';
+  dragState.ghost.style.top  = y + 'px';
+}
+
+function endDrag(x, y) {
+  if (dragState.ghost) { dragState.ghost.style.display = 'none'; }
+  const el = document.elementFromPoint(x, y);
+  if (dragState.ghost) { dragState.ghost.remove(); dragState.ghost = null; }
+  if (dragState.sourceSlot) dragState.sourceSlot.style.opacity = '';
+  titularSlots.forEach(s => s.classList.remove('drag-target'));
+  const targetSlot = el && el.closest('.slot');
+  if (targetSlot && targetSlot !== dragState.sourceSlot) {
+    const srcPos = dragState.sourceSlot.dataset.slotKey.split('-')[1];
+    const tgtPos = targetSlot.dataset.slotKey.split('-')[1];
+    if (srcPos === tgtPos) swapSlots(dragState.sourceSlot, targetSlot);
+  }
+  dragState.active = false;
+  dragState.sourceSlot = null;
+}
+
+function cancelDrag() {
+  if (dragState.ghost) { dragState.ghost.remove(); dragState.ghost = null; }
+  if (dragState.sourceSlot) dragState.sourceSlot.style.opacity = '';
+  titularSlots.forEach(s => s.classList.remove('drag-target'));
+  dragState.active = false;
+  dragState.sourceSlot = null;
+}
+
+function swapSlots(slotA, slotB) {
+  const keyA = slotA.dataset.slotKey;
+  const keyB = slotB.dataset.slotKey;
+  const cardA = slotCards.get(keyA);
+  const cardB = slotCards.get(keyB);
+  if (cardB) slotCards.set(keyA, cardB); else slotCards.delete(keyA);
+  if (cardA) slotCards.set(keyB, cardA); else slotCards.delete(keyB);
+  const carA = slotCarousels.get(keyA);
+  const carB = slotCarousels.get(keyB);
+  if (carB) slotCarousels.set(keyA, carB); else slotCarousels.delete(keyA);
+  if (carA) slotCarousels.set(keyB, carA); else slotCarousels.delete(keyB);
+  renderSlotContent(slotA, cardB);
+  renderSlotContent(slotB, cardA);
+  updateOverallDisplay();
+  updateGuardar();
+  saveState();
+  requestAnimationFrame(renderChemistry);
+}
+
+
+function makeSlot(pos, mini, key) {
+  const div = document.createElement('div');
+  div.className = mini ? 'slot-mini' : 'slot';
+  div.dataset.slotKey = key;
+  div.innerHTML = `<img src="/assets/img/carta-vacia.webp" class="empty-slot-img" alt="">`;
+  if (!mini) {
+    let _dragStartX = 0, _dragStartY = 0, _isDragging = false;
+    div.addEventListener('touchstart', e => {
+      _isDragging = false;
+      _dragStartX = e.touches[0].clientX;
+      _dragStartY = e.touches[0].clientY;
+    }, {passive:true});
+    div.addEventListener('touchmove', e => {
+      if (_isDragging) { e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); return; }
+      const dx = e.touches[0].clientX - _dragStartX;
+      const dy = e.touches[0].clientY - _dragStartY;
+      if (Math.sqrt(dx*dx + dy*dy) > 12 && slotCards.has(div.dataset.slotKey)) {
+        _isDragging = true;
+        startDrag(div, e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+      }
+    }, {passive:false});
+    div.addEventListener('touchend', e => {
+      if (_isDragging) { _isDragging = false; e.preventDefault(); endDrag(e.changedTouches[0].clientX, e.changedTouches[0].clientY); return; }
+      e.preventDefault();
+      openPicker(div, pos);
+    });
+    div.addEventListener('touchcancel', () => { if (_isDragging) { _isDragging = false; cancelDrag(); } });
+    div.addEventListener('click', () => openPicker(div, pos));
+  } else {
+    div.addEventListener('touchend', e => { e.preventDefault(); openPicker(div, pos); });
+    div.addEventListener('click', () => openPicker(div, pos));
+  }
+  return div;
+}
+
+// Titulares — dinámico según formación
+[['row-dl', 'DL', form.dl], ['row-mc', 'MC', form.mc], ['row-df', 'DF', form.df], ['row-pt', 'PT', 1]]
+.forEach(([id, pos, count]) => {
+  const row = document.getElementById(id);
+  row.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const slot = makeSlot(pos, false, 'T-' + pos + '-' + i);
+    titularSlots.push(slot);
+    row.appendChild(slot);
+  }
+});
+
+// Restaurar estado guardado tras cargar todos los scripts externos (cartas.js, etc.)
+document.addEventListener('DOMContentLoaded', loadState);
+
+// Exponer función para que el módulo Firebase pueda aplicar estado remoto
+window._applyFirestoreState = function(data) {
+  try {
+    if (!data || data.formacion !== formKey) return;
+    if (_jornadaActual && data.jornada && data.jornada !== _jornadaActual) return;
+    // Solo aplicar si Firestore es más reciente que localStorage
+    // (evita que Firestore sobreescriba progreso local no sincronizado aún)
+    const localRaw = localStorage.getItem(LS_KEY);
+    if (localRaw) {
+      try {
+        const local = JSON.parse(localRaw);
+        if ((local.savedAt || 0) >= (data.savedAt || 0)) return;
+      } catch(e) {}
+    }
+    // Aplicar igual que loadState pero sin leer localStorage
+    draftState.selectedCards   = new Set(data.selectedCards   || []);
+    draftState.seenCards       = new Set(data.seenCards       || []);
+    draftState.carouselPlayers = new Set(data.carouselPlayers || []);
+    draftState.teamAppearances  = data.teamAppearances  || {};
+    draftState.teamOverallStats = data.teamOverallStats || {};
+    draftState.globalOverallSum   = data.globalOverallSum   || 0;
+    draftState.globalOverallCount = data.globalOverallCount || 0;
+
+    slotCarousels.clear();
+    for (const [key, cards] of Object.entries(data.slotCarousels || {})) {
+      slotCarousels.set(key, cards);
+    }
+
+    slotCards.clear();
+    titularSlots.forEach(s => {
+      s.innerHTML = EMPTY_SLOT_HTML;
+      delete s.dataset.selectedId;
+      delete s.dataset.overall;
+    });
+    document.querySelectorAll('[data-slot-key^="S-"]').forEach(s => {
+      s.innerHTML = EMPTY_SLOT_HTML;
+      delete s.dataset.selectedId;
+      delete s.dataset.overall;
+    });
+
+    for (const [key, card] of Object.entries(data.slotCards || {})) {
+      slotCards.set(key, card);
+      const slotEl = document.querySelector('[data-slot-key="' + key + '"]');
+      if (!slotEl) continue;
+      slotEl.innerHTML = miniCardSVG({
+        nombre:    card.nombre,
+        overall:   card.overall,
+        tier:      card.tier,
+        foto:      card.foto,
+        posicion:  card.posDraft,
+        seleccion: card.seleccion,
+        club:      card.club,
+      }, CARD_W, CARD_H);
+      slotEl.dataset.slotKey    = key;
+      slotEl.dataset.selectedId = card.id;
+      slotEl.dataset.overall    = card.overall;
+    }
+
+    // Sincronizar localStorage con los datos de Firestore
+    try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+    updateOverallDisplay();
+    updateGuardar();
+    requestAnimationFrame(renderChemistry);
+  } catch(e) { console.error('[Draft] _applyFirestoreState error:', e); }
+};
+
+// Reset draft
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (_modoReal) return; // botón oculto en modo real, por seguridad
+  if (!confirm('¿Reiniciar el draft? Se perderá el progreso de práctica.')) return;
+  _hardReset(false); // no tocar la alineación confirmada en Firestore
+  closePicker();
+  window.location.replace('/app/draft/formacion');
+});
+
+// ── AVISO AL SALIR SIN GUARDAR ────────────────────────────────────────────
+let _alignmentSaved = false;
+let _jornadaBloqueada = false; // bloqueo de emergencia (admin)
+let _modoReal = false;         // apertura ≤ ahora < deadline: guardar cuenta
+let _apertura = null;          // timestamp ms
+let _deadline = null;          // timestamp ms
+let _jornadaActual = null;
+
+// Llamado desde el módulo Firebase cuando llega config/jornada
+window._setSchedule = function(apertura, deadline) {
+  _apertura = apertura;
+  _deadline = deadline;
+  clearTimeout(window._aperturaTimer);
+  clearTimeout(window._deadlineTimer);
+  const now = Date.now();
+  if (apertura && now < apertura) {
+    window._aperturaTimer = setTimeout(() => _recalcModo(), apertura - now);
+  }
+  if (deadline && now < deadline) {
+    window._deadlineTimer = setTimeout(() => {
+      _recalcModo();
+      const toast = document.getElementById('guardar-toast');
+      if (toast) {
+        toast.className = 'err';
+        toast.textContent = 'DRAFT CERRADO · Tu alineación está guardada';
+        toast.style.display = 'block';
+        clearTimeout(document._guardarT);
+        document._guardarT = setTimeout(() => { toast.style.display = 'none'; }, 4000);
+      }
+    }, deadline - now);
+  }
+  _recalcModo();
+};
+
+function _recalcModo() {
+  const now = Date.now();
+  _modoReal = !!(_apertura && _deadline && now >= _apertura && now < _deadline);
+  window._modoReal = _modoReal;
+  const btnReset = document.getElementById('btn-reset');
+  const banner   = document.getElementById('modo-banner');
+  if (btnReset) btnReset.style.display = _modoReal ? 'none' : '';
+  if (banner) {
+    if (_apertura || _jornadaActual) {
+      banner.style.display = '';
+      if (_modoReal) {
+        banner.className = 'real';
+        banner.textContent = '⬤ DRAFT REAL ACTIVO';
+      } else {
+        banner.className = 'practica';
+        banner.textContent = 'MODO PRÁCTICA';
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+  updateGuardar();
+}
+
+function _hardReset(clearFirestore) {
+  draftState.selectedCards.clear();
+  draftState.seenCards.clear();
+  draftState.carouselPlayers.clear();
+  draftState.teamAppearances = {};
+  draftState.teamOverallStats = {};
+  draftState.globalOverallSum = 0;
+  draftState.globalOverallCount = 0;
+  slotCarousels.clear();
+  slotCards.clear();
+  _pool = null;
+  titularSlots.length = 0;
+  localStorage.removeItem(LS_KEY);
+  if (clearFirestore && window._clearFirestore) window._clearFirestore();
+  [['row-dl', 'DL', form.dl], ['row-mc', 'MC', form.mc], ['row-df', 'DF', form.df], ['row-pt', 'PT', 1]]
+  .forEach(([id, pos, count]) => {
+    const row = document.getElementById(id);
+    row.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const slot = makeSlot(pos, false, 'T-' + pos + '-' + i);
+      titularSlots.push(slot);
+      row.appendChild(slot);
+    }
+  });
+  _alignmentSaved = false;
+  updateOverallDisplay();
+  updateGuardar();
+  requestAnimationFrame(renderChemistry);
+}
+
+// Intercepta clicks en la barra de navegación inferior
+document.addEventListener('click', function(e) {
+  const navItem = e.target.closest('.nav-item');
+  if (!navItem) return;
+  if (navItem.classList.contains('active')) return;
+  if (!_modoReal || _alignmentSaved || slotCards.size === 0) return;
+  e.stopImmediatePropagation();
+  const label = navItem.querySelector('span')?.textContent || '';
+  const hrefs = { 'INICIO': '/app', 'LIGA': '/app/liga', 'DRAFT': '/app/draft', 'ANÁLISIS': '/app/analisis', 'JORNADA': '/app/jornada' };
+  const dest = hrefs[label] || '/app';
+  if (window.confirm('¿Salir sin presentar la alineación? Perderás el equipo guardado para esta jornada.')) {
+    _alignmentSaved = true;
+    window.location.href = dest;
+  }
+}, true);
+
+// Captura cierre de pestaña / navegación del navegador
+window.addEventListener('beforeunload', function(e) {
+  if (_modoReal && !_alignmentSaved && slotCards.size > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// Guardar alineación
+document.getElementById('btn-guardar').addEventListener('click', () => {
+  if (_jornadaBloqueada) return;
+
+  // Modo práctica: aviso informativo, sin guardar nada
+  if (!_modoReal) {
+    const toast = document.getElementById('guardar-toast');
+    toast.className = 'err';
+    toast.textContent = 'MODO PRÁCTICA · No válido para la jornada';
+    toast.style.display = 'block';
+    clearTimeout(document._guardarT);
+    document._guardarT = setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    return;
+  }
+
+  // Modo real: validar y presentar
+  const rellenos = titularSlots.filter(s => slotCards.has(s.dataset.slotKey)).length;
+  const sumFinal = getTitularOverallSum() + getChemBonus();
+  if (rellenos < titularSlots.length) return;
+  if (sumFinal > 900) {
+    const toast = document.getElementById('guardar-toast');
+    toast.className = 'err';
+    toast.textContent = 'OVERALL ' + sumFinal + ' · LÍMITE MÁXIMO 900';
+    toast.style.display = 'block';
+    clearTimeout(document._guardarT);
+    document._guardarT = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    return;
+  }
+
+  if (!window._saveConfirmed) return;
+  const confirmedData = {
+    formacion: formKey,
+    jornada: _jornadaActual,
+    slotCards: Object.fromEntries(slotCards),
+    overall: sumFinal,
+  };
+  window._saveConfirmed(confirmedData)
+    .then(() => {
+      _alignmentSaved = true;
+      updateGuardar();
+      const toast = document.getElementById('guardar-toast');
+      toast.className = 'ok';
+      toast.textContent = 'ALINEACIÓN PRESENTADA A LA JORNADA';
+      toast.style.display = 'block';
+      clearTimeout(document._guardarT);
+      document._guardarT = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    })
+    .catch(err => {
+      const toast = document.getElementById('guardar-toast');
+      toast.className = 'err';
+      toast.textContent = err?.code === 'permission-denied'
+        ? 'EL DRAFT YA ESTÁ CERRADO'
+        : 'ERROR AL GUARDAR · Inténtalo de nuevo';
+      toast.style.display = 'block';
+      clearTimeout(document._guardarT);
+      document._guardarT = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    });
+});
+
+// ── PICKER ──
+const pState = { slot: null, pos: null, cards: [], active: 0, startX: 0, dragging: false };
+const slotRevealed = new Map(); // slotKey → Set de índices ya revelados
+
+function openPicker(slotEl, pos) {
+  pState.slot = slotEl;
+  pState.pos = pos;
+  pState.active = 0;
+  pState.flipped = false;
+  // Carrusel fijo por slot: se genera una sola vez y se reutiliza siempre
+  const slotKey = slotEl.dataset.slotKey;
+  if (!slotCarousels.has(slotKey)) {
+    slotCarousels.set(slotKey, buildCarousel(pos));
+    saveState();
+  }
+  pState.cards = slotCarousels.get(slotKey);
+  document.getElementById('picker-pos-label').textContent = 'ELIGE TU ' + pos;
+  const track = document.getElementById('carousel-track');
+  track.innerHTML = '';
+  const alreadyChosen = slotCards.has(slotKey);
+  pState.cards.forEach((card, i) => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.dataset.index = i;
+
+    const flipper = document.createElement('div');
+    flipper.className = 'card-flipper';
+    if (alreadyChosen) flipper.classList.add('revealed');
+
+    const front = document.createElement('div');
+    front.className = 'card-face front';
+    front.innerHTML = cardSVG(card, 'p' + i);
+
+    const back = document.createElement('div');
+    back.className = 'card-face back';
+    back.innerHTML = cardBackSVG(card);
+
+    flipper.appendChild(back);
+    flipper.appendChild(front);
+    item.appendChild(flipper);
+
+    const liga = (typeof CLUB_LIGA !== 'undefined' && CLUB_LIGA[card.club])
+      ? CLUB_LIGA[card.club].replace(/\.(png|webp|jpg)$/i, '')
+      : '';
+    const _selIso = (typeof getSelIso !== 'undefined' && card.seleccion) ? getSelIso(card.seleccion) : null;
+    const _flagImg = _selIso ? '<img src="/assets/img/flags/' + _selIso + '.webp" style="width:18px;height:12px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">' : '';
+    const subText = (liga ? liga + '  ·  ' : '') + (card.club || '');
+    const subFont = subText.length > 34 ? '8px' : subText.length > 26 ? '10px' : subText.length > 20 ? '11px' : '13px';
+    const info = document.createElement('div');
+    info.className = 'ci-info' + (alreadyChosen ? ' revealed' : '');
+    info.innerHTML = '<div class="ci-info-name">' + card.nombre + '</div>'
+      + '<div class="ci-info-sel">' + _flagImg + (card.seleccion || '') + '</div>'
+      + '<div class="ci-info-sub" style="font-size:' + subFont + '">' + subText + '</div>';
+    item.appendChild(info);
+
+    track.appendChild(item);
+  });
+  const pickerEl = document.getElementById('picker');
+  pickerEl.classList.add('open');
+  requestAnimationFrame(updateCarousel);
+}
+
+
+function isActiveCardRevealed() {
+  const track = document.getElementById('carousel-track');
+  const items = track.querySelectorAll('.carousel-item');
+  const item = items[pState.active];
+  return !!(item && item.querySelector('.card-flipper')?.classList.contains('revealed'));
+}
+
+function updatePickerBtn() {
+  const btn = document.getElementById('picker-btn-choose');
+  if (!btn) return;
+  btn.style.visibility = isActiveCardRevealed() ? 'visible' : 'hidden';
+}
+
+function updateCarousel() {
+  const carousel = document.getElementById('picker-carousel');
+  const track = document.getElementById('carousel-track');
+  const picker = document.getElementById('picker');
+  const W = carousel.offsetWidth;
+  const CARD_W = 200, GAP = 16;
+  const offset = (W / 2) - (CARD_W / 2) - (pState.active * (CARD_W + GAP));
+  track.style.transform = 'translateX(' + offset + 'px)';
+  if (picker) picker.style.backgroundPositionX = (-pState.active * (CARD_W + GAP)) + 'px';
+  document.getElementById('picker-counter').textContent = (pState.active + 1) + ' / ' + pState.cards.length;
+  let activeItem = null;
+  track.querySelectorAll('.carousel-item').forEach((item, i) => {
+    const dist = Math.abs(i - pState.active);
+    item.style.transform = 'scale(' + (dist === 0 ? 1 : dist === 1 ? 0.85 : 0.75) + ')';
+    item.style.opacity = dist === 0 ? 1 : dist === 1 ? 0.6 : 0.4;
+    if (dist === 0) activeItem = item;
+  });
+  if (activeItem) setTimeout(() => flipCarouselCard(activeItem), 300);
+  updatePickerBtn();
+}
+
+// Swipe + tap
+let _touchHandled = false;
+const carouselEl = document.getElementById('picker-carousel');
+
+function flipCarouselCard(item) {
+  const flipper = item.querySelector('.card-flipper');
+  if (!flipper || flipper.classList.contains('revealed')) return;
+  flipper.classList.add('revealed');
+  const info = item.querySelector('.ci-info');
+  if (info) setTimeout(() => info.classList.add('revealed'), 420);
+  // Mostrar botón ELEGIR ahora que la carta está revelada
+  setTimeout(updatePickerBtn, 450);
+}
+
+function handleCarouselTap(target) {
+  const item = target.closest('.carousel-item');
+  if (!item) return;
+  const idx = parseInt(item.dataset.index);
+  if (idx !== pState.active) {
+    pState.active = idx;
+    updateCarousel();
+  } else {
+    flipCarouselCard(item);
+  }
+}
+
+['picker', 'picker-confirm'].forEach(id => {
+  document.getElementById(id).addEventListener('touchstart', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, {passive: false});
+  document.getElementById(id).addEventListener('gesturestart', e => {
+    e.preventDefault();
+  }, {passive: false});
+});
+
+carouselEl.addEventListener('touchstart', e => {
+  pState.startX = e.touches[0].clientX;
+  pState.dragging = true;
+}, {passive: true});
+
+carouselEl.addEventListener('touchend', e => {
+  if (!pState.dragging) return;
+  pState.dragging = false;
+  _touchHandled = true;
+  const dx = e.changedTouches[0].clientX - pState.startX;
+  if (Math.abs(dx) > 40) {
+    if (dx < 0 && pState.active < pState.cards.length - 1) pState.active++;
+    else if (dx > 0 && pState.active > 0) pState.active--;
+    updateCarousel();
+  } else {
+    handleCarouselTap(e.target);
+  }
+}, {passive: true});
+
+// Click para desktop (en móvil lo gestiona touchend)
+document.getElementById('carousel-track').addEventListener('click', e => {
+  if (_touchHandled) { _touchHandled = false; return; }
+  handleCarouselTap(e.target);
+});
+
+// Cerrar picker sin elegir
+document.getElementById('picker-close').addEventListener('click', closePicker);
+
+// ELEGIR → confirm
+document.getElementById('picker-btn-choose').addEventListener('click', () => {
+  if (_jornadaBloqueada) return;
+  const card = pState.cards[pState.active];
+  document.getElementById('confirm-name').textContent = card.nombre.toUpperCase();
+  document.getElementById('confirm-card-preview').innerHTML = cardSVG(card, 'cf');
+  document.getElementById('picker-confirm').classList.add('open');
+});
+
+// Confirm OK → update slot
+document.getElementById('btn-confirm-ok').addEventListener('click', () => {
+  const card = pState.cards[pState.active];
+  const isTitular = pState.slot && !pState.slot.classList.contains('slot-mini');
+
+  // Si el slot ya tenía una carta, quitarla de selectedCards
+  const prevId = pState.slot ? pState.slot.dataset.selectedId : null;
+  if (prevId) draftState.selectedCards.delete(prevId);
+
+  draftState.selectedCards.add(card.id);
+  if (pState.slot) {
+    pState.slot.innerHTML = miniCardSVG({
+      nombre:    card.nombre,
+      overall:   card.overall,
+      tier:      card.tier,
+      foto:      card.foto,
+      posicion:  card.posDraft,
+      seleccion: card.seleccion,
+      club:      card.club,
+    }, CARD_W, CARD_H);
+    pState.slot.dataset.selectedId = card.id;
+    if (isTitular) pState.slot.dataset.overall = card.overall;
+    slotCards.set(pState.slot.dataset.slotKey, card);
+  }
+
+  updateOverallDisplay();
+  updateGuardar();
+  saveState();
+  closePicker();
+  requestAnimationFrame(renderChemistry);
+});
+
+// Confirm Cancel → back to carousel
+document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+  document.getElementById('picker-confirm').classList.remove('open');
+});
+
+function closePicker() {
+  document.getElementById('picker').classList.remove('open');
+  document.getElementById('picker-confirm').classList.remove('open');
+}
+
+
+</script>
+<script src="/js/jugadores.js?v=12"></script>
+<script src="/js/fotos.js?v=53"></script>
+<script src="/js/ifs.js"></script>
+<script src="/js/rival.js"></script>
+<script src="/js/club_liga.js"></script>
+<script src="/js/cartas.js?v=35"></script>
+<script src="/shared/nav.js"></script>
+<script type="module">
+import { auth as _auth, db as _db } from '/js/config.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { doc, getDoc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { applyOverrides } from '/js/overrides-merge.js';
+
+// Avatar menu
+document.getElementById('avatar-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const m = document.getElementById('user-menu');
+  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', () => {
+  const m = document.getElementById('user-menu');
+  if (m) m.style.display = 'none';
+});
+document.getElementById('umenu-logout').addEventListener('click', async () => {
+  try { await signOut(_auth); } catch(e) {}
+  window.location.href = '/';
+});
+
+let _uid = null;
+let _saveTimer = null;
+
+function _docRef() {
+  return doc(_db, 'drafts', _uid);
+}
+
+// Guardar estado incremental (solo en modo real)
+window._saveToFirestore = function(data) {
+  if (!_uid || !window._modoReal) return;
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    try {
+      await setDoc(_docRef(), data);
+    } catch(e) { console.warn('[Draft] Firestore save error:', e); }
+  }, 1000);
+};
+
+// Guardar alineación confirmada (presentar a la jornada)
+window._saveConfirmed = async function(data) {
+  if (!_uid) throw new Error('No autenticado');
+  clearTimeout(_saveTimer);
+  await setDoc(_docRef(), {
+    ...data,
+    alineacionConfirmada: true,
+    confirmadaEn: Date.now(),
+  });
+};
+
+// Borrar documento al cambiar de jornada
+window._clearFirestore = async function() {
+  if (!_uid) return;
+  clearTimeout(_saveTimer);
+  try {
+    await deleteDoc(_docRef());
+  } catch(e) { console.warn('[Draft] Firestore delete error:', e); }
+};
+
+// Al autenticarse, leer estado remoto y aplicarlo si existe
+onAuthStateChanged(_auth, async (user) => {
+  if (!user || !user.email?.endsWith('@divieto.app')) { window.location.href = '/'; return; }
+  await applyOverrides(_db);
+  _pool = null;
+  _uid = user.uid;
+  const ab = document.getElementById('avatar-btn');
+  if (ab) {
+    try {
+      const _uSnap = await getDoc(doc(_db, 'users', user.uid));
+      const _num = _uSnap.data()?.numero;
+    } catch(e) { }
+    ab.style.opacity = '1';
+  }
+  try {
+    const snap = await getDoc(_docRef());
+    if (snap.exists()) {
+      const data = snap.data();
+      if (window._applyFirestoreState) {
+        window._applyFirestoreState(data);
+      }
+    }
+  } catch(e) { console.warn('[Draft] Firestore load error:', e); }
+
+  // Estado del torneo: equipos eliminados + bloqueo manual de emergencia
+  onSnapshot(
+    doc(_db, 'torneo', 'estado'),
+    snap => {
+      const data = snap.data() || {};
+      window._equiposEliminados = new Set(data.equipos_eliminados || []);
+      if (data.jornada_bloqueada === true) _jornadaBloqueada = true;
+      updateGuardar();
+    },
+    _err => { console.warn('[Draft] torneo/estado snapshot error:', _err.code); }
+  );
+
+  // Jornada activa + apertura/deadline del draft
+  onSnapshot(
+    doc(_db, 'config', 'jornada'),
+    snap => {
+      const data = snap.data() || {};
+      const nuevaJornada = data.actual || null;
+      const apertura = data.apertura || null;
+      const deadline = data.deadline || null;
+
+      // Jornada cambiada → resetear draft y borrar Firestore
+      if (nuevaJornada && _jornadaActual && _jornadaActual !== nuevaJornada) {
+        _hardReset(true);
+      }
+      _jornadaActual = nuevaJornada;
+
+      // Delegar toda la lógica de modo al schedule
+      if (window._setSchedule) window._setSchedule(apertura, deadline);
+
+      // Validar localStorage contra la jornada recién conocida
+      try {
+        const lsRaw = localStorage.getItem(LS_KEY);
+        if (lsRaw && nuevaJornada) {
+          const lsData = JSON.parse(lsRaw);
+          if (lsData.jornada && lsData.jornada !== nuevaJornada) {
+            _hardReset(true);
+          }
+        }
+      } catch(e) {}
+    },
+    _err => { console.warn('[Draft] config/jornada snapshot error:', _err.code); }
+  );
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+node_modules/**
+.git/**
+
+# Imágenes y assets pesados — no necesarios en Cloud Functions
+public/assets/**
+public/app/**
+
+# Tests y herramientas locales
+test/**
+playwright-report/**
+*.bat
+*.sh
+
+# Secretos locales
+.secrets/**
+*.local

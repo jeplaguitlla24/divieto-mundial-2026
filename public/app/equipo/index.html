@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DIVIETO · Equipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html{height:100%;}
+body{background:#000;display:flex;justify-content:center;height:100vh;overflow:hidden;}
+.app{width:100%;max-width:430px;height:100%;background:#000;display:flex;flex-direction:column;overflow:hidden;}
+
+.topbar{flex-shrink:0;height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08);position:relative;z-index:10;}
+.back-btn{font-size:1.2rem;color:#c8a84b;cursor:pointer;padding:4px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.topbar-flag{font-size:1.4rem;flex-shrink:0;}
+.topbar-name{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:1.2rem;letter-spacing:3px;color:#fff;flex:1;}
+.topbar-count{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px;flex-shrink:0;}
+
+.filtros{flex-shrink:0;display:flex;border-bottom:1px solid rgba(255,255,255,0.08);background:#000;}
+.filtro-btn{flex:1;padding:9px 0;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.35);background:transparent;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color 0.15s;}
+.filtro-btn.active{color:#fff;border-bottom:2px solid #c8a84b;}
+
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(56px + env(safe-area-inset-bottom));}
+
+.cartas-grid{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;}
+
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;flex-direction:column;gap:14px;-webkit-tap-highlight-color:transparent;}
+.modal-overlay.open{display:flex;}
+.modal-nav{display:flex;align-items:center;gap:10px;}
+.modal-arrow{background:none;border:none;color:rgba(240,237,230,0.4);font-size:1.6rem;cursor:pointer;padding:8px 10px;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:color 0.15s;}
+.modal-arrow:active{color:#c8a84b;}
+.modal-arrow:disabled{opacity:0.1;pointer-events:none;}
+.modal-card{width:260px;height:395px;position:relative;flex-shrink:0;transition:opacity 0.15s;}
+.modal-card.fade{opacity:0;}
+.modal-info{text-align:center;}
+.modal-info-name{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;letter-spacing:2px;color:#f0ede6;}
+.modal-info-sub{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(240,237,230,0.4);letter-spacing:1px;margin-top:3px;}
+.modal-counter{font-family:'Barlow Condensed',sans-serif;font-size:8px;color:rgba(240,237,230,0.25);letter-spacing:1px;margin-top:5px;}
+
+@media(min-width:768px){.app{max-width:100%;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <span class="back-btn" onclick="history.back()">←</span>
+    <span class="topbar-flag" id="topbar-flag"></span>
+    <span class="topbar-name" id="topbar-name">EQUIPO</span>
+    <span class="topbar-count" id="topbar-count"></span>
+  </header>
+  <div class="filtros">
+    <button class="filtro-btn active" data-pos="ALL">TODOS</button>
+    <button class="filtro-btn" data-pos="PT">PT</button>
+    <button class="filtro-btn" data-pos="DF">DF</button>
+    <button class="filtro-btn" data-pos="MC">MC</button>
+    <button class="filtro-btn" data-pos="DL">DL</button>
+  </div>
+  <div class="scroll-area" id="lista"></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-nav">
+    <button class="modal-arrow" id="modal-prev">←</button>
+    <div class="modal-card" id="modal-card"></div>
+    <button class="modal-arrow" id="modal-next">→</button>
+  </div>
+  <div class="modal-info">
+    <div class="modal-info-name" id="modal-name"></div>
+    <div class="modal-info-sub" id="modal-sub"></div>
+    <div class="modal-counter" id="modal-counter"></div>
+  </div>
+</div>
+
+<script src="/js/jugadores.js?v=12"></script>
+<script src="/js/fotos.js?v=53"></script>
+<script src="/js/ifs.js"></script>
+<script src="/js/rival.js"></script>
+<script src="/js/club_liga.js"></script>
+<script src="/js/cartas.js?v=33"></script>
+<script>
+const sel = new URLSearchParams(window.location.search).get('sel') || '';
+window._initEquipo = function() {
+const equipo = JUGADORES_MUNDIAL.find(t => t.seleccion === sel);
+if (!equipo) { document.body.innerHTML = '<div style="color:#1a1000;padding:32px;font-family:monospace">Equipo no encontrado</div>'; }
+
+const flag = getFlag(sel);
+document.getElementById('topbar-flag').textContent = flag;
+document.getElementById('topbar-name').textContent = sel;
+document.title = 'La Pausa · ' + sel;
+
+const POS_ORDER = {PT:0, DF:1, MC:2, DL:3};
+const jugadores = equipo ? [...equipo.jugadores].sort((a,b) => (POS_ORDER[a.posDraft]??9) - (POS_ORDER[b.posDraft]??9) || b.overall - a.overall) : [];
+document.getElementById('topbar-count').textContent = jugadores.length + ' jugadores';
+
+let filtroPos = 'ALL';
+let filtrados = [];
+
+function getCardDims() {
+  const cw = Math.floor((Math.min(window.innerWidth,430) - 32 - 24) / 4);
+  return { cw, ch: Math.round(cw * 99/65) };
+}
+
+function render() {
+  filtrados = filtroPos === 'ALL' ? jugadores : jugadores.filter(j => j.posDraft === filtroPos);
+  const {cw, ch} = getCardDims();
+  let html = '<div class="cartas-grid">';
+  filtrados.forEach((j, i) => {
+    const foto = (typeof FOTOS_JUGADORES !== 'undefined' && FOTOS_JUGADORES[j.nombre]) || null;
+    html += `<div data-idx="${i}" style="cursor:pointer">` + miniCardSVG({
+      nombre: j.nombre, overall: j.overall, tier: j.tier,
+      foto, posicion: j.posDraft, seleccion: sel, club: j.club,
+    }, cw, ch) + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('lista').innerHTML = html;
+}
+
+document.querySelectorAll('.filtro-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtroPos = btn.dataset.pos;
+    render();
+  });
+});
+
+let modalIdx = 0;
+
+function openModal(idx) {
+  const j = filtrados[idx];
+  if (!j) return;
+  modalIdx = idx;
+  const foto = (typeof FOTOS_JUGADORES !== 'undefined' && FOTOS_JUGADORES[j.nombre]) || null;
+  const cardEl = document.getElementById('modal-card');
+  cardEl.innerHTML = cardSVG({
+    nombre: j.nombre, overall: j.overall, tier: j.tier,
+    foto, posicion: j.posDraft, seleccion: sel, club: j.club,
+  });
+  document.getElementById('modal-name').textContent = j.nombre.toUpperCase();
+  document.getElementById('modal-sub').textContent = (j.pos || j.posDraft) + ' · ' + (j.club || '');
+  document.getElementById('modal-counter').textContent = (idx + 1) + ' / ' + filtrados.length;
+  document.getElementById('modal-prev').disabled = idx === 0;
+  document.getElementById('modal-next').disabled = idx === filtrados.length - 1;
+}
+
+function showModal(idx) {
+  openModal(idx);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function navigateModal(dir) {
+  const next = modalIdx + dir;
+  if (next < 0 || next >= filtrados.length) return;
+  const cardEl = document.getElementById('modal-card');
+  cardEl.classList.add('fade');
+  setTimeout(() => {
+    openModal(next);
+    cardEl.classList.remove('fade');
+  }, 150);
+}
+
+document.getElementById('lista').addEventListener('click', e => {
+  const el = e.target.closest('[data-idx]');
+  if (!el) return;
+  showModal(parseInt(el.dataset.idx));
+});
+
+document.getElementById('modal-overlay').addEventListener('click', () => {
+  document.getElementById('modal-overlay').classList.remove('open');
+});
+document.getElementById('modal-card').addEventListener('click', e => e.stopPropagation());
+document.getElementById('modal-prev').addEventListener('click', e => { e.stopPropagation(); navigateModal(-1); });
+document.getElementById('modal-next').addEventListener('click', e => { e.stopPropagation(); navigateModal(1); });
+
+let _tsx = 0;
+document.getElementById('modal-card').addEventListener('touchstart', e => { _tsx = e.touches[0].clientX; }, {passive:true});
+document.getElementById('modal-card').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - _tsx;
+  if (Math.abs(dx) > 40) navigateModal(dx < 0 ? 1 : -1);
+});
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('modal-overlay').classList.contains('open')) return;
+  if (e.key === 'ArrowLeft') navigateModal(-1);
+  if (e.key === 'ArrowRight') navigateModal(1);
+  if (e.key === 'Escape') document.getElementById('modal-overlay').classList.remove('open');
+});
+
+render();
+}; // end _initEquipo
+</script>
+<script src="/shared/nav.js"></script>
+<script type="module">
+import { db as _db } from '/js/config.js';
+import { applyOverrides } from '/js/overrides-merge.js';
+(async () => {
+  await applyOverrides(_db);
+  window._initEquipo();
+})();
+</script>
+</body>
+</html>

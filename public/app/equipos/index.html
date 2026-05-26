@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DIVIETO · Selecciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;background:#000;}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:430px;height:100dvh;background:#000;display:flex;flex-direction:column;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{flex-shrink:0;height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08);z-index:50;}
+.back-btn{font-size:1.2rem;color:#c8a84b;cursor:pointer;padding:0 4px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.topbar-center{flex:1;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.topbar-logo{height:22px;width:auto;opacity:0.8;filter:invert(1);}
+
+/* STATS BAR */
+.stats-bar{flex-shrink:0;display:flex;align-items:center;background:#000;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 8px;}
+.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:1.7rem;color:#c8a84b;line-height:1;}
+.stat-label{font-family:'Barlow Condensed',sans-serif;font-size:7px;letter-spacing:1.5px;color:rgba(255,255,255,0.38);text-transform:uppercase;text-align:center;}
+.stat-sep{width:1px;height:30px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+
+/* FILTER TABS */
+.filter-tabs{flex-shrink:0;display:flex;overflow-x:auto;scrollbar-width:none;background:#000;border-bottom:1px solid rgba(255,255,255,0.08);padding:0 10px;gap:2px;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:10px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.32);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color 0.15s,border-color 0.15s;-webkit-tap-highlight-color:transparent;}
+.tab-btn.active{color:#fff;border-bottom-color:#c8a84b;}
+
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(64px + env(safe-area-inset-bottom));}
+.scroll-area::-webkit-scrollbar{display:none;}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 12px;}
+
+/* CARD */
+.eq-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.45);
+  border-radius:14px;
+  padding:18px 10px 14px;
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;
+  transition:border-color 0.15s,box-shadow 0.15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.eq-card:active{border-color:rgba(200,168,75,0.45);box-shadow:0 2px 12px rgba(200,168,75,0.12);}
+
+.eq-card-escudo-wrap{
+  width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;
+}
+.eq-card-escudo{width:100%;height:100%;object-fit:contain;}
+.eq-card-escudo--big{transform:scale(1.35);}
+
+.eq-card-name{
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+  font-size:1rem;letter-spacing:1px;
+  color:#fff;text-align:center;
+  line-height:1.1;margin-bottom:8px;
+}
+.eq-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;}
+.eq-card-grupo{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:7px;letter-spacing:1.5px;font-weight:700;
+  background:#c8a84b;color:#ffffff;
+  padding:2px 6px;border-radius:4px;
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+.eq-card-conf{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:7px;letter-spacing:0.8px;
+  color:rgba(255,255,255,0.32);
+  text-transform:uppercase;
+}
+
+@media(min-width:768px){.app{max-width:100%;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <span class="back-btn" onclick="history.back()">←</span>
+    <span class="topbar-center">Selecciones</span>
+    <img class="topbar-logo" src="/assets/logo/logo-completo.webp" alt="La Pausa">
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num">48</span>
+      <span class="stat-label">Selecciones</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <span class="stat-num">12</span>
+      <span class="stat-label">Grupos</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <span class="stat-num">6</span>
+      <span class="stat-label">Confederaciones</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-jugadores">—</span>
+      <span class="stat-label">Jugadores</span>
+    </div>
+  </div>
+
+  <div class="filter-tabs" id="filter-tabs">
+    <button class="tab-btn active" data-conf="TODAS">Todas</button>
+    <button class="tab-btn" data-conf="UEFA">UEFA</button>
+    <button class="tab-btn" data-conf="CONMEBOL">Conmebol</button>
+    <button class="tab-btn" data-conf="CONCACAF">Concacaf</button>
+    <button class="tab-btn" data-conf="CAF">CAF</button>
+    <button class="tab-btn" data-conf="AFC">AFC</button>
+    <button class="tab-btn" data-conf="OFC">OFC</button>
+  </div>
+
+  <div class="scroll-area">
+    <div class="cards-grid" id="cards-grid"></div>
+  </div>
+
+</div>
+
+<script src="/js/jugadores.js?v=12"></script>
+<script>
+const BASE_ESC = '/assets/img/escudos/selecciones/';
+
+const EQUIPOS = [
+  // GRUPO A
+  {n:'México',        s:'MEXICO',               g:'A', conf:'CONCACAF', esc:'mexico national team.webp'},
+  {n:'Sudáfrica',     s:'SUDAFRICA',             g:'A', conf:'CAF',      esc:'sudafrica national team.webp'},
+  {n:'Corea del Sur', s:'COREA DEL SUR',         g:'A', conf:'AFC',      esc:'south-korea-national-team-footballlogos-org.webp'},
+  {n:'Rep. Checa',    s:'REPUBLICA CHECA',       g:'A', conf:'UEFA',     esc:'republica checa national team.webp'},
+  // GRUPO B
+  {n:'Canadá',        s:'CANADA',                g:'B', conf:'CONCACAF', esc:'canada-national-team-footballlogos-org.webp'},
+  {n:'Bosnia-Herz.',  s:'BOSNIA Y HERZEGOVINA',  g:'B', conf:'UEFA',     esc:'bosnia_herzegovina_national_team.webp'},
+  {n:'Qatar',         s:'QATAR',                 g:'B', conf:'AFC',      esc:'qatar-national-team-footballlogos-org.webp'},
+  {n:'Suiza',         s:'SUIZA',                 g:'B', conf:'UEFA',     esc:'swiss-national-team-footballlogos-org.webp', big:true},
+  // GRUPO C
+  {n:'Brasil',        s:'BRASIL',                g:'C', conf:'CONMEBOL', esc:'brazil-national-team-footballlogos-org.webp'},
+  {n:'Marruecos',     s:'MARRUECOS',             g:'C', conf:'CAF',      esc:'marruecos national team.webp'},
+  {n:'Haití',         s:'HAITI',                 g:'C', conf:'CONCACAF', esc:'haiti-national-team-footylogos.webp'},
+  {n:'Escocia',       s:'ESCOCIA',               g:'C', conf:'UEFA',     esc:'scotland-national-team-footballlogos-org.webp'},
+  // GRUPO D
+  {n:'EE.UU.',        s:'ESTADOS UNIDOS',        g:'D', conf:'CONCACAF', esc:'usa-national-team-footballlogos-org.webp'},
+  {n:'Paraguay',      s:'PARAGUAY',              g:'D', conf:'CONMEBOL', esc:'paraguay-national-team-footballlogos-org.webp'},
+  {n:'Australia',     s:'AUSTRALIA',             g:'D', conf:'AFC',      esc:'australia-national-team-footylogos.webp'},
+  {n:'Turquía',       s:'TURQUIA',               g:'D', conf:'UEFA',     esc:'turquia national team.webp'},
+  // GRUPO E
+  {n:'Alemania',      s:'ALEMANIA',              g:'E', conf:'UEFA',     esc:'germany-national-team-footballlogos-org.webp'},
+  {n:'Curaçao',       s:'CURAZAO',               g:'E', conf:'CONCACAF', esc:'curacao-national-team-footballlogos-org.webp'},
+  {n:'C. de Marfil',  s:'COSTA DE MARFIL',       g:'E', conf:'CAF',      esc:'cote-d-ivoire-national-team-footballlogos-org.webp'},
+  {n:'Ecuador',       s:'ECUADOR',               g:'E', conf:'CONMEBOL', esc:'ecuador-national-team-footballlogos-org.webp'},
+  // GRUPO F
+  {n:'P. Bajos',      s:'PAISES BAJOS',          g:'F', conf:'UEFA',     esc:'netherlands-dutch-national-team-footballlogos-org.webp'},
+  {n:'Japón',         s:'JAPON',                 g:'F', conf:'AFC',      esc:'japan-national-team-footballlogos-org.webp'},
+  {n:'Suecia',        s:'SUECIA',                g:'F', conf:'UEFA',     esc:'suecia national team.webp'},
+  {n:'Túnez',         s:'TUNEZ',                 g:'F', conf:'CAF',      esc:'tunisia-national-team-footballlogos-org.webp'},
+  // GRUPO G
+  {n:'Bélgica',       s:'BELGICA',               g:'G', conf:'UEFA',     esc:'belgium-national-team-footballlogos-org.webp'},
+  {n:'Egipto',        s:'EGIPTO',                g:'G', conf:'CAF',      esc:'egypt-national-team-footballlogos-org.webp'},
+  {n:'Irán',          s:'IRAN',                  g:'G', conf:'AFC',      esc:'iran-national-team-footballlogos-org.webp'},
+  {n:'N. Zelanda',    s:'NUEVA ZELANDA',         g:'G', conf:'OFC',      esc:'new-zealand-national-team-footballlogos-org.webp'},
+  // GRUPO H
+  {n:'España',        s:'ESPAÑA',                g:'H', conf:'UEFA',     esc:'spain-national-team-footballlogos-org.webp'},
+  {n:'Cabo Verde',    s:'CABO VERDE',            g:'H', conf:'CAF',      esc:'cabo-verde-footballlogos-org.webp'},
+  {n:'Arabia Saudí',  s:'ARABIA SAUDI',          g:'H', conf:'AFC',      esc:'saudi-arabia-national-team-footballlogos-org.webp'},
+  {n:'Uruguay',       s:'URUGUAY',               g:'H', conf:'CONMEBOL', esc:'uruguay-national-team-footballlogos-org.webp'},
+  // GRUPO I
+  {n:'Francia',       s:'FRANCIA',               g:'I', conf:'UEFA',     esc:'france-national-team-footballlogos-org.webp'},
+  {n:'Senegal',       s:'SENEGAL',               g:'I', conf:'CAF',      esc:'senegal-national-team-footballlogos-org.webp'},
+  {n:'Irak',          s:'IRAK',                  g:'I', conf:'AFC',      esc:'iraq national team.webp'},
+  {n:'Noruega',       s:'NORUEGA',               g:'I', conf:'UEFA',     esc:'norway-national-team-footballlogos-org.webp'},
+  // GRUPO J
+  {n:'Argentina',     s:'ARGENTINA',             g:'J', conf:'CONMEBOL', esc:'argentina-national-team-footballlogos-org.webp'},
+  {n:'Argelia',       s:'ARGELIA',               g:'J', conf:'CAF',      esc:'algeria-national-team-footballlogos-org.webp'},
+  {n:'Austria',       s:'AUSTRIA',               g:'J', conf:'UEFA',     esc:'austria-national-team-footballlogos-org.webp'},
+  {n:'Jordania',      s:'JORDANIA',              g:'J', conf:'AFC',      esc:'jordan-footballlogos-org.webp'},
+  // GRUPO K
+  {n:'Portugal',      s:'PORTUGAL',              g:'K', conf:'UEFA',     esc:'portugal-national-team-footballlogos-org.webp'},
+  {n:'Congo RD',      s:'R.D. CONGO',            g:'K', conf:'CAF',      esc:'congo national team.webp'},
+  {n:'Uzbekistán',    s:'UZBEKISTAN',            g:'K', conf:'AFC',      esc:'uzbekistan-national-team-footballlogos-org.webp'},
+  {n:'Colombia',      s:'COLOMBIA',              g:'K', conf:'CONMEBOL', esc:'colombia-national-team-footballlogos-org.webp'},
+  // GRUPO L
+  {n:'Inglaterra',    s:'INGLATERRA',            g:'L', conf:'UEFA',     esc:'england-national-team-footballlogos-org.webp'},
+  {n:'Croacia',       s:'CROACIA',               g:'L', conf:'UEFA',     esc:'croatia-national-team-footballlogos-org.webp'},
+  {n:'Ghana',         s:'GHANA',                 g:'L', conf:'CAF',      esc:'ghana-footballlogos-org.webp'},
+  {n:'Panamá',        s:'PANAMA',                g:'L', conf:'CONCACAF', esc:'panama national team.webp'},
+];
+
+let filtroConf = 'TODAS';
+
+function render() {
+  const lista = filtroConf === 'TODAS' ? EQUIPOS : EQUIPOS.filter(e => e.conf === filtroConf);
+  document.getElementById('cards-grid').innerHTML = lista.map(e => `
+    <div class="eq-card" data-sel="${encodeURIComponent(e.s)}">
+      <div class="eq-card-escudo-wrap">
+        <img class="eq-card-escudo${e.big ? ' eq-card-escudo--big' : ''}" src="${BASE_ESC}${encodeURIComponent(e.esc)}" alt="${e.n}" loading="lazy">
+      </div>
+      <div class="eq-card-name">${e.n}</div>
+      <div class="eq-card-meta">
+        <span class="eq-card-grupo">GRP ${e.g}</span>
+        <span class="eq-card-conf">${e.conf}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('filter-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtroConf = btn.dataset.conf;
+  render();
+});
+
+document.getElementById('cards-grid').addEventListener('click', e => {
+  const card = e.target.closest('.eq-card');
+  if (!card) return;
+  window.location.href = '/app/equipo/?sel=' + card.dataset.sel;
+});
+
+// Contar jugadores totales
+if (typeof JUGADORES_MUNDIAL !== 'undefined') {
+  let total = 0;
+  JUGADORES_MUNDIAL.forEach(t => { total += (t.jugadores || []).length; });
+  document.getElementById('stat-jugadores').textContent = total;
+}
+
+render();
+</script>
+<script src="/shared/nav.js"></script>
+</body>
+</html>

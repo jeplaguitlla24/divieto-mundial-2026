@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>DIVIETO · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060e1c;--panel:rgba(8,18,36,0.95);--border:rgba(240,204,96,0.12);
+  --text:#f0ede6;--muted:rgba(240,237,230,0.55);
+  --gold:#f0cc60;--gold2:#c8a84b;--silver:#d6d9e0;--bronze:#d08040;
+  --ok:#4ade80;--warn:#f59e0b;--bad:#f87171;--blue:#60a5fa;
+}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Barlow Condensed',sans-serif;overflow:hidden}
+
+/* ── LOGIN ── */
+#loginScreen{
+  position:fixed;inset:0;z-index:999;
+  background:radial-gradient(ellipse at 50% 40%,#0d1e38,#040a14);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-card{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  padding:48px 40px;background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);border-radius:20px;text-align:center;
+}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);letter-spacing:4px}
+.login-logo span{color:var(--muted);font-size:16px;letter-spacing:2px;margin-left:8px;font-family:'JetBrains Mono',monospace}
+.login-sub{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.login-btn{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;
+  padding:12px 24px;background:linear-gradient(135deg,#f0cc60,#c8a84b);
+  color:#1a1000;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.15s;
+}
+.login-btn:hover{opacity:0.9}
+.login-btn svg{width:20px;height:20px;flex-shrink:0}
+#loginError{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bad);letter-spacing:1px;display:none}
+
+/* ── TABS ── */
+.tab-btns{display:flex;gap:4px;margin-left:16px}
+.tab-btn{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  color:var(--muted);border-radius:6px;cursor:pointer;transition:all 0.15s;
+}
+.tab-btn:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.tab-btn.active{background:rgba(240,204,96,0.12);border-color:rgba(240,204,96,0.35);color:var(--gold)}
+
+/* ── JORNADA TAB ── */
+.jornada-panel{
+  grid-column:1/-1;display:none;overflow-y:auto;
+  padding:24px;gap:20px;flex-direction:column;
+  background:var(--bg);
+}
+.jornada-panel.visible{display:flex}
+
+/* ── USUARIOS TAB ── */
+.usuarios-panel{
+  grid-column:1/-1;display:none;overflow-y:auto;
+  padding:24px;gap:20px;flex-direction:column;
+  background:var(--bg);
+}
+.usuarios-panel.visible{display:flex}
+.u-grid{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+.u-section{background:rgba(8,18,36,0.8);border:1px solid var(--border);border-radius:12px;padding:20px}
+.u-section h2{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+.u-gen-btn{
+  width:100%;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;
+  padding:14px;border:none;border-radius:8px;cursor:pointer;transition:all 0.15s;
+  background:linear-gradient(135deg,#f0cc60,#c8a84b);color:#1a1000;
+}
+.u-gen-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.u-gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.u-code-result{
+  margin-top:16px;padding:16px;border-radius:8px;text-align:center;
+  background:rgba(240,204,96,0.08);border:1px solid rgba(240,204,96,0.25);
+  display:none;
+}
+.u-code-result.visible{display:block}
+.u-code-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);letter-spacing:8px;line-height:1}
+.u-code-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.u-copy-btn{
+  margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);border-radius:6px;cursor:pointer;transition:all 0.15s;text-transform:uppercase;
+}
+.u-copy-btn:hover{border-color:rgba(240,204,96,0.4);color:var(--gold)}
+.u-codes-list{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto}
+.u-code-row{
+  display:grid;grid-template-columns:80px 1fr 80px 100px;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.02);
+}
+.u-code-row:hover{background:rgba(255,255,255,0.04)}
+.u-cr-code{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:2px}
+.u-cr-user{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u-cr-user.empty{color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.u-cr-badge{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 7px;border-radius:4px;text-align:center;
+}
+.u-cr-badge.libre{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--ok)}
+.u-cr-badge.usado{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);color:var(--blue)}
+.u-cr-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-align:right}
+.u-empty{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-align:center;padding:20px}
+@media(max-width:768px){.u-grid{grid-template-columns:1fr}}
+.j-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.j-section{background:rgba(8,18,36,0.8);border:1px solid var(--border);border-radius:12px;padding:16px}
+.j-section h2{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.j-status-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.j-badge{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);line-height:1}
+.j-info{display:flex;flex-direction:column;gap:2px}
+.j-label{font-size:14px;font-weight:700;color:var(--text)}
+.j-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.j-deadline{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--warn);margin-top:4px}
+.j-draft-status{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:6px;margin-top:8px}
+.j-draft-status.open{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:var(--ok)}
+.j-draft-status.closed{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--bad)}
+.j-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.j-jornadas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.j-jornada-btn{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;padding:12px 0;text-align:center;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  color:var(--muted);border-radius:8px;cursor:pointer;transition:all 0.15s;
+}
+.j-jornada-btn:hover{background:rgba(240,204,96,0.08);border-color:rgba(240,204,96,0.3);color:var(--gold);transform:translateY(-1px)}
+.j-jornada-btn.current{background:rgba(240,204,96,0.15);border-color:rgba(240,204,96,0.5);color:var(--gold)}
+.j-jornada-sub{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--muted);margin-top:2px}
+.j-action-btns{display:flex;flex-direction:column;gap:8px}
+.j-action-btn{
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;
+  padding:11px 16px;border:none;border-radius:8px;cursor:pointer;transition:all 0.15s;text-align:left;
+}
+.j-action-btn:hover{transform:translateY(-1px);opacity:0.9}
+.j-action-btn.open-draft{background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a1a0a}
+.j-action-btn.close-draft{background:linear-gradient(135deg,#f87171,#ef4444);color:#1a0505}
+.j-scrape-info{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8}
+.j-scrape-info strong{color:var(--text)}
+.j-loading{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:300px 1fr 268px;grid-template-rows:52px 1fr;height:100vh;gap:0}
+.jornada-panel{grid-column:1/-1}
+.topbar{
+  grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:rgba(4,10,20,0.98);border-bottom:1px solid var(--border);z-index:10;
+}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:3px;white-space:nowrap}
+.logo span{color:var(--muted);font-size:13px;letter-spacing:1px;margin-left:6px;font-family:'JetBrains Mono',monospace}
+.app-link{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:5px 10px;border:1px solid var(--border);background:rgba(255,255,255,0.03);
+  color:var(--muted);border-radius:6px;cursor:pointer;text-decoration:none;
+  transition:all 0.15s;text-transform:uppercase;white-space:nowrap;
+}
+.app-link:hover{border-color:rgba(240,204,96,0.3);color:var(--gold)}
+.topbar-stats{display:flex;gap:0;margin-left:auto}
+.tstat{display:flex;flex-direction:column;align-items:center;padding:0 12px;border-left:1px solid var(--border)}
+.tstat strong{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:var(--gold)}
+.tstat span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:1px}
+.progress-wrap{width:160px;border-left:1px solid var(--border);padding-left:12px}
+.progress-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.progress-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:2px;transition:width 0.4s}
+.topbar-actions{display:flex;gap:6px;margin-left:10px}
+.btn-sm{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:5px 10px;border:1px solid var(--border);background:rgba(255,255,255,0.03);
+  color:var(--muted);border-radius:6px;cursor:pointer;transition:all 0.15s;text-transform:uppercase;
+}
+.btn-sm:hover{background:rgba(240,204,96,0.08);border-color:rgba(240,204,96,0.3);color:var(--gold)}
+.btn-sm.danger{border-color:rgba(248,113,113,0.3);color:var(--bad)}
+.btn-sm.danger:hover{background:rgba(248,113,113,0.08)}
+.user-email{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:5px 10px;color:var(--muted);
+}
+
+/* ── LEFT ── */
+.left{background:rgba(4,10,20,0.7);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.filters{padding:10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.filter-row{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.filter-item{display:flex;flex-direction:column;gap:3px}
+.filter-item label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+select,input[type="text"],input[type="number"]{
+  font:inherit;font-size:13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);border-radius:6px;padding:6px 8px;outline:none;width:100%;
+}
+select:focus,input:focus{border-color:rgba(240,204,96,0.4);box-shadow:0 0 0 2px rgba(240,204,96,0.06)}
+.search-full{grid-column:1/-1}
+.nav-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.nav-btns button{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--muted);border-radius:6px;cursor:pointer;transition:all 0.15s;
+}
+.nav-btns button:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+.nav-btns button.accent{border-color:rgba(240,204,96,0.25);color:var(--gold)}
+.nav-btns button.accent:hover{background:rgba(240,204,96,0.08)}
+.list-wrap{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent}
+.list-wrap::-webkit-scrollbar{width:4px}
+.list-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.list-item{
+  display:grid;grid-template-columns:22px 1fr 34px 28px 16px;align-items:center;
+  gap:6px;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;transition:background 0.1s;
+}
+.list-item:hover{background:rgba(255,255,255,0.03)}
+.list-item.active{background:rgba(240,204,96,0.07);border-left:2px solid var(--gold)}
+.list-item.no-override{opacity:0.55}
+.list-item.no-override:hover{opacity:0.8}
+.list-item.no-override.active{opacity:1}
+.list-rank{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:right}
+.list-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-team{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-overall{font-family:'Bebas Neue',sans-serif;font-size:17px;text-align:center}
+.list-src{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;text-align:center;justify-self:center;line-height:1}
+.list-src.base{color:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:3px;padding:2px 3px}
+.list-src.override{width:7px;height:7px;border-radius:50%;padding:0}
+.list-src.ok{background:var(--ok)}
+.list-src.up{background:var(--blue)}
+.list-src.down{background:var(--bad)}
+.list-estado{font-size:10px;text-align:center;line-height:1}
+
+/* ── CENTER ── */
+.center{
+  display:flex;flex-direction:column;align-items:center;justify-content:start;
+  gap:16px;padding:18px;position:relative;overflow-y:auto;
+}
+.center-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(240,204,96,0.04),transparent 60%);pointer-events:none}
+.card-wrap{position:relative;width:220px;height:340px;flex-shrink:0}
+.center-controls{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:320px}
+
+.overall-display{display:flex;align-items:center;gap:14px}
+.overall-current,.overall-new{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.overall-current .label,.overall-new .label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;height:13px;line-height:13px}
+.overall-current .label{color:var(--muted)}
+.overall-new .label{color:var(--gold)}
+.overall-new.neutral .label{color:var(--muted)}
+.overall-current .val,.overall-new .val{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1}
+.overall-current .val{color:var(--muted)}
+.overall-new .val{color:var(--gold)}
+.overall-new.neutral .val{color:var(--muted)}
+.overall-current .spacer,.overall-new .spacer{height:26px;display:flex;align-items:center;justify-content:center}
+.overall-arrow{font-size:18px;color:var(--muted);flex-shrink:0;margin-top:18px}
+.delta-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:2px 9px;border-radius:4px}
+.delta-badge.up{background:rgba(96,165,250,0.15);color:var(--blue)}
+.delta-badge.down{background:rgba(248,113,113,0.15);color:var(--bad)}
+.delta-badge.flat{background:rgba(255,255,255,0.06);color:var(--muted)}
+
+.bumpers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.bumper{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;padding:9px 0;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);border-radius:8px;cursor:pointer;transition:all 0.12s;text-align:center;
+}
+.bumper:hover{transform:translateY(-2px)}
+.bumper.neg{color:var(--bad);border-color:rgba(248,113,113,0.2)}
+.bumper.neg:hover{background:rgba(248,113,113,0.08)}
+.bumper.pos{color:var(--blue);border-color:rgba(96,165,250,0.2)}
+.bumper.pos:hover{background:rgba(96,165,250,0.08)}
+
+.manual-row{display:flex;gap:8px;width:100%;align-items:center}
+.manual-row label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.manual-row input{width:72px;font-family:'Bebas Neue',sans-serif;font-size:20px;text-align:center;padding:5px 8px}
+
+.brillo-pills{display:flex;gap:6px;width:100%}
+.brillo-pill{
+  flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:1px;padding:7px 4px;text-align:center;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--muted);border-radius:8px;cursor:pointer;transition:all 0.12s;
+}
+.brillo-pill:hover{background:rgba(255,255,255,0.07)}
+.brillo-pill.active-auto{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);color:var(--text)}
+.brillo-pill.active-brillante{background:rgba(240,204,96,0.15);border-color:rgba(240,204,96,0.4);color:var(--gold)}
+.brillo-pill.active-mate{background:rgba(180,180,180,0.12);border-color:rgba(180,180,180,0.3);color:var(--silver)}
+
+.estado-pills{display:flex;gap:6px;width:100%;flex-wrap:wrap}
+.estado-pill{
+  flex:1;min-width:60px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:1px;padding:7px 4px;text-align:center;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--muted);border-radius:8px;cursor:pointer;transition:all 0.12s;
+}
+.estado-pill:hover{background:rgba(255,255,255,0.07)}
+.estado-pill.active-none{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);color:var(--text)}
+.estado-pill.active-lesion{background:rgba(196,40,40,0.2);border-color:rgba(196,40,40,0.5);color:#f87171}
+.estado-pill.active-duda{background:rgba(200,148,30,0.2);border-color:rgba(200,148,30,0.5);color:#f0cc60}
+.estado-pill.active-forma{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.3);color:var(--ok)}
+
+.action-row{display:flex;gap:6px;width:100%}
+.action-btn{
+  flex:1;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;
+  padding:11px 0;border:none;border-radius:8px;cursor:pointer;transition:all 0.15s;
+}
+.action-btn.save{background:linear-gradient(135deg,#f0cc60,#c8a84b);color:#1a1000}
+.action-btn.reset{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
+.action-btn:hover{transform:translateY(-1px);opacity:0.9}
+
+.kbd-hints{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.kbd{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.kbd code{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--text)}
+
+.center-nav{display:flex;align-items:center;gap:18px}
+.cnav-btn{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);border-radius:8px;cursor:pointer;transition:all 0.15s;
+}
+.cnav-btn:hover{background:rgba(240,204,96,0.08);border-color:rgba(240,204,96,0.3);color:var(--gold)}
+.cnav-info{text-align:center}
+.cnav-count{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
+.cnav-scope{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+
+/* ── RIGHT ── */
+.right{background:rgba(4,10,20,0.7);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.right-section{padding:14px;border-bottom:1px solid var(--border)}
+.right-section h3{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.info-row .key{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.info-row .val{font-size:13px;font-weight:600;text-align:right;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tier-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px}
+.tier-pill.gold{background:rgba(240,204,96,0.15);color:#fff3b8;border:1px solid rgba(240,204,96,0.3)}
+.tier-pill.silver{background:rgba(214,217,224,0.12);color:#e8ecf0;border:1px solid rgba(214,217,224,0.25)}
+.tier-pill.bronze{background:rgba(208,128,64,0.15);color:#ffd5b2;border:1px solid rgba(208,128,64,0.3)}
+.note-wrap{flex:1;padding:14px;display:flex;flex-direction:column;gap:6px}
+.note-wrap h3{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.note-wrap textarea{
+  flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  color:var(--text);border-radius:8px;padding:10px;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;resize:none;outline:none;line-height:1.5;min-height:80px;
+}
+.note-wrap textarea:focus{border-color:rgba(240,204,96,0.35)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:100%;color:var(--muted);text-align:center;padding:40px}
+.empty-state .big{font-family:'Bebas Neue',sans-serif;font-size:48px;color:rgba(240,204,96,0.2)}
+.empty-state p{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;line-height:1.8}
+
+.toast{position:fixed;bottom:24px;right:24px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;padding:10px 16px;border-radius:8px;background:#1a2a1a;border:1px solid rgba(74,222,128,0.3);color:var(--ok);opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;z-index:100}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.warn{background:#2a1a0a;border-color:rgba(245,158,11,0.3);color:var(--warn)}
+.toast.err{background:#2a0a0a;border-color:rgba(248,113,113,0.3);color:var(--bad)}
+
+.saving-indicator{
+  position:fixed;top:60px;right:16px;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:1px;padding:6px 12px;background:rgba(96,165,250,0.15);
+  border:1px solid rgba(96,165,250,0.3);color:var(--blue);border-radius:6px;
+  opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:50;
+}
+.saving-indicator.show{opacity:1}
+
+/* ── MOBILE BACK BUTTON (oculto en desktop) ── */
+#mobileBack{display:none}
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  html,body{overflow-y:auto !important;height:auto !important}
+
+  /* !important necesario: showApp() fuerza display:grid como inline style */
+  #adminApp{
+    display:flex !important;flex-direction:column;
+    height:auto !important;min-height:100vh;overflow:visible;
+  }
+
+  /* topbar compacto y sticky */
+  .topbar{
+    position:sticky;top:0;z-index:20;flex-shrink:0;
+    height:auto;min-height:48px;flex-wrap:wrap;gap:6px;padding:8px 12px;
+  }
+  .topbar-stats,.progress-wrap,.user-email{display:none !important}
+  .tab-btns{margin-left:0}
+
+  /* PANTALLA 1 — lista: ocupa todo salvo topbar */
+  .left{
+    flex:1;border-right:none;border-bottom:1px solid var(--border);
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .left.m-hidden{display:none !important}
+  .list-wrap{flex:1;max-height:none;overflow-y:auto}
+  .filter-item label{display:none}
+  .filters{gap:4px;padding:8px}
+  .nav-btns{grid-template-columns:1fr 1fr;gap:4px;padding:6px 8px}
+  .list-item{padding:10px;min-height:44px}
+
+  /* PANTALLA 2 — editor: oculta hasta que se selecciona jugador */
+  .center{display:none !important;flex-direction:column;overflow-y:auto;padding:0}
+  .center.m-active{display:flex !important}
+  .center-controls{max-width:100%;padding:0 12px 20px}
+
+  /* botón volver */
+  #mobileBack{
+    display:flex;align-items:center;gap:8px;flex-shrink:0;
+    padding:12px 14px;border-bottom:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;
+    color:var(--gold);text-transform:uppercase;cursor:pointer;
+    background:var(--bg);position:sticky;top:0;z-index:10;
+  }
+
+  /* carta centrada sin margen excesivo */
+  .center-nav{padding:12px 0 4px}
+
+  /* panel derecho: oculto, info ya está en la carta */
+  .right{display:none !important}
+
+  /* controles táctiles grandes */
+  .bumpers{gap:8px;padding:0}
+  .bumper{padding:15px 0;font-size:22px;border-radius:10px}
+  .action-btn{padding:16px 0;font-size:18px;border-radius:10px}
+  .brillo-pill,.estado-pill{padding:12px 4px;font-size:14px;border-radius:10px}
+  .manual-row input{width:80px;font-size:22px;padding:8px}
+  .kbd-hints{display:none}
+
+  /* jornada en columna */
+  .jornada-panel{overflow-y:auto}
+  .j-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ─────────────────────────────────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">DIVIETO <span>· ADMIN</span></div>
+    <p class="login-sub">Panel de administración · Acceso restringido</p>
+    <button class="login-btn" id="loginBtn">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Entrar con Google
+    </button>
+    <p id="loginError">Sin permiso de acceso para esta cuenta</p>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ──────────────────────────────────────────────────────────── -->
+<div class="app" id="adminApp" style="display:none">
+  <header class="topbar">
+    <div class="logo">DIVIETO <span>· ADMIN</span></div>
+    <a href="/app/" class="app-link">← App</a>
+    <div class="tab-btns">
+      <button class="tab-btn active" id="tabJugadores">Jugadores</button>
+      <button class="tab-btn" id="tabJornada">Jornada</button>
+      <button class="tab-btn" id="tabUsuarios">Usuarios</button>
+    </div>
+    <div class="topbar-stats">
+      <div class="tstat"><strong id="statTotal">0</strong><span>Total</span></div>
+      <div class="tstat"><strong id="statRevisados">0</strong><span>Con Override</span></div>
+      <div class="tstat"><strong id="statCambiados">0</strong><span>Cambiados</span></div>
+      <div class="tstat"><strong id="statPendientes">0</strong><span>Pendientes</span></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">Progreso</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="topbar-actions">
+      <span class="user-email" id="userEmail">—</span>
+      <button class="btn-sm danger" id="logoutBtn">Salir</button>
+    </div>
+  </header>
+
+  <aside class="left">
+    <div class="filters">
+      <div class="filter-row">
+        <div class="filter-item">
+          <label>Selección</label>
+          <select id="teamFilter"><option value="all">Todas</option></select>
+        </div>
+        <div class="filter-item">
+          <label>Metal</label>
+          <select id="metalFilter">
+            <option value="all">Todos</option>
+            <option value="gold">Oro</option>
+            <option value="silver">Plata</option>
+            <option value="bronze">Bronce</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-item">
+          <label>Posición</label>
+          <select id="posFilter">
+            <option value="all">Todas</option>
+            <option value="PT">PT</option>
+            <option value="DF">DF</option>
+            <option value="MC">MC</option>
+            <option value="DL">DL</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>Brillo</label>
+          <select id="brilloFilter">
+            <option value="all">Todos</option>
+            <option value="brillante">✨ Brillante</option>
+            <option value="mate">◾ Mate</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-item">
+          <label>Estado</label>
+          <select id="reviewFilter">
+            <option value="all">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="reviewed">Revisados</option>
+            <option value="changed">Con cambio</option>
+            <option value="lesion">Lesión</option>
+            <option value="duda">Duda</option>
+            <option value="forma">Forma</option>
+          </select>
+        </div>
+        <div class="filter-item search-full">
+          <label>Buscar</label>
+          <input type="text" id="searchInput" placeholder="Nombre, club, pos…">
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button id="prevPendingBtn">← Pendiente ant.</button>
+      <button id="nextPendingBtn" class="accent">Pendiente sig. →</button>
+      <button id="sortOvrBtn">Orden: Selección</button>
+      <button id="jumpTeamBtn" class="accent">1º de selección</button>
+    </div>
+    <div class="list-wrap" id="listWrap"></div>
+  </aside>
+
+  <main class="center">
+    <div id="mobileBack">← Lista de jugadores</div>
+    <div class="center-bg"></div>
+    <div id="emptyState" class="empty-state">
+      <div class="big">⌛</div>
+      <p>Cargando jugadores...</p>
+    </div>
+
+    <div id="mainContent" style="display:none;width:100%;flex-direction:column;align-items:center;gap:14px">
+      <div class="center-nav">
+        <button class="cnav-btn" id="prevBtn">‹</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+          <div class="card-wrap" id="cardWrap"></div>
+          <div class="cnav-info">
+            <div class="cnav-count" id="cnavCount">0 / 0</div>
+            <div class="cnav-scope" id="cnavScope">—</div>
+          </div>
+        </div>
+        <button class="cnav-btn" id="nextBtn">›</button>
+      </div>
+
+      <div class="center-controls">
+        <div class="overall-display">
+          <div class="overall-current">
+            <div class="label">Base</div>
+            <div class="val" id="dispOriginal">—</div>
+            <div class="spacer"></div>
+          </div>
+          <div class="overall-arrow">→</div>
+          <div class="overall-new neutral" id="dispNewWrap">
+            <div class="label">Nuevo</div>
+            <div class="val" id="dispNew">—</div>
+            <div class="spacer"><div class="delta-badge flat" id="dispDelta">sin cambio</div></div>
+          </div>
+        </div>
+
+        <div class="bumpers">
+          <button class="bumper neg" style="font-size:14px" data-delta="-5">−5</button>
+          <button class="bumper neg" data-delta="-1">−1</button>
+          <button class="bumper pos" data-delta="+1">+1</button>
+          <button class="bumper pos" style="font-size:14px" data-delta="+5">+5</button>
+        </div>
+
+        <div class="manual-row">
+          <label>Manual:</label>
+          <input type="number" id="manualInput" min="30" max="99" placeholder="—">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)">rango 30–99</span>
+        </div>
+
+        <div class="brillo-pills">
+          <button class="brillo-pill" data-brillo="">Auto</button>
+          <button class="brillo-pill" data-brillo="brillante">✨ Brillante</button>
+          <button class="brillo-pill" data-brillo="mate">◾ Mate</button>
+        </div>
+
+        <div class="estado-pills">
+          <button class="estado-pill" data-estado="">— Sin estado</button>
+          <button class="estado-pill" data-estado="lesion">🔴 Lesión</button>
+          <button class="estado-pill" data-estado="duda">🩹 Duda</button>
+          <button class="estado-pill" data-estado="forma">🔥 Forma</button>
+        </div>
+
+        <div class="action-row">
+          <button class="action-btn save" id="saveBtn">GUARDAR</button>
+          <button class="action-btn reset" id="resetBtn">BORRAR OVERRIDE</button>
+        </div>
+
+        <div class="kbd-hints">
+          <span class="kbd"><code>←</code><code>→</code> navegar</span>
+          <span class="kbd"><code>Enter</code> guardar</span>
+          <span class="kbd"><code>Tab</code> sig. pendiente</span>
+          <span class="kbd"><code>↑</code><code>↓</code> ±1</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── JORNADA PANEL ── -->
+  <div class="jornada-panel" id="jornadaPanel">
+
+    <div class="j-grid">
+
+      <!-- Estado actual -->
+      <div class="j-section">
+        <h2>Estado actual</h2>
+        <div class="j-status-row">
+          <div class="j-badge" id="jActualBadge">—</div>
+          <div class="j-info">
+            <div class="j-label" id="jActualLabel">Cargando…</div>
+            <div class="j-sub" id="jActualFase">—</div>
+          </div>
+        </div>
+        <div class="j-deadline" id="jDeadlineStr">—</div>
+        <div class="j-draft-status closed" id="jDraftStatus">
+          <div class="j-dot"></div><span id="jDraftLabel">Draft cerrado</span>
+        </div>
+        <div class="j-scrape-info" id="jScrapeInfo" style="margin-top:12px">
+          <div class="j-loading">Cargando puntuaciones…</div>
+        </div>
+      </div>
+
+      <!-- Cambiar jornada -->
+      <div class="j-section">
+        <h2>Cambiar jornada</h2>
+        <div class="j-jornadas">
+          <div>
+            <button class="j-jornada-btn" data-j="J1">J1</button>
+            <div class="j-jornada-sub" style="text-align:center">12 jun</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J2">J2</button>
+            <div class="j-jornada-sub" style="text-align:center">19 jun</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J3">J3</button>
+            <div class="j-jornada-sub" style="text-align:center">25 jun</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J4">J4</button>
+            <div class="j-jornada-sub" style="text-align:center">30 jun</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J5">J5</button>
+            <div class="j-jornada-sub" style="text-align:center">5 jul</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J6">J6</button>
+            <div class="j-jornada-sub" style="text-align:center">10 jul</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J7">J7</button>
+            <div class="j-jornada-sub" style="text-align:center">15 jul</div>
+          </div>
+          <div>
+            <button class="j-jornada-btn" data-j="J8">J8</button>
+            <div class="j-jornada-sub" style="text-align:center">20 jul</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles manuales -->
+      <div class="j-section">
+        <h2>Controles manuales</h2>
+        <div class="j-action-btns">
+          <button class="j-action-btn open-draft" id="jOpenDraft">Abrir draft</button>
+          <button class="j-action-btn close-draft" id="jCloseDraft">Cerrar draft ahora</button>
+          <button class="j-action-btn" id="jCerrarJornada" style="background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;margin-top:8px">Cerrar jornada y guardar pts</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── USUARIOS PANEL ── -->
+  <div class="usuarios-panel" id="usuariosPanel">
+    <div class="u-grid">
+
+      <!-- Clave de registro -->
+      <div class="u-section">
+        <h2>Clave de registro</h2>
+        <div class="u-code-result visible" id="claveResult">
+          <div class="u-code-num" id="claveActual" style="font-size:1.3rem;letter-spacing:4px;">—</div>
+          <div class="u-code-label">Clave actual · compártela con los jugadores</div>
+          <button class="u-copy-btn" id="copiarClaveBtn">Copiar</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input type="text" id="claveInput" placeholder="Nueva clave…"
+            style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(240,204,96,0.2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;outline:none;"
+            autocomplete="off" spellcheck="false">
+          <button class="u-gen-btn" id="guardarClaveBtn" style="width:auto;padding:10px 18px;white-space:nowrap;">Guardar</button>
+        </div>
+      </div>
+
+      <!-- Lista de usuarios -->
+      <div class="u-section">
+        <h2>Jugadores registrados</h2>
+        <div class="u-codes-list" id="codigosList">
+          <div class="u-empty">Cargando…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <aside class="right">
+    <div class="right-section">
+      <h3>Jugador</h3>
+      <div class="info-row"><span class="key">Nombre</span><span class="val" id="infoName">—</span></div>
+      <div class="info-row"><span class="key">Selección</span><span class="val" id="infoTeam">—</span></div>
+      <div class="info-row"><span class="key">Posición</span><span class="val" id="infoPos">—</span></div>
+      <div class="info-row"><span class="key">Club</span><span class="val" id="infoClub">—</span></div>
+      <div class="info-row"><span class="key">Tier base</span><span class="val"><span class="tier-pill bronze" id="infoTier">Bronce</span></span></div>
+      <div class="info-row"><span class="key">Estado actual</span><span class="val" id="infoEstado">—</span></div>
+      <div class="info-row"><span class="key">Fuente overall</span><span class="val" id="infoFuente">—</span></div>
+    </div>
+    <div class="note-wrap">
+      <h3>Nota interna</h3>
+      <textarea id="noteInput" placeholder="Motivo del cambio, referencias, contexto…"></textarea>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="saving-indicator" id="savingIndicator">Guardando…</div>
+
+<script>
+// Bloquear zoom en iOS Safari (ignora user-scalable=no desde iOS 10)
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+// Bloquear doble tap zoom
+let _lt = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - _lt < 300) e.preventDefault();
+  _lt = now;
+}, { passive: false });
+</script>
+<script src="/js/jugadores.js"></script>
+<script src="/js/fotos.js"></script>
+<script src="/js/ifs.js"></script>
+<script src="/js/club_liga.js"></script>
+<script src="/js/cartas.js"></script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const ADMIN_EMAILS = ['pepepresta@gmail.com', 'jeplaguitlla@gmail.com'];
+const firebaseConfig = {
+  apiKey:"AIzaSyBuM2Y9RAASDUL_bn_97T12HQzfjREVvj8",
+  authDomain:"la-pausa-mundial-2026.web.app",
+  projectId:"la-pausa-mundial-2026",
+  storageBucket:"la-pausa-mundial-2026.firebasestorage.app",
+  messagingSenderId:"434896019884",
+  appId:"1:434896019884:web:2d71a647065c576ca19a09"
+};
+const fbApp  = initializeApp(firebaseConfig);
+const auth   = getAuth(fbApp);
+const db     = getFirestore(fbApp);
+const gProv  = new GoogleAuthProvider();
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let allPlayers = [], filteredPlayers = [], currentIndex = 0;
+let overrides  = {};   // nombre → {overall,tier,estado,nota,...}
+let pendingOverall = null;
+let pendingEstado  = undefined; // undefined = not touched
+let pendingBrillo  = undefined; // undefined = not touched
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, gProv); } catch(e) { showToast('Error al iniciar sesión', 'err'); }
+});
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { showLogin(); return; }
+  if (!ADMIN_EMAILS.includes(user.email)) {
+    await signOut(auth);
+    document.getElementById('loginError').style.display = 'block';
+    showLogin(); return;
+  }
+  showApp(user.email);
+  await init();
+});
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminApp').style.display = 'none';
+}
+function showApp(email) {
+  document.getElementById('loginScreen').style.display = 'none';
+  // En móvil CSS controla display:flex via !important; en desktop necesitamos grid
+  document.getElementById('adminApp').style.display = window.innerWidth <= 768 ? 'flex' : 'grid';
+  document.getElementById('userEmail').textContent = email;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  allPlayers = buildPlayerList();
+  rebuildTeamFilter();
+  document.getElementById('emptyState').querySelector('p').textContent = 'Cargando overrides de Firestore…';
+  try {
+    await loadOverrides();
+  } catch(e) {
+    showToast('Error cargando overrides', 'err');
+  }
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'flex';
+  applyFilters();
+}
+
+function buildPlayerList() {
+  const list = [];
+  for (const sel of JUGADORES_MUNDIAL) {
+    for (const j of sel.jugadores) {
+      list.push({
+        nombre:      j.nombre,
+        seleccion:   sel.seleccion,
+        pos:         j.pos,
+        posDraft:    j.posDraft || '',
+        club:        j.club,
+        overallBase: j.overall,
+        tierBase:    j.tier,
+      });
+    }
+  }
+  return list;
+}
+
+async function loadOverrides() {
+  const snap = await getDocs(collection(db, 'overrides'));
+  overrides = {};
+  snap.forEach(d => { const data = d.data(); if (data.nombre) overrides[data.nombre] = data; });
+}
+
+// ── COMPUTED ──────────────────────────────────────────────────────────────────
+function getOv(p) { return overrides[p.nombre] || null; }
+function effectiveOverall(p) { const o = getOv(p); return (o && o.overall != null) ? o.overall : p.overallBase; }
+function effectiveEstado(p)  { const o = getOv(p); return o ? (o.estado || null) : null; }
+function effectiveBrillo(p)  { const o = getOv(p); return o ? (o.brillo || null) : null; }
+function getBrilloFromOverall(overall) {
+  if (overall >= 84) return 'brillante';
+  if (overall >= 75) return 'mate';
+  if (overall >= 70) return 'brillante';
+  if (overall >= 65) return 'mate';
+  if (overall >= 55) return 'brillante';
+  return 'mate';
+}
+function effectiveTier(overall, brillo) {
+  const metal = overall >= 75 ? 'oro' : overall >= 65 ? 'plata' : 'bronce';
+  return `${metal}-${brillo || getBrilloFromOverall(overall)}`;
+}
+function getMetal(overall) { return overall >= 75 ? 'gold' : overall >= 65 ? 'silver' : 'bronze'; }
+function getTierLabel(overall, brillo) {
+  const metal = overall >= 75 ? 'Oro' : overall >= 65 ? 'Plata' : 'Bronce';
+  const b = brillo || getBrilloFromOverall(overall);
+  return `${metal} ${b === 'brillante' ? 'Brillante' : 'Mate'}`;
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function rebuildTeamFilter() {
+  const sel = document.getElementById('teamFilter');
+  const teams = [...new Set(allPlayers.map(p => p.seleccion))].sort((a,b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="all">Todas</option>';
+  teams.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
+}
+
+function applyFilters() {
+  const teamV   = document.getElementById('teamFilter').value;
+  const metalV  = document.getElementById('metalFilter').value;
+  const posV    = document.getElementById('posFilter').value;
+  const brilloV = document.getElementById('brilloFilter').value;
+  const revV    = document.getElementById('reviewFilter').value;
+  const searchV = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  filteredPlayers = allPlayers.filter(p => {
+    const eff  = effectiveOverall(p);
+    const ov   = getOv(p);
+    const reviewed = !!ov;
+    const changed  = reviewed && ov.overall != null && ov.overall !== p.overallBase;
+    const estado   = effectiveEstado(p);
+    const brillo   = effectiveBrillo(p) || getBrilloFromOverall(eff);
+    if (teamV   !== 'all' && p.seleccion !== teamV) return false;
+    if (metalV  !== 'all' && getMetal(eff) !== metalV) return false;
+    if (posV    !== 'all' && p.posDraft !== posV) return false;
+    if (brilloV !== 'all' && brillo !== brilloV) return false;
+    if (revV === 'pending'  && reviewed)  return false;
+    if (revV === 'reviewed' && !reviewed) return false;
+    if (revV === 'changed'  && !changed)  return false;
+    if (revV === 'lesion' && estado !== 'lesion') return false;
+    if (revV === 'duda'   && estado !== 'duda')   return false;
+    if (revV === 'forma'  && estado !== 'forma')  return false;
+    const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+    if (searchV && !norm(`${p.nombre} ${p.seleccion} ${p.pos} ${p.club}`).includes(norm(searchV))) return false;
+    return true;
+  }).sort((a,b) => sortByOvr
+    ? effectiveOverall(b) - effectiveOverall(a)
+    : a.seleccion !== b.seleccion ? a.seleccion.localeCompare(b.seleccion) : effectiveOverall(b) - effectiveOverall(a));
+
+  if (currentIndex >= filteredPlayers.length) currentIndex = Math.max(0, filteredPlayers.length - 1);
+  pendingOverall = null; pendingEstado = undefined; pendingBrillo = undefined;
+  renderAll();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAll() { renderStats(); renderCard(); renderList(); }
+
+function renderStats() {
+  const reviewed = allPlayers.filter(p => getOv(p)).length;
+  const changed  = allPlayers.filter(p => { const o = getOv(p); return o && o.overall != null && o.overall !== p.overallBase; }).length;
+  document.getElementById('statTotal').textContent     = allPlayers.length;
+  document.getElementById('statRevisados').textContent = reviewed;
+  document.getElementById('statCambiados').textContent = changed;
+  document.getElementById('statPendientes').textContent = allPlayers.length - reviewed;
+  const pct = allPlayers.length ? Math.round(reviewed / allPlayers.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function renderCard() {
+  if (!filteredPlayers.length) return;
+  const p = filteredPlayers[currentIndex];
+  const ov = getOv(p);
+  const working = pendingOverall !== null ? pendingOverall : effectiveOverall(p);
+  const workingEstado = pendingEstado !== undefined ? pendingEstado : effectiveEstado(p);
+  const workingBrillo = pendingBrillo !== undefined ? pendingBrillo : effectiveBrillo(p);
+  const delta = working - p.overallBase;
+
+  document.getElementById('cnavCount').textContent = `${currentIndex + 1} / ${filteredPlayers.length}`;
+  document.getElementById('cnavScope').textContent  = buildScope();
+  document.getElementById('dispOriginal').textContent = p.overallBase;
+  document.getElementById('dispNew').textContent      = working;
+  document.getElementById('manualInput').value = working !== p.overallBase ? working : '';
+
+  const newWrap  = document.getElementById('dispNewWrap');
+  const deltaEl  = document.getElementById('dispDelta');
+  if (delta === 0)      { newWrap.className = 'overall-new neutral'; deltaEl.className = 'delta-badge flat'; deltaEl.textContent = 'sin cambio'; }
+  else if (delta > 0)   { newWrap.className = 'overall-new';         deltaEl.className = 'delta-badge up';   deltaEl.textContent = `+${delta}`; }
+  else                  { newWrap.className = 'overall-new';         deltaEl.className = 'delta-badge down'; deltaEl.textContent = `${delta}`; }
+
+  // Info panel
+  document.getElementById('infoName').textContent  = p.nombre;
+  document.getElementById('infoTeam').textContent  = p.seleccion;
+  document.getElementById('infoPos').textContent   = p.pos;
+  document.getElementById('infoClub').textContent  = p.club;
+  const metal = getMetal(working);
+  const tierEl = document.getElementById('infoTier');
+  tierEl.textContent = getTierLabel(working, workingBrillo);
+  tierEl.className = `tier-pill ${metal}`;
+  const estadoLabels = { lesion:'🔴 Lesión', duda:'🩹 Duda', forma:'🔥 Forma' };
+  document.getElementById('infoEstado').textContent = workingEstado ? (estadoLabels[workingEstado] || workingEstado) : '—';
+  const fuenteEl = document.getElementById('infoFuente');
+  if (ov && ov.overall != null) {
+    fuenteEl.textContent = '⚡ Firestore override';
+    fuenteEl.style.color = 'var(--ok)';
+  } else {
+    fuenteEl.textContent = '📄 Base jugadores.js';
+    fuenteEl.style.color = 'var(--muted)';
+  }
+  document.getElementById('noteInput').value = ov?.nota || '';
+
+  // Brillo pills
+  document.querySelectorAll('.brillo-pill').forEach(btn => {
+    const val = btn.dataset.brillo;
+    btn.className = 'brillo-pill';
+    if (val === (workingBrillo || '')) {
+      if (val === '') btn.classList.add('active-auto');
+      else if (val === 'brillante') btn.classList.add('active-brillante');
+      else btn.classList.add('active-mate');
+    }
+  });
+
+  // Estado pills
+  document.querySelectorAll('.estado-pill').forEach(btn => {
+    const val = btn.dataset.estado;
+    btn.className = 'estado-pill';
+    if (val === (workingEstado || '')) {
+      if (val === '') btn.classList.add('active-none');
+      else if (val === 'lesion') btn.classList.add('active-lesion');
+      else if (val === 'duda')   btn.classList.add('active-duda');
+      else if (val === 'forma')  btn.classList.add('active-forma');
+    }
+  });
+
+  updateCardSVG(p, working);
+}
+
+function updateCardSVG(p, overall) {
+  const brillo = getWorkingBrillo();
+  const tier = effectiveTier(overall, brillo);
+  const foto = (typeof FOTOS_JUGADORES !== 'undefined') ? (FOTOS_JUGADORES[p.nombre] || null) : null;
+  const cardObj = {
+    nombre:   p.nombre,
+    overall,
+    tier,
+    foto,
+    seleccion: p.seleccion,
+    posicion:  p.posDraft,
+    posDraft:  p.posDraft,
+    club:      p.club,
+  };
+  document.getElementById('cardWrap').innerHTML = cardSVG(cardObj);
+}
+
+
+function renderList() {
+  const wrap = document.getElementById('listWrap'); wrap.innerHTML = '';
+  filteredPlayers.forEach((p, i) => {
+    const ov = getOv(p);
+    const eff = effectiveOverall(p);
+    const reviewed = !!ov;
+    const changed  = reviewed && ov.overall != null && ov.overall !== p.overallBase;
+    const estado   = effectiveEstado(p);
+    const overallColor = !reviewed
+      ? 'rgba(240,237,230,0.3)'
+      : getMetal(eff) === 'gold' ? '#f0cc60' : getMetal(eff) === 'silver' ? '#d6d9e0' : '#d08040';
+    const estadoIcon = estado === 'lesion' ? '🔴' : estado === 'duda' ? '🩹' : estado === 'forma' ? '🔥' : '';
+    const srcHtml = !reviewed
+      ? `<div class="list-src base">BASE</div>`
+      : `<div class="list-src override ${changed ? (eff > p.overallBase ? 'up' : 'down') : 'ok'}"></div>`;
+    const div = document.createElement('div');
+    div.className = `list-item${i === currentIndex ? ' active' : ''}${!reviewed ? ' no-override' : ''}`;
+    div.innerHTML = `
+      <div class="list-rank">${i+1}</div>
+      <div>
+        <div class="list-name">${esc(p.nombre)}</div>
+        <div class="list-team">${esc(p.seleccion)} · ${esc(p.posDraft || '')}</div>
+      </div>
+      <div class="list-overall" style="color:${overallColor}">${eff}</div>
+      ${srcHtml}
+      <div class="list-estado">${estadoIcon}</div>`;
+    div.addEventListener('click', () => { currentIndex = i; pendingOverall = null; pendingEstado = undefined; pendingBrillo = undefined; renderAll(); scrollActive(); if (window.innerWidth <= 768) showMobileEditor(); });
+    wrap.appendChild(div);
+  });
+  scrollActive();
+}
+function scrollActive() { const el = document.querySelector('.list-item.active'); if (el) el.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+function buildScope() {
+  const parts = [];
+  const tv = document.getElementById('teamFilter').value;
+  const mv = document.getElementById('metalFilter').value;
+  const rv = document.getElementById('reviewFilter').value;
+  if (tv !== 'all') parts.push(tv);
+  if (mv !== 'all') parts.push(mv);
+  if (rv !== 'all') parts.push(rv);
+  return parts.join(' · ') || 'Sin filtro';
+}
+
+// ── WORKING VALUES ────────────────────────────────────────────────────────────
+function getWorkingOverall() {
+  if (!filteredPlayers.length) return null;
+  const p = filteredPlayers[currentIndex];
+  return pendingOverall !== null ? pendingOverall : effectiveOverall(p);
+}
+function getWorkingEstado() {
+  if (!filteredPlayers.length) return null;
+  const p = filteredPlayers[currentIndex];
+  return pendingEstado !== undefined ? pendingEstado : effectiveEstado(p);
+}
+function getWorkingBrillo() {
+  if (!filteredPlayers.length) return null;
+  const p = filteredPlayers[currentIndex];
+  return pendingBrillo !== undefined ? pendingBrillo : effectiveBrillo(p);
+}
+function setWorkingOverall(val) { val = Math.max(30, Math.min(99, val)); pendingOverall = val; renderCard(); }
+function applyDelta(d) { const c = getWorkingOverall(); if (c === null) return; setWorkingOverall(c + d); }
+function setWorkingEstado(val) { pendingEstado = val || null; renderCard(); }
+function setWorkingBrillo(val) { pendingBrillo = val || null; renderCard(); }
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+async function saveCurrentPlayer() {
+  if (!filteredPlayers.length) return;
+  const p = filteredPlayers[currentIndex];
+  const working = getWorkingOverall();
+  const estado  = getWorkingEstado();
+  const brillo  = getWorkingBrillo();
+  const nota    = document.getElementById('noteInput').value.trim();
+
+  const data = {
+    nombre:      p.nombre,
+    seleccion:   p.seleccion,
+    overall:     working,
+    overallBase: p.overallBase,
+    tier:        effectiveTier(working, brillo),
+    brillo:      brillo || null,
+    estado:      estado || null,
+    nota,
+    updatedAt:   new Date().toISOString(),
+  };
+
+  setSaving(true);
+  try {
+    await setDoc(doc(db, 'overrides', p.nombre), data);
+    overrides[p.nombre] = data;
+    pendingOverall = null; pendingEstado = undefined; pendingBrillo = undefined;
+    showToast(`✓ ${p.nombre} · ${working}`);
+    renderAll();
+  } catch(e) {
+    showToast('Error al guardar', 'err');
+  } finally {
+    setSaving(false);
+  }
+}
+
+async function resetCurrentPlayer() {
+  if (!filteredPlayers.length) return;
+  const p = filteredPlayers[currentIndex];
+  if (!getOv(p)) { showToast('Este jugador no tiene override', 'warn'); return; }
+  if (!confirm(`¿Borrar el override de ${p.nombre}?`)) return;
+  setSaving(true);
+  try {
+    await deleteDoc(doc(db, 'overrides', p.nombre));
+    delete overrides[p.nombre];
+    pendingOverall = null; pendingEstado = undefined; pendingBrillo = undefined;
+    showToast(`Borrado: ${p.nombre}`, 'warn');
+    renderAll();
+  } catch(e) {
+    showToast('Error al borrar', 'err');
+  } finally {
+    setSaving(false);
+  }
+}
+
+function setSaving(on) {
+  document.getElementById('savingIndicator').classList.toggle('show', on);
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function moveTo(i) {
+  if (!filteredPlayers.length) return;
+  currentIndex = ((i % filteredPlayers.length) + filteredPlayers.length) % filteredPlayers.length;
+  pendingOverall = null; pendingEstado = undefined; pendingBrillo = undefined;
+  renderAll(); scrollActive();
+}
+function moveBy(step) { moveTo(currentIndex + step); }
+function jumpPending(dir) {
+  for (let c = 0; c < filteredPlayers.length; c++) {
+    const i = ((currentIndex + dir * (c + 1)) + filteredPlayers.length * 10) % filteredPlayers.length;
+    if (!getOv(filteredPlayers[i])) { moveTo(i); return; }
+  }
+  showToast('No hay más pendientes', 'warn');
+}
+let sortByOvr = false;
+function toggleSortOvr() {
+  sortByOvr = !sortByOvr;
+  document.getElementById('sortOvrBtn').textContent = sortByOvr ? 'Orden: OVR ↓' : 'Orden: Selección';
+  document.getElementById('sortOvrBtn').classList.toggle('accent', sortByOvr);
+  applyFilters();
+}
+function jumpTeamFirst() {
+  const tv = document.getElementById('teamFilter').value;
+  if (tv !== 'all') { moveTo(0); return; }
+  const cur = filteredPlayers[currentIndex];
+  if (!cur) return;
+  const i = filteredPlayers.findIndex(p => p.seleccion === cur.seleccion);
+  moveTo(i >= 0 ? i : 0);
+}
+
+// ── MOBILE NAV ────────────────────────────────────────────────────────────────
+function showMobileEditor() {
+  document.querySelector('.left').classList.add('m-hidden');
+  document.querySelector('.center').classList.add('m-active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+function showMobileList() {
+  document.querySelector('.left').classList.remove('m-hidden');
+  document.querySelector('.center').classList.remove('m-active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  requestAnimationFrame(() => scrollActive());
+}
+document.getElementById('mobileBack').addEventListener('click', showMobileList);
+
+// ── EVENT LISTENERS ───────────────────────────────────────────────────────────
+document.getElementById('teamFilter').addEventListener('change', applyFilters);
+document.getElementById('metalFilter').addEventListener('change', applyFilters);
+document.getElementById('posFilter').addEventListener('change', applyFilters);
+document.getElementById('brilloFilter').addEventListener('change', applyFilters);
+document.getElementById('reviewFilter').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('prevBtn').addEventListener('click', () => moveBy(-1));
+document.getElementById('nextBtn').addEventListener('click', () => moveBy(1));
+document.getElementById('prevPendingBtn').addEventListener('click', () => jumpPending(-1));
+document.getElementById('nextPendingBtn').addEventListener('click', () => jumpPending(1));
+document.getElementById('sortOvrBtn').addEventListener('click', toggleSortOvr);
+document.getElementById('jumpTeamBtn').addEventListener('click', jumpTeamFirst);
+document.getElementById('saveBtn').addEventListener('click', saveCurrentPlayer);
+document.getElementById('resetBtn').addEventListener('click', resetCurrentPlayer);
+
+document.querySelectorAll('.bumper[data-delta]').forEach(btn => {
+  btn.addEventListener('click', () => applyDelta(Number(btn.dataset.delta)));
+});
+document.querySelectorAll('.brillo-pill').forEach(btn => {
+  btn.addEventListener('click', () => setWorkingBrillo(btn.dataset.brillo));
+});
+document.querySelectorAll('.estado-pill').forEach(btn => {
+  btn.addEventListener('click', () => setWorkingEstado(btn.dataset.estado));
+});
+document.getElementById('manualInput').addEventListener('input', e => {
+  const v = parseInt(e.target.value); if (!isNaN(v) && v >= 30 && v <= 99) setWorkingOverall(v);
+});
+
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); saveCurrentPlayer(); }
+    return;
+  }
+  if (e.key === 'ArrowRight')      { e.preventDefault(); moveBy(1); }
+  else if (e.key === 'ArrowLeft')  { e.preventDefault(); moveBy(-1); }
+  else if (e.key === 'Enter')      { e.preventDefault(); saveCurrentPlayer(); }
+  else if (e.key === 'Tab')        { e.preventDefault(); jumpPending(e.shiftKey ? -1 : 1); }
+  else if (e.key === 'ArrowUp')    { e.preventDefault(); applyDelta(1); }
+  else if (e.key === 'ArrowDown')  { e.preventDefault(); applyDelta(-1); }
+});
+
+// ── JORNADA TAB ───────────────────────────────────────────────────────────────
+const JORNADA_SCHEDULE = {
+  J1:{ deadline:1781204400000, label:'Jornada 1 — Fase de grupos',  fase:'Fase de grupos'  },
+  J2:{ deadline:1781798400000, label:'Jornada 2 — Fase de grupos',  fase:'Fase de grupos'  },
+  J3:{ deadline:1782327600000, label:'Jornada 3 — Fase de grupos',  fase:'Fase de grupos'  },
+  J4:{ deadline:1782673200000, label:'Jornada 4 — Octavos de final',   fase:'Octavos de final'    },
+  J5:{ deadline:1783184400000, label:'Jornada 5 — Cuartos de final',  fase:'Cuartos de final'    },
+  J6:{ deadline:1783627200000, label:'Jornada 6 — Semifinales',       fase:'Semifinales'          },
+  J7:{ deadline:1784055600000, label:'Jornada 7 — Semifinales',       fase:'Semifinales'          },
+  J8:{ deadline:1784408400000, label:'Jornada 8 — 3er puesto y Final',fase:'3er puesto y Final'   },
+};
+
+let _jornadaSnap = null;
+
+document.getElementById('tabJugadores').addEventListener('click', () => switchTab('jugadores'));
+document.getElementById('tabJornada').addEventListener('click', () => switchTab('jornada'));
+document.getElementById('tabUsuarios').addEventListener('click', () => switchTab('usuarios'));
+
+function switchTab(tab) {
+  const tabs = ['jugadores','jornada','usuarios'];
+  tabs.forEach(t => document.getElementById(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active', t === tab));
+  const isJornada  = tab === 'jornada';
+  const isUsuarios = tab === 'usuarios';
+  const isJugadores = tab === 'jugadores';
+  document.querySelector('.left').style.display    = isJugadores ? '' : 'none';
+  document.querySelector('.center').style.display  = isJugadores ? '' : 'none';
+  document.querySelector('.right').style.display   = isJugadores ? '' : 'none';
+  document.getElementById('jornadaPanel').classList.toggle('visible', isJornada);
+  document.getElementById('usuariosPanel').classList.toggle('visible', isUsuarios);
+  if (isJornada)  initJornadaTab();
+  if (isUsuarios) initUsuariosTab();
+}
+
+let _jornadaUnsub = null;
+let _scrapeUnsub  = null;
+function initJornadaTab() {
+  if (_jornadaUnsub) return;
+  _jornadaUnsub = onSnapshot(doc(db, 'config', 'jornada'), snap => {
+    const prev = _jornadaSnap?.actual;
+    _jornadaSnap = snap.data() || null;
+    renderJornadaStatus();
+    const actual = _jornadaSnap?.actual || 'J1';
+    if (actual !== prev) {
+      if (_scrapeUnsub) { _scrapeUnsub(); _scrapeUnsub = null; }
+      _scrapeUnsub = onSnapshot(doc(db, 'puntuaciones', actual), s => renderScrapeInfo(s.data()));
+    }
+  });
+}
+
+function renderJornadaStatus() {
+  const data = _jornadaSnap;
+  if (!data) return;
+  const { actual, deadline, label, fase } = data;
+  document.getElementById('jActualBadge').textContent = actual || '—';
+  document.getElementById('jActualLabel').textContent = label || actual || '—';
+  document.getElementById('jActualFase').textContent  = fase || '—';
+
+  const now = Date.now();
+  const isDraftOpen = deadline > now;
+  const dl = new Date(deadline);
+  const dlStr = dl.toLocaleString('es-ES', { timeZone:'Europe/Madrid', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('jDeadlineStr').textContent = isDraftOpen
+    ? `Draft abierto hasta el ${dlStr} (Madrid)`
+    : `Draft cerrado desde el ${dlStr} (Madrid)`;
+
+  const statusEl = document.getElementById('jDraftStatus');
+  const labelEl  = document.getElementById('jDraftLabel');
+  statusEl.className = `j-draft-status ${isDraftOpen ? 'open' : 'closed'}`;
+  labelEl.textContent = isDraftOpen ? 'Draft abierto' : 'Draft cerrado';
+
+  document.querySelectorAll('.j-jornada-btn').forEach(btn => {
+    btn.classList.toggle('current', btn.dataset.j === actual);
+  });
+}
+
+function renderScrapeInfo(data) {
+  const el = document.getElementById('jScrapeInfo');
+  if (!data || !data._meta) {
+    el.innerHTML = '<span style="color:var(--muted)">Sin datos de puntuaciones aún.</span>';
+    return;
+  }
+  const m = data._meta;
+  const jugadores = Object.keys(data).filter(k => !k.startsWith('_')).length;
+  const updated = m.updatedAt ? new Date(m.updatedAt).toLocaleString('es-ES', { timeZone:'Europe/Madrid', hour:'2-digit', minute:'2-digit' }) : '—';
+  el.innerHTML = `
+    <div><strong>Último scrape:</strong> ${updated}</div>
+    <div><strong>Jugadores con nota:</strong> ${jugadores}</div>
+    <div><strong>Estado SofaScore:</strong> ${m.status || '—'}</div>
+  `;
+}
+
+document.querySelectorAll('.j-jornada-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const j = btn.dataset.j;
+    const input = prompt(`Escribe "${j}" para confirmar el cambio de jornada activa:`);
+    if (!input || input.trim().toUpperCase() !== j) { showToast('Cancelado', 'warn'); return; }
+    try {
+      const cfg = JORNADA_SCHEDULE[j];
+      await setDoc(doc(db, 'config', 'jornada'), {
+        actual: j, deadline: cfg.deadline, label: cfg.label, fase: cfg.fase, updatedAt: Date.now()
+      });
+      showToast(`✓ Jornada cambiada a ${j}`);
+    } catch(e) { showToast('Error: ' + e.message, 'err'); }
+  });
+});
+
+document.getElementById('jOpenDraft').addEventListener('click', async () => {
+  if (!_jornadaSnap?.actual) return;
+  const j = _jornadaSnap.actual;
+  const cfg = JORNADA_SCHEDULE[j];
+  if (!confirm(`¿Reabrir el draft para ${j}? Se restaurará el deadline original.`)) return;
+  try {
+    await updateDoc(doc(db, 'config', 'jornada'), { deadline: cfg.deadline, updatedAt: Date.now() });
+    showToast(`✓ Draft abierto para ${j}`);
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+});
+
+document.getElementById('jCloseDraft').addEventListener('click', async () => {
+  if (!confirm('¿Cerrar el draft ahora para todos los managers?')) return;
+  try {
+    await updateDoc(doc(db, 'config', 'jornada'), { deadline: Date.now() - 1000, updatedAt: Date.now() });
+    showToast('✓ Draft cerrado');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+});
+
+document.getElementById('jCerrarJornada').addEventListener('click', async () => {
+  const jornada = document.getElementById('jActualBadge').textContent.trim();
+  if (!jornada || jornada === '—') { showToast('No hay jornada activa', 'err'); return; }
+  if (!confirm(`¿Cerrar jornada ${jornada} y guardar puntos finales de todos los mánagers?\n\nEsto escribirá los puntos en historial.${jornada} de cada draft.`)) return;
+
+  const btn = document.getElementById('jCerrarJornada');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+
+  const CHEM_CONNS = {
+    '4-4-2':[['T-DL-0','T-DL-1'],['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],['T-MC-2','T-MC-3'],['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],['T-DF-2','T-DF-3'],['T-DL-0','T-MC-0'],['T-DL-0','T-MC-1'],['T-DL-1','T-MC-2'],['T-DL-1','T-MC-3'],['T-MC-0','T-DF-0'],['T-MC-1','T-DF-1'],['T-MC-2','T-DF-2'],['T-MC-3','T-DF-3'],['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0']],
+    '4-3-3':[['T-DL-0','T-DL-1'],['T-DL-1','T-DL-2'],['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],['T-DF-2','T-DF-3'],['T-DL-0','T-MC-0'],['T-DL-1','T-MC-1'],['T-DL-2','T-MC-2'],['T-MC-0','T-DF-0'],['T-MC-0','T-DF-1'],['T-MC-1','T-DF-1'],['T-MC-1','T-DF-2'],['T-MC-2','T-DF-2'],['T-MC-2','T-DF-3'],['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0']],
+    '3-4-3':[['T-DL-0','T-DL-1'],['T-DL-1','T-DL-2'],['T-MC-0','T-MC-1'],['T-MC-1','T-MC-2'],['T-MC-2','T-MC-3'],['T-DF-0','T-DF-1'],['T-DF-1','T-DF-2'],['T-DL-0','T-MC-0'],['T-DL-1','T-MC-1'],['T-DL-1','T-MC-2'],['T-DL-2','T-MC-3'],['T-MC-0','T-DF-0'],['T-MC-1','T-DF-1'],['T-MC-2','T-DF-1'],['T-MC-3','T-DF-2'],['T-DF-0','T-PT-0'],['T-DF-1','T-PT-0'],['T-DF-2','T-PT-0']],
+  };
+
+  function calcPtsAdmin(slotCards, formacion, puntuaciones) {
+    if (!slotCards || !puntuaciones) return 0;
+    const sc = {};
+    for (const [sk, card] of Object.entries(slotCards)) {
+      let club = card.club || '';
+      if (!club && typeof JUGADORES_MUNDIAL !== 'undefined') {
+        for (const s of JUGADORES_MUNDIAL) { const j = s.jugadores.find(x => x.nombre === card.nombre); if (j) { club = j.club || ''; break; } }
+      }
+      sc[sk] = { seleccion: card.seleccion || '', club };
+    }
+    const cs = (k1, k2) => {
+      const c1 = sc[k1], c2 = sc[k2]; if (!c1 || !c2) return -1;
+      if (c1.club && c2.club && c1.club === c2.club) return 2;
+      const l1 = typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[c1.club] : null;
+      const l2 = typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[c2.club] : null;
+      let f = 0; if (c1.seleccion && c1.seleccion === c2.seleccion) f++; if (l1 && l2 && l1 === l2) f++;
+      return Math.min(f, 2);
+    };
+    const cm = sk => {
+      const conns = (CHEM_CONNS[formacion] || []).filter(([a, b]) => a === sk || b === sk);
+      if (!conns.length) return 1;
+      let total = 0; for (const [a, b] of conns) { const s = cs(a, b); if (s > 0) total += s; }
+      return total >= conns.length ? 1.5 : total >= 1 ? 1.25 : 1;
+    };
+    let total = 0;
+    for (const [sk, card] of Object.entries(slotCards)) {
+      const base = puntuaciones.hasOwnProperty(card.nombre) ? puntuaciones[card.nombre] : null;
+      if (base === null) continue;
+      total += Math.round(base * cm(sk));
+    }
+    return total;
+  }
+
+  try {
+    const ptsSnap = await getDoc(doc(db, 'puntuaciones', jornada));
+    if (!ptsSnap.exists()) { showToast('Sin puntuaciones para ' + jornada, 'err'); return; }
+    const rawPts = {};
+    for (const [k, v] of Object.entries(ptsSnap.data())) {
+      if (!k.startsWith('_') && typeof v === 'number') rawPts[k] = v;
+    }
+    const ligaSnap = await getDoc(doc(db, 'ligas', 'mundial-2026-general'));
+    if (!ligaSnap.exists()) { showToast('No se encontró liga general', 'err'); return; }
+    const managers = ligaSnap.data().managers || [];
+    let saved = 0, sinDraft = 0;
+    for (const uid of managers) {
+      const draftSnap = await getDoc(doc(db, 'drafts', uid));
+      if (!draftSnap.exists()) { sinDraft++; continue; }
+      const { slotCards, formacion } = draftSnap.data();
+      const pts = calcPtsAdmin(slotCards, formacion || '4-3-3', rawPts);
+      await updateDoc(doc(db, 'drafts', uid), { [`historial.${jornada}`]: pts });
+      saved++;
+    }
+    showToast(`✓ ${jornada} cerrada · ${saved} mánagers guardados${sinDraft ? ` · ${sinDraft} sin draft` : ''}`);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Cerrar jornada y guardar pts';
+  }
+});
+
+// ── USUARIOS TAB ──────────────────────────────────────────────────────────────
+let _usuariosUnsub = null;
+
+function initUsuariosTab() {
+  if (_usuariosUnsub) return;
+
+  // Cargar clave de registro actual
+  getDoc(doc(db, 'config', 'registro')).then(snap => {
+    const clave = snap.exists() ? (snap.data().clave || '—') : '—';
+    document.getElementById('claveActual').textContent = clave;
+  });
+
+  // Suscribirse a la lista de usuarios
+  _usuariosUnsub = onSnapshot(collection(db, 'users'), snap => {
+    const docs = [];
+    snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+    docs.sort((a, b) => (a.numero || 999) - (b.numero || 999));
+    renderUsuariosList(docs);
+  });
+}
+
+function renderUsuariosList(docs) {
+  const el = document.getElementById('codigosList');
+  const jugadores = docs.filter(d => d.nombre);
+  if (!jugadores.length) { el.innerHTML = '<div class="u-empty">No hay jugadores aún</div>'; return; }
+  el.innerHTML = jugadores.map(d => `
+    <div class="u-code-row">
+      <div class="u-cr-code">#${d.numero || '?'}</div>
+      <div class="u-cr-user">${esc(d.nombre)}</div>
+      <div class="u-cr-badge libre">${esc(d.username || '')}</div>
+      <div class="u-cr-date">${esc(d.uid ? d.uid.slice(0,8)+'…' : '—')}</div>
+    </div>`
+  ).join('');
+}
+
+document.getElementById('guardarClaveBtn').addEventListener('click', async () => {
+  const btn   = document.getElementById('guardarClaveBtn');
+  const clave = document.getElementById('claveInput').value.trim();
+  if (!clave) { showToast('Escribe una clave', 'err'); return; }
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  try {
+    await setDoc(doc(db, 'config', 'registro'), { clave }, { merge: true });
+    document.getElementById('claveActual').textContent = clave;
+    document.getElementById('claveInput').value = '';
+    showToast('✓ Clave actualizada');
+  } catch(e) {
+    showToast('Error al guardar', 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar';
+  }
+});
+
+document.getElementById('copiarClaveBtn').addEventListener('click', () => {
+  const clave = document.getElementById('claveActual').textContent;
+  if (clave && clave !== '—') {
+    navigator.clipboard.writeText(clave).then(() => showToast('✓ Copiado al portapapeles'));
+  }
+});
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast show ${type || ''}`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 2400);
+}
+function esc(t) { return (t||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+</script>
+</body>
+</html>

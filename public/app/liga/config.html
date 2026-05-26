@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DIVIETO · Config Liga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/base.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    .app { height: 100dvh; display: flex; flex-direction: column; }
+
+    /* ── Topbar ── */
+    .topbar {
+      flex-shrink: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(4,13,31,0.98);
+      border-bottom: 1px solid rgba(200,168,75,0.12);
+      position: relative;
+      z-index: 50;
+    }
+    .topbar-logo { height: 20px; width: auto; }
+    .topbar-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(240,237,230,0.5);
+    }
+    .btn-volver {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(240,237,230,0.5);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.2s;
+    }
+    .btn-volver:hover { color: #f0ede6; }
+
+    /* ── Scroll area ── */
+    .scroll-area {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+
+    /* ── Config wrap ── */
+    .config-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Secciones ── */
+    .config-section {
+      background: rgba(6,15,38,0.8);
+      border: 1px solid rgba(200,168,75,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .config-section-title {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c8a84b;
+      opacity: 0.7;
+      margin-bottom: 16px;
+    }
+
+    /* ── Código invitación ── */
+    .codigo-display {
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 2rem;
+      letter-spacing: 6px;
+      color: #f0cc60;
+      background: rgba(200,168,75,0.08);
+      border: 1px solid rgba(200,168,75,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-secondary {
+      flex: 1;
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid rgba(200,168,75,0.2);
+      border-radius: 8px;
+      color: #f0ede6;
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: #c8a84b; background: rgba(200,168,75,0.05); }
+
+    /* ── Nombre editable ── */
+    .input-liga-nombre {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(200,168,75,0.15);
+      border-radius: 0;
+      padding: 6px 0;
+      color: #f0ede6;
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      width: 100%;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .input-liga-nombre:focus { border-bottom-color: #c8a84b; }
+    .input-liga-nombre:disabled { cursor: default; opacity: 0.7; }
+
+    /* ── Estado inscripciones ── */
+    .estado-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .estado-label {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+    }
+    .estado-label.abierto { color: #22c55e; }
+    .estado-label.cerrado { color: #e05252; }
+    .toggle-btn {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid rgba(200,168,75,0.2);
+      border-radius: 6px;
+      color: rgba(240,237,230,0.5);
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: none;
+    }
+    .toggle-btn.visible { display: block; }
+    .toggle-btn:hover { border-color: #c8a84b; color: #f0ede6; }
+
+    /* ── Managers ── */
+    .managers-list { display: flex; flex-direction: column; gap: 10px; }
+    .manager-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-kick {
+      flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: transparent;
+      border: 1px solid rgba(224,82,82,0.3);
+      color: rgba(224,82,82,0.55);
+      font-size: 14px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-kick:hover { background: rgba(224,82,82,0.1); border-color: #e05252; color: #e05252; }
+    .manager-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #0b1e3e;
+      border: 1px solid rgba(200,168,75,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 0.75rem;
+      color: #c8a84b;
+      flex-shrink: 0;
+    }
+    .manager-nombre {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.6rem;
+      color: #f0ede6;
+      flex: 1;
+    }
+    .badge-creador {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.38rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #c8a84b;
+      border: 1px solid rgba(200,168,75,0.3);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* ── Zona de peligro ── */
+    .btn-danger {
+      width: 100%;
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 1rem;
+      letter-spacing: 3px;
+      background: transparent;
+      border: 1px solid rgba(224,82,82,0.4);
+      border-radius: 8px;
+      color: #e05252;
+      padding: 14px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-danger:hover { background: rgba(224,82,82,0.08); border-color: #e05252; }
+
+    /* ── Estado cargando ── */
+    .loading-text {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: rgba(240,237,230,0.3);
+      text-align: center;
+      padding: 40px 0;
+    }
+  *{-webkit-user-select:none;user-select:none;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <img class="topbar-logo" src="/assets/logo/logo-completo.webp" alt="La Pausa">
+    <span class="topbar-center">Configuración</span>
+    <button class="btn-volver" onclick="history.back()">← Volver</button>
+  </header>
+
+  <!-- SCROLL -->
+  <div class="scroll-area">
+    <div class="config-wrap">
+
+      <div class="loading-text" id="loading">Cargando liga...</div>
+
+      <!-- 1. CÓDIGO INVITACIÓN -->
+      <div class="config-section" id="section-codigo" style="display:none">
+        <div class="config-section-title">// Invitar a la liga</div>
+        <div class="codigo-display" id="codigo-display">—</div>
+        <div class="btn-row">
+          <button class="btn-secondary" id="btn-copiar">📋 Copiar código</button>
+          <button class="btn-secondary" id="btn-compartir">🔗 Compartir enlace</button>
+        </div>
+      </div>
+
+      <!-- 2. INFO LIGA -->
+      <div class="config-section" id="section-info" style="display:none">
+        <div class="config-section-title">// Liga</div>
+        <input class="input-liga-nombre" type="text" id="liga-nombre" disabled>
+        <div class="estado-row">
+          <span class="estado-label" id="estado-label">—</span>
+          <button class="toggle-btn" id="btn-toggle">Cambiar</button>
+        </div>
+      </div>
+
+      <!-- 3. MANAGERS -->
+      <div class="config-section" id="section-managers" style="display:none">
+        <div class="config-section-title">// Managers</div>
+        <div class="managers-list" id="managers-list"></div>
+      </div>
+
+      <!-- 4. ZONA DE PELIGRO -->
+      <div class="config-section" id="section-peligro" style="display:none; border-color: rgba(224,82,82,0.15);">
+        <div class="config-section-title" style="color:#e05252">// Zona de peligro</div>
+        <button class="btn-danger" id="btn-accion-peligro">—</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { auth, db } from '../../js/config.js';
+  import {
+    onAuthStateChanged, signOut
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import {
+    doc, getDoc, updateDoc, deleteDoc, arrayRemove, writeBatch
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  let currentUser = null;
+  let ligaId = null;
+  let ligaData = null;
+  let esCreador = false;
+
+  // ── Auth guard ──
+  onAuthStateChanged(auth, async user => {
+    if (!user || !user.email?.endsWith('@divieto.app')) { window.location.href = '/'; return; }
+    currentUser = user;
+    await cargarLiga();
+  });
+
+  async function cargarLiga() {
+    const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
+    if (!userSnap.exists() || !userSnap.data().ligaId) {
+      window.location.href = '/app/liga/onboarding.html'; return;
+    }
+
+    ligaId = userSnap.data().ligaId;
+    const ligaSnap = await getDoc(doc(db, 'ligas', ligaId));
+    if (!ligaSnap.exists()) {
+      window.location.href = '/app/liga/onboarding.html'; return;
+    }
+
+    ligaData = ligaSnap.data();
+    esCreador = ligaData.creadoPor === currentUser.uid;
+
+    document.getElementById('loading').style.display = 'none';
+    renderCodigo();
+    renderInfo();
+    renderManagers();
+    renderPeligro();
+  }
+
+  // ── 1. Código ──
+  function renderCodigo() {
+    document.getElementById('codigo-display').textContent = ligaData.codigo;
+    document.getElementById('section-codigo').style.display = 'block';
+  }
+
+  document.getElementById('btn-copiar').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(ligaData.codigo);
+      const btn = document.getElementById('btn-copiar');
+      btn.textContent = '✓ Copiado';
+      setTimeout(() => { btn.textContent = '📋 Copiar código'; }, 2000);
+    } catch (_) {}
+  });
+
+  document.getElementById('btn-compartir').addEventListener('click', async () => {
+    const url = `${location.origin}/app/liga/onboarding.html?codigo=${ligaData.codigo}`;
+    const data = { title: 'La Pausa · Draft Mundial', text: `Únete a "${ligaData.nombre}" con el código ${ligaData.codigo}`, url };
+    try {
+      if (navigator.share) { await navigator.share(data); }
+      else { await navigator.clipboard.writeText(url); alert('Enlace copiado'); }
+    } catch (_) {}
+  });
+
+  // ── 2. Info ──
+  function renderInfo() {
+    const input = document.getElementById('liga-nombre');
+    input.value = ligaData.nombre;
+    if (esCreador) input.disabled = false;
+
+    const abierto = ligaData.inscripcionAbierta !== false;
+    const estadoEl = document.getElementById('estado-label');
+    estadoEl.textContent = abierto ? 'Inscripciones abiertas' : 'Inscripciones cerradas';
+    estadoEl.className = 'estado-label ' + (abierto ? 'abierto' : 'cerrado');
+
+    if (esCreador) {
+      const toggleBtn = document.getElementById('btn-toggle');
+      toggleBtn.classList.add('visible');
+      toggleBtn.textContent = abierto ? 'Cerrar' : 'Abrir';
+    }
+
+    document.getElementById('section-info').style.display = 'block';
+  }
+
+  document.getElementById('liga-nombre').addEventListener('blur', async e => {
+    if (!esCreador) return;
+    const nuevo = e.target.value.trim();
+    if (!nuevo || nuevo === ligaData.nombre) return;
+    await updateDoc(doc(db, 'ligas', ligaId), { nombre: nuevo });
+    ligaData.nombre = nuevo;
+  });
+
+  document.getElementById('btn-toggle').addEventListener('click', async () => {
+    const abierto = ligaData.inscripcionAbierta !== false;
+    await updateDoc(doc(db, 'ligas', ligaId), { inscripcionAbierta: !abierto });
+    ligaData.inscripcionAbierta = !abierto;
+    renderInfo();
+  });
+
+  // ── 3. Managers ──
+  async function renderManagers() {
+    const list = document.getElementById('managers-list');
+    list.innerHTML = '';
+
+    for (const uid of ligaData.managers) {
+      const snap = await getDoc(doc(db, 'users', uid));
+      const nombre = snap.exists() ? (snap.data().nombre || uid) : uid;
+      const iniciales = nombre.split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
+      const esCreadorFila = uid === ligaData.creadoPor;
+
+      const row = document.createElement('div');
+      row.className = 'manager-row';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'manager-avatar';
+      avatar.textContent = iniciales;
+
+      const nombreEl = document.createElement('span');
+      nombreEl.className = 'manager-nombre';
+      nombreEl.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      nombreEl.textContent = nombre;
+
+      row.appendChild(avatar);
+      row.appendChild(nombreEl);
+
+      if (esCreadorFila) {
+        const badge = document.createElement('span');
+        badge.className = 'badge-creador';
+        badge.textContent = 'Creador';
+        row.appendChild(badge);
+      }
+
+      if (esCreador) {
+        const btnKick = document.createElement('button');
+        btnKick.className = 'btn-kick';
+        btnKick.title = 'Expulsar';
+        btnKick.innerHTML = '×';
+        btnKick.addEventListener('click', () => kickManager(uid, nombre));
+        row.appendChild(btnKick);
+      }
+
+      list.appendChild(row);
+    }
+
+    document.getElementById('section-managers').style.display = 'block';
+  }
+
+  async function kickManager(uid, nombre) {
+    const esSelf = uid === currentUser.uid;
+    const msg = esSelf
+      ? `¿Salir de la liga? Perderás el acceso y tendrás que crear una cuenta nueva.`
+      : `¿Expulsar a "${nombre}" de la liga?`;
+    if (!confirm(msg)) return;
+
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'ligas', ligaId), { managers: arrayRemove(uid) });
+    batch.update(doc(db, 'users', uid), { ligaId: null });
+    await batch.commit();
+
+    if (esSelf) {
+      window.location.href = '/app/liga/onboarding.html';
+    } else {
+      ligaData.managers = ligaData.managers.filter(m => m !== uid);
+      renderManagers();
+    }
+  }
+
+  // ── 4. Peligro ──
+  function renderPeligro() {
+    const btn = document.getElementById('btn-accion-peligro');
+    btn.textContent = esCreador ? 'Disolver liga' : 'Abandonar liga';
+    document.getElementById('section-peligro').style.display = 'block';
+  }
+
+  document.getElementById('btn-accion-peligro').addEventListener('click', async () => {
+    if (esCreador) {
+      if (!confirm(`¿Seguro que quieres disolver "${ligaData.nombre}"? Esta acción no se puede deshacer.`)) return;
+      await disolverLiga();
+    } else {
+      if (!confirm('¿Seguro que quieres abandonar la liga?')) return;
+      await abandonarLiga();
+    }
+  });
+
+  async function disolverLiga() {
+    const batch = writeBatch(db);
+    for (const uid of ligaData.managers) {
+      batch.update(doc(db, 'users', uid), { ligaId: null });
+    }
+    batch.delete(doc(db, 'ligas', ligaId));
+    await batch.commit();
+    window.location.href = '/app/liga/onboarding.html';
+  }
+
+  async function abandonarLiga() {
+    await updateDoc(doc(db, 'ligas', ligaId), { managers: arrayRemove(currentUser.uid) });
+    await updateDoc(doc(db, 'users', currentUser.uid), { ligaId: null });
+    window.location.href = '/app/liga/onboarding.html';
+  }
+</script>
+</body>
+</html>

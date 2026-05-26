@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DIVIETO · Selección</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;overflow:hidden;}
+body{background:#000;display:flex;justify-content:center;}
+.app{width:100%;max-width:430px;height:100dvh;background:#000;display:flex;flex-direction:column;overflow:hidden;}
+
+/* HEADER */
+.sel-header{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.back-btn{width:34px;height:34px;border:none;background:rgba(255,255,255,0.1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;color:#fff;flex-shrink:0;}
+.sel-flag{width:36px;height:26px;border-radius:3px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.sel-esc{width:34px;height:34px;object-fit:contain;flex-shrink:0;}
+.sel-title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:22px;letter-spacing:1.5px;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sel-grupo{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.35);flex-shrink:0;}
+
+/* SUB-TABS */
+.sub-tabs{flex-shrink:0;display:flex;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sub-tab{flex:1;padding:11px 0;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:15px;letter-spacing:3px;text-align:center;cursor:pointer;border:none;background:none;color:rgba(255,255,255,0.3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;}
+.sub-tab.active{color:#fff;border-bottom-color:#c8a84b;}
+
+/* PANELS */
+.tab-panel{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:14px 14px 52px;}
+.tab-panel.active{display:block;}
+.tab-panel::-webkit-scrollbar{display:none;}
+
+/* SECTION TITLE */
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:12px;letter-spacing:3px;color:rgba(255,255,255,0.35);margin-bottom:8px;margin-top:22px;}
+.sec-title:first-child{margin-top:0;}
+
+/* ── CARRUSEL PARTIDOS ── */
+.matches-outer{margin:0 -14px;overflow:hidden;}
+.matches-carousel{display:flex;overflow-x:scroll;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding:0 14px;}
+.matches-carousel::-webkit-scrollbar{display:none;}
+.match-card{flex:0 0 calc(100% - 44px);scroll-snap-align:start;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.45);border-radius:12px;padding:12px 14px;}
+.carousel-dots{display:flex;justify-content:center;gap:5px;margin-top:10px;}
+.c-dot{height:5px;border-radius:3px;background:rgba(255,255,255,0.2);transition:all 0.25s;width:5px;}
+.c-dot.active{background:#c8a84b;width:16px;}
+.match-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.match-j{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.35);}
+.match-grp{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.35);}
+.match-teams{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.match-team{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;min-width:0;}
+.match-esc{width:50px;height:50px;object-fit:contain;}
+.match-tname{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:#fff;text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.match-vs{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:18px;color:rgba(255,255,255,0.2);letter-spacing:1px;flex-shrink:0;padding:0 4px;}
+.match-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;gap:8px;}
+.match-time{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,0.38);}
+.match-sede{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,0.38);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%;}
+
+/* ── PALMARÉS ── */
+.palm-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.45);border-radius:12px;padding:14px;}
+.palm-hero{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.palm-trophy-icon{font-size:36px;line-height:1;flex-shrink:0;}
+.palm-hero-right{}
+.palm-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:44px;color:#c8a84b;line-height:1;}
+.palm-num-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-top:-2px;}
+.palm-no-titles{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,0.38);}
+.palm-groups{}
+.palm-group{margin-bottom:10px;}
+.palm-group:last-child{margin-bottom:0;}
+.palm-comp-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:3px;}
+.palm-years{display:flex;flex-wrap:wrap;gap:5px;}
+.palm-year-tag{background:rgba(200,168,75,0.12);border-radius:5px;padding:3px 8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#c8a84b;}
+
+/* ── STATS MUNDIALES ── */
+.mun-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.stat-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.45);border-radius:10px;padding:12px 14px;}
+.stat-value{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:30px;color:#fff;line-height:1;}
+.stat-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-top:2px;}
+.mejor-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.45);border-radius:10px;padding:11px 14px;}
+.mejor-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.mejor-value{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
+.hist-wrap{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.45);border-radius:10px;overflow:hidden;margin-top:8px;}
+.hist-table{width:100%;border-collapse:collapse;}
+.hist-table th{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:8px 4px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);}
+.hist-table td{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,0.9);padding:10px 4px;text-align:center;}
+
+/* ── LIGAS VISUAL ── */
+.ligas-visual{display:flex;flex-wrap:wrap;gap:10px;}
+.liga-badge{position:relative;width:66px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.liga-badge:active{opacity:0.7;}
+.liga-logo-wrap{width:56px;height:56px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.45);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;}
+.liga-logo{width:44px;height:44px;object-fit:contain;}
+.liga-cnt-badge{position:absolute;top:-5px;right:-5px;background:#c8a84b;color:#fff;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+.liga-badge-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.2px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.2;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+
+/* ── LIGA BUBBLE ── */
+.liga-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center;}
+.liga-overlay.open{display:flex;}
+.liga-sheet{width:100%;max-width:430px;max-height:82dvh;background:#111;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);}
+.liga-overlay.open .liga-sheet{transform:translateY(0);}
+.liga-sheet-handle{width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:10px auto 0;flex-shrink:0;}
+.liga-sheet-head{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;}
+.liga-sheet-logo{width:36px;height:36px;object-fit:contain;flex-shrink:0;}
+.liga-sheet-title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:17px;letter-spacing:2px;color:#fff;flex:1;}
+.liga-sheet-close{width:30px;height:30px;border:none;background:rgba(255,255,255,0.1);border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;line-height:1;}
+.liga-sheet-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 14px 24px;}
+.liga-sheet-scroll::-webkit-scrollbar{display:none;}
+.liga-mini-grid{display:flex;flex-wrap:wrap;gap:7px;}
+
+/* HISTORIA */
+.texto{font-family:'Barlow Condensed',sans-serif;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.85);}
+
+/* PLANTILLA */
+.pos-blk{margin-bottom:22px;}
+.pos-hdr{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:12px;letter-spacing:3px;color:rgba(255,255,255,0.35);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:8px;}
+.cards-grid{display:flex;flex-wrap:wrap;gap:7px;}
+
+/* TROFEOS */
+.palm-trophy-img{height:52px;width:auto;object-fit:contain;flex-shrink:0;}
+.palm-trophy-img.medal{height:44px;}
+
+/* ERROR */
+.error-msg{text-align:center;padding:60px 20px;font-family:'Barlow Condensed',sans-serif;font-size:16px;color:rgba(255,255,255,0.38);}
+
+/* ── HISTORIAL AMPLIADO (SEL26) ── */
+.hist-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.hbadge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;}
+.hbadge-cam{background:rgba(200,168,75,0.18);color:#c8a84b;border:1px solid rgba(200,168,75,0.3);}
+.hbadge-sub{background:rgba(156,163,175,0.18);color:rgba(255,255,255,0.7);}
+.hbadge-top{background:rgba(22,163,74,0.12);color:#22c55e;}
+.hbadge-deb{background:rgba(59,130,246,0.12);color:#60a5fa;}
+.hist-mun-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.hist-mun-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.hist-big-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:30px;color:#fff;line-height:1;}
+.hist-big-num.gold{color:#c8a84b;}
+.hist-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-top:2px;}
+.hist-table-ext{width:100%;border-collapse:collapse;}
+.hist-table-ext th{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:8px 4px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);}
+.hist-table-ext td{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,0.9);padding:10px 4px;text-align:center;}
+.td-dg-pos{color:#22c55e;}
+.td-dg-neg{color:#f87171;}
+.hist-pts-strip{background:rgba(200,168,75,0.07);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.hist-pts-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:26px;color:#c8a84b;letter-spacing:1px;}
+.hist-pts-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+.hist-rank-strip{background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.hist-rank-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:26px;color:#fff;letter-spacing:1px;}
+.hist-rank-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="sel-header">
+    <button class="back-btn" onclick="history.back()">&#8592;</button>
+    <img class="sel-flag" id="sel-flag" src="" alt="" style="display:none">
+    <span class="sel-title" id="sel-title">Cargando...</span>
+    <span class="sel-grupo" id="sel-grupo"></span>
+  </div>
+
+  <div class="sub-tabs">
+    <button class="sub-tab active" data-tab="info" onclick="switchTab('info')">INFO</button>
+    <button class="sub-tab" data-tab="plantilla" onclick="switchTab('plantilla')">PLANTILLA</button>
+  </div>
+
+  <div id="tab-info" class="tab-panel active"></div>
+  <div id="tab-plantilla" class="tab-panel"></div>
+
+</div>
+
+<!-- LIGA BUBBLE -->
+<div class="liga-overlay" id="liga-overlay" onclick="closeLigaBubble()">
+  <div class="liga-sheet" onclick="event.stopPropagation()">
+    <div class="liga-sheet-handle"></div>
+    <div class="liga-sheet-head">
+      <img class="liga-sheet-logo" id="liga-sheet-logo" src="" alt="">
+      <span class="liga-sheet-title" id="liga-sheet-title"></span>
+      <button class="liga-sheet-close" onclick="closeLigaBubble()">&#215;</button>
+    </div>
+    <div class="liga-sheet-scroll">
+      <div class="liga-mini-grid" id="liga-mini-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/jugadores.js?v=12"></script>
+<script src="/js/fotos.js?v=53"></script>
+<script src="/js/club_liga.js"></script>
+<script src="/js/grupos.js"></script>
+<script src="/js/selecciones-data.js?v=2"></script>
+<script src="/js/selecciones2026.js"></script>
+<script src="/js/titulos2026.js"></script>
+<script src="/js/cartas.js?v=33"></script>
+<script>
+// Match venues — filled in when official schedule is confirmed
+var MATCH_SEDES = {
+  // id: 'Estadio · Ciudad'
+};
+
+function switchTab(tab) {
+  document.querySelectorAll('.sub-tab').forEach(function(t) {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(function(p) {
+    p.classList.toggle('active', p.id === 'tab-' + tab);
+  });
+}
+
+var _ligaStore = {};
+
+function openLigaBubble(idx) {
+  var entry = _ligaStore[idx];
+  if (!entry) return;
+  var logoSrc = '/assets/img/escudos/ligas/' + entry.file;
+  document.getElementById('liga-sheet-logo').src = logoSrc;
+  document.getElementById('liga-sheet-title').textContent = entry.liga;
+  var CW = 78, CH = Math.round(CW * 928 / 594);
+  var html = '';
+  entry.players.forEach(function(p) {
+    var card = {
+      nombre: p.nombre,
+      overall: p.overall,
+      tier: p.tier,
+      foto: FOTOS_JUGADORES[p.nombre] || null,
+      seleccion: entry.s,
+      club: p.club,
+      posicion: p.posDraft
+    };
+    html += miniCardSVG(card, CW, CH);
+  });
+  document.getElementById('liga-mini-grid').innerHTML = html;
+  document.getElementById('liga-overlay').classList.add('open');
+}
+
+function closeLigaBubble() {
+  document.getElementById('liga-overlay').classList.remove('open');
+}
+
+window._initSeleccion = function() {
+  var params = new URLSearchParams(window.location.search);
+  var s = params.get('s') || '';
+
+  if (!s) {
+    document.getElementById('sel-title').textContent = 'No encontrado';
+    document.getElementById('tab-info').innerHTML = '<p class="error-msg">Selección no especificada.</p>';
+    return;
+  }
+
+  var GD = window.GRUPOS_DATA;
+  var SD = window.SELECCIONES_DATA || {};
+  var equipo = GD.equipos.find(function(e) { return e.s === s; });
+  var data = SD[s];
+
+  var sToCode = {};
+  Object.keys(GD.codeToS).forEach(function(code) {
+    sToCode[GD.codeToS[code]] = code;
+  });
+  var myCode = sToCode[s];
+
+  var matches = GD.partidos.filter(function(p) {
+    return p.local === myCode || p.visit === myCode;
+  }).sort(function(a, b) { return a.id - b.id; });
+
+  function jornada(id) {
+    return Math.floor(((id - 1) % 6) / 2) + 1;
+  }
+
+  // ── HEADER ──
+  if (equipo) {
+    var iso = data ? data.iso : null;
+    var flagEl = document.getElementById('sel-flag');
+    if (iso) {
+      flagEl.src = 'https://flagcdn.com/w80/' + iso + '.png';
+      flagEl.alt = equipo.n;
+      flagEl.style.display = '';
+    }
+    document.getElementById('sel-title').textContent = equipo.n;
+    document.getElementById('sel-grupo').textContent = 'GRUPO ' + equipo.g;
+    document.title = equipo.n + ' · DIVIETO';
+  } else {
+    document.getElementById('sel-title').textContent = s;
+  }
+
+  // ── PLAYERS ──
+  var myGroup = (JUGADORES_MUNDIAL || []).find(function(g) { return g.seleccion === s; });
+  var players = myGroup ? myGroup.jugadores : [];
+
+  // Build liga map: idx → {liga, file, players, s}
+  var ligaMap = {};
+  var ligaOrder = [];
+  players.forEach(function(p) {
+    var lf = CLUB_LIGA[p.club];
+    if (!lf) return;
+    var key = lf.replace('.webp', '');
+    if (!ligaMap[key]) {
+      ligaMap[key] = { liga: key, file: lf, players: [], s: s };
+      ligaOrder.push(key);
+    }
+    ligaMap[key].players.push(p);
+  });
+  ligaOrder.sort(function(a, b) {
+    return ligaMap[b].players.length - ligaMap[a].players.length;
+  });
+  // Store for bubble access
+  ligaOrder.forEach(function(key, i) {
+    _ligaStore[i] = ligaMap[key];
+  });
+
+  // ── BUILD INFO ──
+  var h = '';
+
+  // 1. PARTIDOS
+  h += '<div class="sec-title">PRÓXIMOS PARTIDOS</div>';
+  if (matches.length === 0) {
+    h += '<p class="error-msg" style="padding:20px 0">Sin partidos registrados.</p>';
+  } else {
+    h += '<div class="matches-outer"><div class="matches-carousel" id="matches-carousel">';
+    matches.forEach(function(m) {
+      var localEq = GD.equipos.find(function(e) { return e.s === GD.codeToS[m.local]; });
+      var visitEq = GD.equipos.find(function(e) { return e.s === GD.codeToS[m.visit]; });
+      var localEsc = localEq ? GD.baseEsc + encodeURIComponent(localEq.esc) : '';
+      var visitEsc = visitEq ? GD.baseEsc + encodeURIComponent(visitEq.esc) : '';
+      var localName = localEq ? localEq.n : m.local;
+      var visitName = visitEq ? visitEq.n : m.visit;
+      var j = jornada(m.id);
+      var sede = MATCH_SEDES[m.id] || 'Por confirmar';
+      h += '<div class="match-card">';
+      h += '<div class="match-top"><span class="match-j">JORNADA ' + j + '</span><span class="match-grp">GRUPO ' + (equipo ? equipo.g : '') + '</span></div>';
+      h += '<div class="match-teams">';
+      h += '<div class="match-team"><img class="match-esc" src="' + localEsc + '" alt="' + localName + '" loading="lazy"><span class="match-tname">' + localName + '</span></div>';
+      h += '<div class="match-vs">VS</div>';
+      h += '<div class="match-team"><img class="match-esc" src="' + visitEsc + '" alt="' + visitName + '" loading="lazy"><span class="match-tname">' + visitName + '</span></div>';
+      h += '</div>';
+      h += '<div class="match-footer"><span class="match-time">&#128336; Por confirmar</span><span class="match-sede">&#128205; ' + sede + '</span></div>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+    // Dots
+    var dotsHtml = '<div class="carousel-dots">';
+    matches.forEach(function(_, i) { dotsHtml += '<div class="c-dot' + (i === 0 ? ' active' : '') + '" id="cdot-' + i + '"></div>'; });
+    dotsHtml += '</div>';
+    h += dotsHtml;
+  }
+
+  // Lookup datos históricos SEL26 (usado en PALMARÉS e HISTORIAL)
+  var hist = (window.SEL26 && window.SEL26.byS) ? window.SEL26.byS(s) : null;
+  var titulos2026 = (hist && window.TITULOS2026) ? window.TITULOS2026.byId(hist.id) : null;
+
+  // 2. PALMARÉS
+  var _CONF_TROPHY = { UEFA:'eurocopa', CONMEBOL:'copa-america', CAF:'copa-africa', AFC:'copa-asia', CONCACAF:'copa-oro', OFC:'copa-oceania' };
+  var _CONF_NAME   = { UEFA:'UEFA Euro', CONMEBOL:'Copa América', CAF:'Copa África de Naciones', AFC:'Copa Asiática AFC', CONCACAF:'Copa Oro CONCACAF', OFC:'Copa Oceanía OFC' };
+  var _contTrophy  = equipo ? (_CONF_TROPHY[equipo.conf] || null) : null;
+  var _contName    = equipo ? (_CONF_NAME[equipo.conf]   || 'Títulos continentales') : 'Títulos continentales';
+
+  h += '<div class="sec-title">PALMARÉS</div>';
+  h += '<div class="palm-card">';
+
+  // Copa del Mundo
+  if (hist && hist.mundialYears && hist.mundialYears.length) {
+    h += '<div class="palm-group" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08)">';
+    h += '<div class="palm-hero">';
+    h += '<img class="palm-trophy-img" src="/assets/img/trofeos/mundial.webp" alt="Copa del Mundo">';
+    h += '<div class="palm-hero-right"><div class="palm-num" style="color:#c8a84b">' + hist.mundialYears.length + '</div>';
+    h += '<div class="palm-num-label">Copa del Mundo FIFA</div></div>';
+    h += '</div>';
+    h += '<div class="palm-years">';
+    hist.mundialYears.forEach(function(y) {
+      h += '<span class="palm-year-tag">' + y + '</span>';
+    });
+    h += '</div></div>';
+  }
+
+  var titulos = data && data.titulos ? data.titulos : [];
+  var t26cont = titulos2026 ? titulos2026.continentalSinNationsLeague : 0;
+  if (titulos.length) {
+    // Group by competition
+    var compMap = {};
+    var compOrder = [];
+    titulos.forEach(function(t) {
+      var m2 = t.match(/^(.+?)\s+(\d{4})(\s.*)?$/);
+      var comp = m2 ? m2[1] : t;
+      var year = m2 ? m2[2] : '?';
+      if (!compMap[comp]) { compMap[comp] = []; compOrder.push(comp); }
+      compMap[comp].push(year);
+    });
+    compOrder.forEach(function(comp, ci) {
+      var notLast = ci < compOrder.length - 1;
+      h += '<div class="palm-group"' + (notLast ? ' style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08)"' : '') + '>';
+      h += '<div class="palm-hero">';
+      if (_contTrophy) {
+        h += '<img class="palm-trophy-img" src="/assets/img/trofeos/' + _contTrophy + '.webp" alt="' + comp + '">';
+      } else {
+        h += '<div class="palm-trophy-icon">&#127942;</div>';
+      }
+      h += '<div class="palm-hero-right"><div class="palm-num">' + compMap[comp].length + '</div>';
+      h += '<div class="palm-num-label">' + comp + '</div></div>';
+      h += '</div>';
+      h += '<div class="palm-years">';
+      compMap[comp].forEach(function(y) {
+        h += '<span class="palm-year-tag">' + y + '</span>';
+      });
+      h += '</div></div>';
+    });
+  } else if (t26cont > 0) {
+    h += '<div class="palm-hero">';
+    if (_contTrophy) {
+      h += '<img class="palm-trophy-img" src="/assets/img/trofeos/' + _contTrophy + '.webp" alt="Títulos continentales">';
+    } else {
+      h += '<div class="palm-trophy-icon">&#127942;</div>';
+    }
+    h += '<div class="palm-hero-right"><div class="palm-num">' + t26cont + '</div>';
+    h += '<div class="palm-num-label">' + _contName + '</div></div>';
+    h += '</div>';
+  } else {
+    h += '<p class="palm-no-titles">Sin títulos continentales registrados.</p>';
+  }
+
+  // Otros títulos (confederaciones, JJOO, otros) — sin duplicar mundial ni continental
+  if (titulos2026) {
+    var t26extra = [
+      { key: 'confederaciones', lbl: 'Copa Confederaciones', img: 'confederaciones', medal: false },
+      { key: 'jjooAbsolutos',   lbl: 'Juegos Olímpicos',   img: 'jjoo-oro',         medal: true  }
+    ].filter(function(c) { return titulos2026[c.key] > 0; });
+    if (t26extra.length) {
+      h += '<div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:12px;padding-top:12px;">';
+      h += '<div class="palm-comp-name" style="margin-bottom:10px">OTROS TÍTULOS</div>';
+      h += '<div style="display:flex;flex-direction:column;gap:12px;">';
+      t26extra.forEach(function(c) {
+        h += '<div style="display:flex;align-items:center;gap:12px;">';
+        if (c.img) h += '<img class="palm-trophy-img' + (c.medal ? ' medal' : '') + '" src="/assets/img/trofeos/' + c.img + '.webp" alt="' + c.lbl + '">';
+        h += '<div><div style="font-family:\'DM Sans\',sans-serif;font-style:italic;font-weight:700;font-size:28px;color:#fff;line-height:1;">' + titulos2026[c.key] + '</div>';
+        h += '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.38);text-transform:uppercase;margin-top:1px;">' + c.lbl + '</div></div>';
+        h += '</div>';
+      });
+      h += '</div>';
+      h += '</div>';
+    }
+  }
+
+  h += '</div>';
+
+  // 3. HISTORIAL MUNDIALISTA
+  h += '<div class="sec-title">HISTORIAL MUNDIALISTA</div>';
+
+  // Badges
+  var badgesH = '';
+  if (hist) {
+    if (hist.subcampeonatos > 0)      badgesH += '<span class="hbadge hbadge-sub">SUBCAMPEONA ×' + hist.subcampeonatos + '</span>';
+    if (hist.rankingHistorico <= 10)  badgesH += '<span class="hbadge hbadge-top">TOP 10 HISTÓRICO</span>';
+    if (hist.partidosJugados === 0)   badgesH += '<span class="hbadge hbadge-deb">DEBUTANTE EN 2026</span>';
+  }
+  if (badgesH) h += '<div class="hist-badges">' + badgesH + '</div>';
+
+  // Stat cards row
+  h += '<div class="mun-stats">';
+  h += '<div class="stat-card"><div class="stat-value">' + (data && data.fifa != null ? data.fifa : '—') + '</div><div class="stat-label">Ranking FIFA</div></div>';
+  h += '<div class="stat-card"><div class="stat-value">' + (hist ? hist.mundiales : (data ? data.mundiales || 0 : 0)) + '</div><div class="stat-label">Participaciones en Mundiales</div></div>';
+  h += '</div>';
+
+  // Ranking histórico + puntos históricos
+  if (hist) {
+    h += '<div class="hist-rank-strip">';
+    h += '<span class="hist-rank-lbl">Ranking histórico en Mundiales</span>';
+    h += '<span class="hist-rank-num">#' + hist.rankingHistorico + '</span>';
+    h += '</div>';
+    h += '<div class="hist-pts-strip">';
+    h += '<span class="hist-pts-lbl">Puntos históricos en Mundiales</span>';
+    h += '<span class="hist-pts-num">' + hist.puntosHistoricos + '</span>';
+    h += '</div>';
+  }
+
+  // Mejor resultado
+  if (data && data.mejor) {
+    h += '<div class="mejor-card"><div class="mejor-label">Mejor resultado</div><div class="mejor-value">' + data.mejor + '</div></div>';
+  }
+
+  // Stats table
+  if (hist) {
+    var dg = hist.diferenciaGol;
+    var dgTxt = dg > 0 ? '+' + dg : String(dg);
+    var dgCls = dg > 0 ? ' class="td-dg-pos"' : dg < 0 ? ' class="td-dg-neg"' : '';
+    h += '<div class="hist-wrap"><table class="hist-table-ext">';
+    h += '<thead><tr><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th></tr></thead>';
+    h += '<tbody><tr>';
+    h += '<td>' + hist.partidosJugados + '</td>';
+    h += '<td>' + hist.ganados + '</td>';
+    h += '<td>' + hist.empatados + '</td>';
+    h += '<td>' + hist.perdidos + '</td>';
+    h += '<td>' + hist.golesFavor + '</td>';
+    h += '<td>' + hist.golesContra + '</td>';
+    h += '<td' + dgCls + '>' + dgTxt + '</td>';
+    h += '</tr></tbody></table></div>';
+  } else {
+    var st = data ? (data.stats || { pj:0,pg:0,pe:0,pp:0,gf:0,gc:0 }) : { pj:0,pg:0,pe:0,pp:0,gf:0,gc:0 };
+    h += '<div class="hist-wrap"><table class="hist-table"><thead><tr><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th></tr></thead>';
+    h += '<tbody><tr>';
+    h += '<td>' + st.pj + '</td><td>' + st.pg + '</td><td>' + st.pe + '</td><td>' + st.pp + '</td><td>' + st.gf + '</td><td>' + st.gc + '</td>';
+    h += '</tr></tbody></table></div>';
+  }
+
+  // 4. LIGAS REPRESENTADAS
+  if (ligaOrder.length) {
+    h += '<div class="sec-title">LIGAS REPRESENTADAS</div>';
+    h += '<div class="ligas-visual">';
+    ligaOrder.forEach(function(key, i) {
+      var entry = ligaMap[key];
+      var logoSrc = '/assets/img/escudos/ligas/' + encodeURIComponent(entry.file);
+      var shortName = key.replace('— ', '').split(' ').slice(0,3).join(' ');
+      h += '<div class="liga-badge" onclick="openLigaBubble(' + i + ')">';
+      h += '<div class="liga-logo-wrap">';
+      h += '<img class="liga-logo" src="' + logoSrc + '" alt="' + key + '" loading="lazy">';
+      h += '<span class="liga-cnt-badge">' + entry.players.length + '</span>';
+      h += '</div>';
+      h += '<span class="liga-badge-label">' + shortName + '</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  // 5. HISTORIA / CLASIFICACIÓN
+  if (data) {
+    if (data.historia) {
+      h += '<div class="sec-title">HISTORIA EN EL MUNDIAL</div>';
+      h += '<p class="texto">' + data.historia + '</p>';
+    }
+    if (data.clasificacion) {
+      h += '<div class="sec-title">CÓMO CLASIFICÓ</div>';
+      h += '<p class="texto">' + data.clasificacion + '</p>';
+    }
+  }
+
+  document.getElementById('tab-info').innerHTML = h;
+
+  // ── CAROUSEL INIT ──
+  var carousel = document.getElementById('matches-carousel');
+  if (carousel && matches.length > 1) {
+    var carCurrent = 0;
+    var carTotal = matches.length;
+    var dots = document.querySelectorAll('.c-dot');
+
+    function carGoTo(idx) {
+      carCurrent = ((idx % carTotal) + carTotal) % carTotal;
+      var cardW = carousel.querySelector('.match-card').offsetWidth + 10;
+      carousel.scrollTo({ left: carCurrent * cardW, behavior: 'smooth' });
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === carCurrent); });
+    }
+
+    var carTimer = setInterval(function() { carGoTo(carCurrent + 1); }, 5000);
+
+    carousel.addEventListener('scroll', function() {
+      var cardW = carousel.querySelector('.match-card').offsetWidth + 10;
+      var idx = Math.round(carousel.scrollLeft / cardW);
+      if (idx !== carCurrent) {
+        carCurrent = idx;
+        dots.forEach(function(d, i) { d.classList.toggle('active', i === carCurrent); });
+        clearInterval(carTimer);
+        carTimer = setInterval(function() { carGoTo(carCurrent + 1); }, 5000);
+      }
+    });
+  }
+
+  // ── BUILD PLANTILLA ──
+  var CW = 92;
+  var CH = Math.round(CW * 928 / 594);
+  var POS = [
+    { key: 'PT', label: 'PORTEROS' },
+    { key: 'DF', label: 'DEFENSAS' },
+    { key: 'MC', label: 'CENTROCAMPISTAS' },
+    { key: 'DL', label: 'DELANTEROS' },
+  ];
+
+  var ph = '';
+  POS.forEach(function(pos) {
+    var group = players.filter(function(p) { return p.posDraft === pos.key; });
+    if (!group.length) return;
+    ph += '<div class="pos-blk">';
+    ph += '<div class="pos-hdr">' + pos.label + '</div>';
+    ph += '<div class="cards-grid">';
+    group.forEach(function(p) {
+      ph += miniCardSVG({
+        nombre:    p.nombre,
+        overall:   p.overall,
+        tier:      p.tier,
+        foto:      FOTOS_JUGADORES[p.nombre] || null,
+        seleccion: s,
+        club:      p.club,
+        posicion:  p.posDraft
+      }, CW, CH);
+    });
+    ph += '</div></div>';
+  });
+
+  if (!ph) ph = '<p class="error-msg">No hay jugadores registrados para esta selección.</p>';
+  document.getElementById('tab-plantilla').innerHTML = ph;
+};
+</script>
+<script type="module">
+import { db as _db } from '/js/config.js';
+import { applyOverrides } from '/js/overrides-merge.js';
+(async () => {
+  await applyOverrides(_db);
+  window._initSeleccion();
+})();
+</script>
+</body>
+</html>

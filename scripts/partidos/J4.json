@@ -1,0 +1,18 @@
+[
+  { "sofaId": 12813000, "matchId": 73, "home": "2A", "away": "2B" },
+  { "sofaId": 12813012, "matchId": 74, "home": "1C", "away": "2F" },
+  { "sofaId": 12813014, "matchId": 75, "home": "1E", "away": "3A/B/C/D/F" },
+  { "sofaId": 12812998, "matchId": 76, "home": "1F", "away": "2C" },
+  { "sofaId": 12812989, "matchId": 77, "home": "2E", "away": "2I" },
+  { "sofaId": 12812995, "matchId": 78, "home": "1I", "away": "3C/D/F/G/H" },
+  { "sofaId": 12813001, "matchId": 79, "home": "1A", "away": "3C/E/F/H/I" },
+  { "sofaId": 12813020, "matchId": 80, "home": "1L", "away": "3E/H/I/J/K" },
+  { "sofaId": 12813013, "matchId": 81, "home": "G1", "away": "3A/E/H/I/J" },
+  { "sofaId": 12812992, "matchId": 82, "home": "1D", "away": "3B/E/F/I/J" },
+  { "sofaId": 12813004, "matchId": 83, "home": "H1", "away": "2J" },
+  { "sofaId": 12812997, "matchId": 84, "home": "2K", "away": "2L" },
+  { "sofaId": 12813019, "matchId": 85, "home": "1B", "away": "3E/F/G/I/J" },
+  { "sofaId": 12813018, "matchId": 86, "home": "2D", "away": "G2" },
+  { "sofaId": 12812999, "matchId": 87, "home": "1J", "away": "H2" },
+  { "sofaId": 12813011, "matchId": 88, "home": "1K", "away": "3D/E/I/J/L" }
+]

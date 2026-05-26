@@ -1,0 +1,109 @@
+/*
+ * ─────────────────────────────────────────────────────────
+ * CARTAS — La Pausa Mundial
+ * ─────────────────────────────────────────────────────────
+ *
+ * SVG PATHS DEL BLASÓN — NO CAMBIAR
+ *
+ * SHAPE (exterior):
+ *   M 0,20 L 20,0 C 80,-12 180,-12 240,0 L 260,20 L 260,308
+ *   C 252,330 188,346 130,370 C 72,346 8,330 0,308 Z
+ *
+ * INNER (borde interior):
+ *   M 5,22 L 23,4 C 82,-8 178,-8 237,4 L 255,22 L 255,306
+ *   C 247,327 186,342 130,364 C 74,342 13,327 5,306 Z
+ *
+ * viewBox: 0 -22 260 417  —  rendered: 260×395px
+ *
+ * ─────────────────────────────────────────────────────────
+ * TIERS — gradientes, bordes y textos
+ * ─────────────────────────────────────────────────────────
+ *
+ * Oro IF:           grad #030200 → #0c0800   borde #f0c830   texto #fff8c0
+ * Oro Brillante:    grad #c88000 → #fffac0   borde #000000   texto #1a1000
+ * Oro Mate:         grad #7a5000 → #d4a820   borde #000000   texto #1a1000
+ *
+ * Plata IF:         grad #050505 → #0e0e0e   borde #c8c8c8   texto #c8c8c8
+ * Plata Brillante:  grad #686868 → #f0f0f0   borde #000000   texto #1a1000
+ * Plata Mate:       grad #505050 → #989898   borde #000000   texto #1a1000
+ *
+ * Bronce IF:        grad #030100 → #080400   borde #d08040   texto #ffe8c0
+ * Bronce Brillante: grad #903010 → #ffc888   borde #000000   texto #1a1000
+ * Bronce Mate:      grad #5a2800 → #c06828   borde #000000   texto #1a1000
+ *
+ * Shimmer brillantes (diagonal):
+ *   x1="0" y1="0" x2="1" y2="1"
+ *   stops: 0% transparent → 38% 0.03 → 50% 0.26 → 60% 0.05 → 100% transparent
+ * ─────────────────────────────────────────────────────────
+ */
+
+/* ─────────────────────────────────────────
+   FLIP CSS (webkit para iOS)
+───────────────────────────────────────── */
+.flip-wrap {
+  -webkit-perspective: 1200px;
+  perspective: 1200px;
+  cursor: pointer;
+  width: 260px;
+  height: 395px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 260px;
+  height: 395px;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transition: -webkit-transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.flip-wrap.flipped .flip-inner {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card-back {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+}
+
+/* ─────────────────────────────────────────
+   CARTA BASE
+───────────────────────────────────────── */
+.carta-wrap {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6));
+}
+
+/* ─────────────────────────────────────────
+   PÍLDORAS RACHA
+───────────────────────────────────────── */
+.pill-azul {
+  background: #3b82f6; /* ≥10 pts */
+}
+
+.pill-verde {
+  background: #22c55e; /* 6–9 pts */
+}
+
+.pill-naranja {
+  background: #f59e0b; /* 1–5 pts */
+}
+
+.pill-gris {
+  background: #888888; /* 0 pts */
+}
+
+.pill-rojo {
+  background: #ef4444; /* negativo */
+}

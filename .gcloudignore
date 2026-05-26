@@ -1,0 +1,10 @@
+.gcloudignore
+.git
+node_modules
+public/assets
+public/app
+test
+playwright-report
+*.bat
+*.sh
+.secrets

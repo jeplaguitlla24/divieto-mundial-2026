@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DIVIETO · Liga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/base.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    .app { height: 100dvh; display: flex; flex-direction: column; }
+
+    /* ── Topbar ── */
+    .topbar {
+      flex-shrink: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(4,13,31,0.98);
+      border-bottom: 1px solid rgba(200,168,75,0.12);
+      z-index: 50;
+    }
+    .topbar-logo { height: 20px; width: auto; }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-user {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      color: rgba(240,237,230,0.5);
+    }
+    .btn-salir {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(240,237,230,0.6);
+      border: 1px solid rgba(200,168,75,0.25);
+      border-radius: 4px;
+      padding: 5px 10px;
+      background: transparent;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-salir:hover { color: #f0ede6; border-color: #c8a84b; }
+
+    /* ── Onboarding wrap ── */
+    .onboarding-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Card ── */
+    .onboarding-card {
+      max-width: 480px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Blasón + logo ── */
+    .ob-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .ob-logo-img {
+      height: 26px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+
+    /* ── Títulos ── */
+    .ob-title {
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 2.5rem;
+      letter-spacing: 3px;
+      color: #f0ede6;
+      text-align: center;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .ob-sub {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 1.5px;
+      color: rgba(240,237,230,0.4);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    /* ── Opciones ── */
+    .ob-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .ob-option {
+      border: 1px solid rgba(200,168,75,0.1);
+      border-radius: 12px;
+      padding: 20px 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .ob-option:hover {
+      border-color: #c8a84b;
+      background: rgba(200,168,75,0.05);
+    }
+    .ob-option.selected {
+      border-color: #c8a84b;
+      background: rgba(200,168,75,0.08);
+    }
+    .ob-option-icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    .ob-option-title {
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 1.1rem;
+      letter-spacing: 1.5px;
+      color: #f0ede6;
+    }
+    .ob-option-sub {
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 1px;
+      color: rgba(240,237,230,0.35);
+      margin-top: 4px;
+    }
+
+    /* ── Opción liga general (full width) ── */
+    .ob-option-general {
+      width: 100%;
+      border: 1px solid rgba(200,168,75,0.1);
+      border-radius: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .ob-option-general:hover {
+      border-color: #c8a84b;
+      background: rgba(200,168,75,0.05);
+    }
+    .ob-option-general.selected {
+      border-color: #c8a84b;
+      background: rgba(200,168,75,0.08);
+    }
+    .ob-option-general .ob-option-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+    .ob-option-general .ob-option-text { display: flex; flex-direction: column; gap: 3px; }
+
+    /* ── Paneles ── */
+    .ob-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .ob-panel.hidden { display: none; }
+
+    input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200,168,75,0.1);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #f0ede6;
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.75rem;
+      width: 100%;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input::placeholder { color: rgba(240,237,230,0.3); }
+    input:focus { border-color: #c8a84b; }
+
+    .btn-primary {
+      background: #c8a84b;
+      color: #040d1f;
+      font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;
+      font-size: 1rem;
+      letter-spacing: 3px;
+      padding: 14px;
+      border-radius: 8px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #f0cc60; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Error ── */
+    .ob-error {
+      display: none;
+      font-family: 'Barlow Condensed',sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      color: #e05252;
+      text-align: center;
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(224,82,82,0.08);
+      border-radius: 6px;
+      border: 1px solid rgba(224,82,82,0.2);
+    }
+    .ob-error.visible { display: block; }
+  *{-webkit-user-select:none;user-select:none;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <img class="topbar-logo" src="/assets/logo/logo-completo.webp" alt="La Pausa">
+    <div class="topbar-right">
+      <span class="topbar-user" id="user-nombre"></span>
+      <button class="btn-salir" id="btn-salir">Salir</button>
+    </div>
+  </header>
+
+  <!-- ONBOARDING -->
+  <div class="onboarding-wrap">
+    <div class="onboarding-card">
+
+      <!-- Blasón + logo -->
+      <div class="ob-logo">
+        <svg width="80" height="122" viewBox="0 -22 260 417" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0,20 L 20,0 C 80,-12 180,-12 240,0 L 260,20 L 260,308 C 252,330 188,346 130,370 C 72,346 8,330 0,308 Z"
+                fill="rgba(6,15,38,0.9)" stroke="#c8a84b" stroke-width="3"/>
+          <path d="M 5,22 L 23,4 C 82,-8 178,-8 237,4 L 255,22 L 255,306 C 247,327 186,342 130,364 C 74,342 13,327 5,306 Z"
+                fill="none" stroke="rgba(200,168,75,0.35)" stroke-width="1.5"/>
+          <text x="130" y="200" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-style="italic" font-weight="700"
+                font-size="28" letter-spacing="1" fill="rgba(200,168,75,0.8)">La Pau<tspan fill="#f0cc60">s</tspan>a.</text>
+        </svg>
+        <img class="ob-logo-img" src="/assets/logo/logo-completo.webp" alt="La Pausa">
+      </div>
+
+      <div class="ob-title">Bienvenido</div>
+      <div class="ob-sub">Para empezar necesitas una liga</div>
+
+      <!-- Opciones -->
+      <div class="ob-options">
+        <div class="ob-option" id="opt-crear">
+          <div class="ob-option-icon">✦</div>
+          <div class="ob-option-title">Crear liga</div>
+          <div class="ob-option-sub">Invita a tus amigos con un código</div>
+        </div>
+        <div class="ob-option" id="opt-unirse">
+          <div class="ob-option-icon">◎</div>
+          <div class="ob-option-title">Unirse</div>
+          <div class="ob-option-sub">Tengo un código de invitación</div>
+        </div>
+      </div>
+
+      <!-- Opción LIGA GENERAL -->
+      <div class="ob-option-general" id="opt-general">
+        <div class="ob-option-icon">🌍</div>
+        <div class="ob-option-text">
+          <div class="ob-option-title">Solo quiero jugar en la liga general</div>
+          <div class="ob-option-sub">Compite contra todos los jugadores del Mundial 2026</div>
+        </div>
+      </div>
+
+      <!-- Panel CREAR -->
+      <div class="ob-panel hidden" id="panel-crear">
+        <input type="text" id="crear-nombre" placeholder="Nombre de la liga" maxlength="40">
+        <button class="btn-primary" id="btn-crear">Crear liga</button>
+      </div>
+
+      <!-- Panel UNIRSE -->
+      <div class="ob-panel hidden" id="panel-unirse">
+        <input type="text" id="unirse-codigo" placeholder="PAUSA-XXXX" maxlength="10" style="text-transform:uppercase">
+        <button class="btn-primary" id="btn-unirse">Unirme</button>
+      </div>
+
+      <!-- Panel GENERAL -->
+      <div class="ob-panel hidden" id="panel-general">
+        <button class="btn-primary" id="btn-general">Entrar a la liga general</button>
+      </div>
+
+      <div class="ob-error" id="ob-error"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { auth, db } from '../../js/config.js';
+  import {
+    onAuthStateChanged,
+    signOut
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import {
+    collection, addDoc, setDoc, doc, updateDoc, getDoc,
+    query, where, getDocs, arrayUnion, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const LIGA_GENERAL_ID = 'mundial-2026-general';
+
+  let currentUser = null;
+
+  // ── Pre-rellenar código desde URL (?codigo=PAUSA-XXXX) ──
+  const codigoURL = new URLSearchParams(window.location.search).get('codigo');
+  if (codigoURL) {
+    document.getElementById('opt-unirse').classList.add('selected');
+    document.getElementById('panel-unirse').classList.remove('hidden');
+    document.getElementById('unirse-codigo').value = codigoURL.toUpperCase();
+  }
+
+  // ── Auth guard ──
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '/index.html'; return; }
+    currentUser = user;
+    document.getElementById('user-nombre').textContent = user.displayName || user.email;
+  });
+
+  // ── Cerrar sesión ──
+  document.getElementById('btn-salir').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '/index.html';
+  });
+
+  // ── Helpers ──
+  function generateCode() {
+    return 'PAUSA-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+  }
+
+  function mostrarError(msg) {
+    const el = document.getElementById('ob-error');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+  function limpiarError() {
+    document.getElementById('ob-error').classList.remove('visible');
+  }
+
+  // ── Unirse a la liga general (siempre, en los tres flujos) ──
+  async function unirseALigaGeneral(uid, nombre) {
+    const generalRef = doc(db, 'ligas', LIGA_GENERAL_ID);
+    const snap = await getDoc(generalRef);
+    if (!snap.exists()) {
+      await setDoc(generalRef, {
+        nombre: 'Liga General · Mundial 2026',
+        codigo: 'GENERAL-2026',
+        creadoPor: 'system',
+        creadoEn: serverTimestamp(),
+        estado: 'activa',
+        inscripcionAbierta: true,
+        esGeneral: true,
+        managers: []
+      });
+    }
+    await updateDoc(generalRef, { managers: arrayUnion(uid) });
+    await setDoc(doc(db, 'users', uid), {
+      uid,
+      nombre: nombre || '',
+      enLigaGeneral: true,
+      ligaGeneralId: LIGA_GENERAL_ID
+    }, { merge: true });
+  }
+
+  // ── Selección de opción ──
+  function seleccionarOpcion(activa) {
+    ['opt-crear', 'opt-unirse', 'opt-general'].forEach(id => {
+      document.getElementById(id).classList.remove('selected');
+    });
+    ['panel-crear', 'panel-unirse', 'panel-general'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(activa).classList.add('selected');
+    document.getElementById(activa.replace('opt-', 'panel-')).classList.remove('hidden');
+    limpiarError();
+  }
+
+  document.getElementById('opt-crear').addEventListener('click', () => seleccionarOpcion('opt-crear'));
+  document.getElementById('opt-unirse').addEventListener('click', () => seleccionarOpcion('opt-unirse'));
+  document.getElementById('opt-general').addEventListener('click', () => seleccionarOpcion('opt-general'));
+
+  // ── Solo liga general ──
+  document.getElementById('btn-general').addEventListener('click', async () => {
+    limpiarError();
+    const btn = document.getElementById('btn-general');
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    try {
+      await unirseALigaGeneral(currentUser.uid, currentUser.displayName || '');
+      window.location.href = '/app/index.html';
+    } catch (err) {
+      mostrarError('Error al unirse a la liga general. Inténtalo de nuevo.');
+      btn.disabled = false;
+      btn.textContent = 'Entrar a la liga general';
+    }
+  });
+
+  // ── Uppercase automático en código ──
+  document.getElementById('unirse-codigo').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase();
+  });
+
+  // ── Crear liga ──
+  document.getElementById('btn-crear').addEventListener('click', async () => {
+    limpiarError();
+    const nombre = document.getElementById('crear-nombre').value.trim();
+
+    if (!nombre) { mostrarError('Escribe un nombre para tu liga.'); return; }
+
+    const btn = document.getElementById('btn-crear');
+    btn.disabled = true;
+    btn.textContent = 'Creando...';
+
+    try {
+      const codigo = generateCode();
+      const ligaRef = await addDoc(collection(db, 'ligas'), {
+        nombre,
+        codigo,
+        creadoPor: currentUser.uid,
+        managers: [currentUser.uid],
+        creadoEn: serverTimestamp(),
+        estado: 'esperando',
+        inscripcionAbierta: true
+      });
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        uid: currentUser.uid,
+        nombre: currentUser.displayName || '',
+        ligaId: ligaRef.id
+      }, { merge: true });
+      await unirseALigaGeneral(currentUser.uid, currentUser.displayName || '');
+
+      window.location.href = '/app/index.html';
+    } catch (err) {
+      mostrarError('Error al crear la liga. Inténtalo de nuevo.');
+      btn.disabled = false;
+      btn.textContent = 'Crear liga';
+    }
+  });
+
+  // ── Unirse a liga ──
+  document.getElementById('btn-unirse').addEventListener('click', async () => {
+    limpiarError();
+    const codigo = document.getElementById('unirse-codigo').value.trim().toUpperCase();
+
+    if (!codigo) { mostrarError('Escribe el código de la liga.'); return; }
+
+    const btn = document.getElementById('btn-unirse');
+    btn.disabled = true;
+    btn.textContent = 'Buscando...';
+
+    try {
+      const q = query(collection(db, 'ligas'), where('codigo', '==', codigo));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        mostrarError('Código no válido. Compruébalo con quien te invitó.');
+        btn.disabled = false; btn.textContent = 'Unirme'; return;
+      }
+
+      const ligaDoc = snap.docs[0];
+      const liga = ligaDoc.data();
+
+      if (!liga.inscripcionAbierta) {
+        mostrarError('Esta liga ya no admite nuevos managers.');
+        btn.disabled = false; btn.textContent = 'Unirme'; return;
+      }
+
+      if (liga.managers.includes(currentUser.uid)) {
+        window.location.href = '/app/index.html'; return;
+      }
+
+      await updateDoc(ligaDoc.ref, { managers: arrayUnion(currentUser.uid) });
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        uid: currentUser.uid,
+        nombre: currentUser.displayName || '',
+        ligaId: ligaDoc.id
+      }, { merge: true });
+      await unirseALigaGeneral(currentUser.uid, currentUser.displayName || '');
+
+      window.location.href = '/app/index.html';
+    } catch (err) {
+      mostrarError('Error al unirse. Inténtalo de nuevo.');
+      btn.disabled = false; btn.textContent = 'Unirme';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DIVIETO · Configurar perfil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;background:#000;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+
+.card{
+  width:100%;max-width:400px;background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);border-radius:20px;
+  padding:36px 28px;display:flex;flex-direction:column;align-items:center;
+}
+
+.logo{margin-bottom:24px;}
+.logo img{height:28px;width:auto;opacity:0.85;}
+
+.paso-indicator{
+  display:flex;gap:6px;margin-bottom:24px;
+}
+.paso-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,0.15);transition:background 0.3s;
+}
+.paso-dot.active{background:#c8a84b;}
+.paso-dot.done{background:rgba(200,168,75,0.4);}
+
+.step{display:none;width:100%;flex-direction:column;align-items:center;}
+.step.active{display:flex;}
+
+.titulo{
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;
+  color:#fff;text-align:center;line-height:1;margin-bottom:6px;
+}
+.subtitulo{
+  font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:1.5px;
+  color:rgba(255,255,255,0.35);text-align:center;margin-bottom:24px;text-transform:uppercase;
+}
+
+.numero-badge{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(200,168,75,0.1);border:2px solid rgba(200,168,75,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:1.2rem;color:#8a6a10;
+  margin-bottom:20px;
+}
+
+input[type="text"]{
+  width:100%;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:14px 16px;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;
+  outline:none;transition:border-color 0.2s;margin-bottom:14px;
+}
+input[type="text"]::placeholder{color:rgba(255,255,255,0.3);}
+input[type="text"]:focus{border-color:#c8a84b;}
+
+.btn{
+  width:100%;background:#c8a84b;color:#1a1000;border:none;
+  border-radius:10px;padding:15px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;
+  transition:background 0.2s,transform 0.1s;
+}
+.btn:hover{background:#f0cc60;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+
+.btn-secondary{
+  width:100%;background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px;padding:13px;cursor:pointer;margin-top:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;
+  transition:all 0.2s;
+}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.3);color:#fff;}
+
+.liga-opciones{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:4px;}
+.liga-opcion{
+  padding:16px 18px;border-radius:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+  transition:all 0.2s;text-align:left;
+}
+.liga-opcion:hover{border-color:rgba(200,168,75,0.4);background:rgba(200,168,75,0.05);}
+.liga-opcion.selected{border-color:#c8a84b;background:rgba(200,168,75,0.1);}
+.liga-opcion-titulo{
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:#fff;margin-bottom:3px;
+}
+.liga-opcion-desc{
+  font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:1px;color:rgba(255,255,255,0.35);
+  text-transform:uppercase;
+}
+
+.liga-accion-btns{display:flex;gap:8px;width:100%;margin-bottom:14px;}
+.liga-accion-btn{
+  flex:1;padding:14px 8px;border-radius:10px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:1px;
+  color:rgba(255,255,255,0.6);transition:all 0.2s;text-align:center;
+}
+.liga-accion-btn:hover{border-color:rgba(200,168,75,0.4);color:#fff;}
+.liga-accion-btn.selected{border-color:#c8a84b;background:rgba(200,168,75,0.1);color:#c8a84b;}
+
+.codigo-generado{
+  display:none;width:100%;padding:16px;border-radius:10px;
+  background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.2);
+  text-align:center;margin-bottom:14px;
+}
+.codigo-generado.visible{display:block;}
+.codigo-generado-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:6px;color:#c8a84b;
+}
+.codigo-generado-label{
+  font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:2px;
+  color:rgba(255,255,255,0.35);text-transform:uppercase;margin-top:4px;
+}
+.copy-btn{
+  margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:1px;
+  padding:5px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.5);border-radius:6px;cursor:pointer;transition:all 0.15s;
+  text-transform:uppercase;
+}
+.copy-btn:hover{border-color:rgba(200,168,75,0.4);color:#c8a84b;}
+
+.error{
+  display:none;font-family:'JetBrains Mono',monospace;font-size:0.55rem;
+  letter-spacing:1px;color:#ef4444;text-align:center;margin-top:10px;
+  padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:6px;border:1px solid rgba(239,68,68,0.2);
+}
+.error.visible{display:block;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo"><img src="/assets/logo/logo-completo.webp" alt="La Pausa"></div>
+
+  <div class="paso-indicator">
+    <div class="paso-dot active" id="dot0"></div>
+    <div class="paso-dot" id="dot1"></div>
+    <div class="paso-dot" id="dot2"></div>
+  </div>
+
+  <!-- PASO 1: Nombre -->
+  <div class="step active" id="step0">
+    <div class="numero-badge" id="numeroBadge">·</div>
+    <div class="titulo">Elige tu nombre</div>
+    <div class="subtitulo">Así te verán los demás en la liga</div>
+    <input type="text" id="nombreInput" placeholder="Tu nombre en la liga" maxlength="20" autocomplete="off" spellcheck="false">
+    <button class="btn" id="btnNombre">Continuar</button>
+    <div class="error" id="errNombre"></div>
+  </div>
+
+  <!-- PASO 2: Tipo de liga -->
+  <div class="step" id="step1">
+    <div class="titulo">¿Cómo quieres jugar?</div>
+    <div class="subtitulo">Elige tu modo de competición</div>
+    <div class="liga-opciones">
+      <div class="liga-opcion" id="opcionGeneral" onclick="selectLiga('general')">
+        <div class="liga-opcion-titulo">Solo liga general</div>
+        <div class="liga-opcion-desc">Compites contra todos los participantes</div>
+      </div>
+      <div class="liga-opcion" id="opcionPrivada" onclick="selectLiga('privada')">
+        <div class="liga-opcion-titulo">Liga privada + general</div>
+        <div class="liga-opcion-desc">Crea o únete a una liga con amigos · también ves la general</div>
+      </div>
+    </div>
+    <button class="btn" id="btnLiga" disabled>Continuar</button>
+    <div class="error" id="errLiga"></div>
+  </div>
+
+  <!-- PASO 3: Crear o unirse a liga privada -->
+  <div class="step" id="step2">
+    <div class="titulo">Liga privada</div>
+    <div class="subtitulo">Crea una nueva o únete a una existente</div>
+    <div class="liga-accion-btns">
+      <div class="liga-accion-btn" id="btnCrear" onclick="selectAccion('crear')">Crear liga</div>
+      <div class="liga-accion-btn" id="btnUnirse" onclick="selectAccion('unirse')">Unirme a una</div>
+    </div>
+    <div id="seccionCrear" style="display:none;width:100%;">
+      <div class="codigo-generado" id="codigoGenerado">
+        <div class="codigo-generado-num" id="codigoGeneradoNum">——————</div>
+        <div class="codigo-generado-label">Comparte este código con tus amigos</div>
+        <button class="copy-btn" onclick="copiarCodigo()">Copiar</button>
+      </div>
+    </div>
+    <div id="seccionUnirse" style="display:none;width:100%;">
+      <input type="text" id="codigoLigaInput" placeholder="Código de liga · ej: LIGA_A3X9KW" maxlength="11" autocomplete="off" spellcheck="false" style="text-transform:uppercase;">
+    </div>
+    <button class="btn" id="btnFinalizar">Entrar a la liga</button>
+    <button class="btn-secondary" id="btnVolver">← Volver</button>
+    <div class="error" id="errLigaPrivada"></div>
+  </div>
+</div>
+
+<script>
+window.selectLiga = function(tipo) {
+  document.getElementById('opcionGeneral').classList.toggle('selected', tipo === 'general');
+  document.getElementById('opcionPrivada').classList.toggle('selected', tipo === 'privada');
+  document.getElementById('btnLiga').disabled = false;
+  window._ligaTipo = tipo;
+};
+window.selectAccion = function(accion) {
+  document.getElementById('btnCrear').classList.toggle('selected', accion === 'crear');
+  document.getElementById('btnUnirse').classList.toggle('selected', accion === 'unirse');
+  document.getElementById('seccionCrear').style.display  = accion === 'crear'  ? 'block' : 'none';
+  document.getElementById('seccionUnirse').style.display = accion === 'unirse' ? 'block' : 'none';
+  window._ligaAccion = accion;
+  if (accion === 'crear' && !window._codigoLigaGenerado) generarCodigoLiga();
+};
+window.copiarCodigo = function() {
+  if (window._codigoLigaGenerado) navigator.clipboard.writeText(window._codigoLigaGenerado);
+};
+window._ligaTipo = null;
+window._ligaAccion = null;
+window._codigoLigaGenerado = null;
+
+function generarCodigoLiga() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let cod = 'LIGA_';
+  for (let i = 0; i < 6; i++) cod += chars[Math.floor(Math.random() * chars.length)];
+  window._codigoLigaGenerado = cod;
+  document.getElementById('codigoGeneradoNum').textContent = cod;
+  document.getElementById('codigoGenerado').classList.add('visible');
+}
+
+function irAPaso(n) {
+  document.querySelectorAll('.step').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+    document.getElementById(`dot${i}`).classList.toggle('active', i === n);
+    document.getElementById(`dot${i}`).classList.toggle('done', i < n);
+  });
+}
+</script>
+
+<script type="module">
+import { auth, db } from '/js/config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { doc, getDoc, setDoc, updateDoc, runTransaction, arrayUnion } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const LIGA_GENERAL_ID = 'mundial-2026-general';
+let currentUid = null;
+let currentNombre = null;
+
+onAuthStateChanged(auth, async user => {
+  if (!user || !user.email?.endsWith('@divieto.app')) { window.location.href = '/'; return; }
+  currentUid = user.uid;
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  if (snap.exists() && snap.data().nombre) {
+    window.location.href = '/app/'; return;
+  }
+  const numero = snap.exists() ? snap.data().numero : null;
+  if (numero) document.getElementById('numeroBadge').textContent = `#${numero}`;
+});
+
+// ── PASO 1: Nombre ────────────────────────────────────────────────────────────
+document.getElementById('btnNombre').addEventListener('click', guardarNombre);
+document.getElementById('nombreInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') guardarNombre();
+});
+
+async function guardarNombre() {
+  const nombre = document.getElementById('nombreInput').value.trim();
+  const errEl  = document.getElementById('errNombre');
+  errEl.classList.remove('visible');
+  if (!nombre) { errEl.textContent = 'Escribe un nombre.'; errEl.classList.add('visible'); return; }
+  if (nombre.length < 2) { errEl.textContent = 'Mínimo 2 caracteres.'; errEl.classList.add('visible'); return; }
+
+  const btn = document.getElementById('btnNombre');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  try {
+    const userRef = doc(db, 'users', currentUid);
+    const generalRef = doc(db, 'ligas', LIGA_GENERAL_ID);
+    await runTransaction(db, async tx => {
+      const [userSnap, ligaSnap] = await Promise.all([tx.get(userRef), tx.get(generalRef)]);
+      const managers = ligaSnap.exists() ? (ligaSnap.data().managers || []) : [];
+      const numero   = managers.length + 1;
+      if (!ligaSnap.exists()) {
+        tx.set(generalRef, { nombre: 'Liga General · Mundial 2026', esGeneral: true, managers: [currentUid], managersInfo: { [currentUid]: { nombre, numero } } });
+      } else if (!managers.includes(currentUid)) {
+        tx.update(generalRef, { managers: arrayUnion(currentUid), [`managersInfo.${currentUid}`]: { nombre, numero } });
+      }
+      const existingData = userSnap.exists() ? userSnap.data() : {};
+      tx.set(userRef, { ...existingData, uid: currentUid, nombre, numero: existingData.numero || numero, ligaGeneralId: LIGA_GENERAL_ID }, { merge: true });
+    });
+    currentNombre = nombre;
+    irAPaso(1);
+  } catch(e) {
+    errEl.textContent = 'Error al guardar. Inténtalo de nuevo.'; errEl.classList.add('visible');
+    btn.disabled = false; btn.textContent = 'Continuar';
+  }
+}
+
+// ── PASO 2: Tipo de liga ──────────────────────────────────────────────────────
+document.getElementById('btnLiga').addEventListener('click', () => {
+  if (!window._ligaTipo) return;
+  if (window._ligaTipo === 'general') {
+    finalizarSetup();
+  } else {
+    irAPaso(2);
+  }
+});
+
+// ── PASO 3: Liga privada ──────────────────────────────────────────────────────
+document.getElementById('btnVolver').addEventListener('click', () => irAPaso(1));
+document.getElementById('btnFinalizar').addEventListener('click', manejarLigaPrivada);
+
+async function manejarLigaPrivada() {
+  const errEl = document.getElementById('errLigaPrivada');
+  errEl.classList.remove('visible');
+  const btn = document.getElementById('btnFinalizar');
+
+  if (!window._ligaAccion) {
+    errEl.textContent = 'Elige crear o unirte a una liga.';
+    errEl.classList.add('visible'); return;
+  }
+
+  if (window._ligaAccion === 'crear') {
+    if (!window._codigoLigaGenerado) { generarCodigoLiga(); return; }
+    btn.disabled = true; btn.textContent = 'Creando…';
+    try {
+      const ligaId = window._codigoLigaGenerado;
+      await setDoc(doc(db, 'ligas', ligaId), {
+        nombre:       `Liga de ${currentNombre}`,
+        codigo:       ligaId,
+        esGeneral:    false,
+        managers:     [currentUid],
+        managersInfo: { [currentUid]: { nombre: currentNombre } },
+        creadoAt:     new Date().toISOString()
+      });
+      await updateDoc(doc(db, 'users', currentUid), { ligaPrivadaId: ligaId });
+      window.location.href = '/app/';
+    } catch(e) {
+      errEl.textContent = 'Error al crear la liga.'; errEl.classList.add('visible');
+      btn.disabled = false; btn.textContent = 'Entrar a la liga';
+    }
+
+  } else {
+    const codigo = document.getElementById('codigoLigaInput').value.trim().toUpperCase();
+    if (!codigo.startsWith('LIGA_') || codigo.length < 10) {
+      errEl.textContent = 'Formato incorrecto · ej: LIGA_A3X9KW';
+      errEl.classList.add('visible'); return;
+    }
+    btn.disabled = true; btn.textContent = 'Uniéndome…';
+    try {
+      const ligaRef  = doc(db, 'ligas', codigo);
+      const ligaSnap = await getDoc(ligaRef);
+      if (!ligaSnap.exists()) {
+        errEl.textContent = 'Liga no encontrada. Revisa el código.';
+        errEl.classList.add('visible'); btn.disabled = false; btn.textContent = 'Entrar a la liga'; return;
+      }
+      await updateDoc(ligaRef, {
+        managers: arrayUnion(currentUid),
+        [`managersInfo.${currentUid}`]: { nombre: currentNombre }
+      });
+      await updateDoc(doc(db, 'users', currentUid), { ligaPrivadaId: codigo });
+      window.location.href = '/app/';
+    } catch(e) {
+      errEl.textContent = 'Error al unirse. Inténtalo de nuevo.';
+      errEl.classList.add('visible'); btn.disabled = false; btn.textContent = 'Entrar a la liga';
+    }
+  }
+}
+
+async function finalizarSetup() {
+  window.location.href = '/app/';
+}
+</script>
+</body>
+</html>

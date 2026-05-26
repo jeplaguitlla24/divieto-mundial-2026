@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DIVIETO · Formación</title>
+<style>body{visibility:hidden}</style>
+<script>
+(function(){
+  var fs = ['4-4-2','4-3-3','3-4-3'];
+  for (var i = 0; i < fs.length; i++) {
+    if (localStorage.getItem('lp_draft_' + fs[i])) {
+      window.location.replace('/app/draft?formacion=' + fs[i]);
+      return;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){ document.body.style.visibility='visible'; });
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;background:#000;}
+body{display:flex;justify-content:center;}
+
+/* FONDO FIJO */
+.bg-layer{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:#000;
+  z-index:0;
+}
+
+/* APP */
+.app{
+  width:100%;max-width:430px;min-height:100dvh;
+  display:flex;flex-direction:column;
+  background:transparent;
+  position:relative;z-index:1;
+}
+
+/* LP HEADER */
+.lp-header{position:sticky;top:0;height:64px;z-index:50;background:#000;border-bottom:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 8px;}
+.lp-header-logo{display:flex;align-items:center;gap:0px;text-decoration:none;}
+.lp-logo-divieto{height:52px;width:auto;}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 0 140px;}
+
+/* FORMACION ITEM */
+.formacion-item{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 16px;margin:8px 16px;
+  background:#0d0d0d;
+  border:1px solid rgba(200,168,75,0.22);
+  border-radius:14px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background 0.18s,border-color 0.18s,box-shadow 0.18s;
+}
+.formacion-item.selected{
+  background:rgba(240,204,96,0.09);
+  border:2px solid #f0cc60;
+  box-shadow:0 0 0 3px rgba(240,204,96,0.18),0 6px 28px rgba(200,168,75,0.35);
+}
+.formacion-campo{width:80px;height:60px;flex-shrink:0;display:block;}
+.formacion-nombre{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:28px;color:rgba(255,255,255,0.4);letter-spacing:2px;line-height:1;transition:color 0.18s;}
+.formacion-item.selected .formacion-nombre{color:#f0cc60;}
+
+/* CONFIRMAR */
+#btn-confirmar{
+  display:none;width:calc(100% - 32px);margin:12px 16px 0;height:52px;
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:3px;color:#1a1000;background:#f0cc60;
+  border:none;border-radius:10px;cursor:pointer;
+  align-items:center;justify-content:center;
+}
+#btn-confirmar.visible{display:flex;}
+
+@media(min-width:768px){.app{max-width:100%;}.lp-header{max-width:100%;}.bg-layer{background:#000;}}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="app">
+  <header class="lp-header">
+    <a href="/app/" class="lp-header-logo">
+      <img src="/assets/img/divieto-texto.webp" class="lp-logo-divieto" alt="DIVIETO">
+    </a>
+  </header>
+  <div class="scroll-area" id="list">
+    <button id="btn-confirmar">CONFIRMAR FORMACIÓN</button>
+  </div>
+</div>
+
+<script src="/shared/nav.js"></script>
+<script>
+const FORMATIONS = [
+  {name:'4-4-2', dots:[[18,25],[18,55],[52,12],[52,30],[52,52],[52,70],[88,12],[88,30],[88,52],[88,70],[112,40]]},
+  {name:'4-3-3', dots:[[18,15],[18,40],[18,65],[52,15],[52,40],[52,65],[88,12],[88,30],[88,52],[88,70],[112,40]]},
+  {name:'3-4-3', dots:[[18,15],[18,40],[18,65],[52,12],[52,30],[52,52],[52,70],[88,18],[88,40],[88,62],[112,40]]},
+];
+
+function fieldSVG(dots) {
+  const circles = dots.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="3" fill="white" opacity="0.9"/>`).join('');
+  return `<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" class="formacion-campo">
+    <rect x="0"  width="24" height="80" fill="#1a4a1a"/>
+    <rect x="24" width="24" height="80" fill="#164016"/>
+    <rect x="48" width="24" height="80" fill="#1a4a1a"/>
+    <rect x="72" width="24" height="80" fill="#164016"/>
+    <rect x="96" width="24" height="80" fill="#1a4a1a"/>
+    <g fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.8">
+      <rect x="2" y="2" width="116" height="76"/>
+      <line x1="60" y1="2" x2="60" y2="78"/>
+      <circle cx="60" cy="40" r="10"/>
+      <rect x="2"  y="22" width="16" height="36"/>
+      <rect x="102" y="22" width="16" height="36"/>
+    </g>
+    ${circles}
+  </svg>`;
+}
+
+let selected = null;
+const list = document.getElementById('list');
+const btnConfirmar = document.getElementById('btn-confirmar');
+
+FORMATIONS.forEach(f => {
+  const item = document.createElement('div');
+  item.className = 'formacion-item';
+  item.dataset.name = f.name;
+  item.innerHTML = fieldSVG(f.dots) + `<div class="formacion-nombre">${f.name}</div>`;
+  item.addEventListener('touchend', e => { e.preventDefault(); selectItem(item, f.name); });
+  item.addEventListener('click', () => selectItem(item, f.name));
+  list.insertBefore(item, btnConfirmar);
+});
+
+function selectItem(item, name) {
+  document.querySelectorAll('.formacion-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  selected = name;
+  btnConfirmar.classList.add('visible');
+}
+
+btnConfirmar.addEventListener('click', () => {
+  if (selected) window.location.href = '/app/draft?formacion=' + encodeURIComponent(selected);
+});
+</script>
+</body>
+</html>

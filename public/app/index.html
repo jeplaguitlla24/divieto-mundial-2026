@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DIVIETO · Mundial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+  html,body{height:100%;background:#000;}
+  body{display:flex;justify-content:center;}
+
+  /* FONDO */
+  .bg-layer{
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:#000;
+    z-index:0;
+  }
+
+  /* APP */
+  .app{
+    width:100%;max-width:430px;height:100dvh;
+    display:flex;flex-direction:column;
+    background:transparent;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;z-index:1;
+    padding-top:64px;
+  }
+
+  /* LP HEADER */
+  .lp-header{
+    position:fixed;top:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:430px;z-index:100;height:64px;
+    background:#000;border-bottom:none;
+    display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 8px;
+  }
+  .lp-header-logo{display:flex;align-items:center;gap:0px;text-decoration:none;}
+  .lp-logo-divieto{height:52px;width:auto;}
+  .lp-header-right{display:flex;align-items:center;gap:10px;position:relative;}
+  .lp-bell{
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,0.1);border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;color:#ffffff;
+  }
+  .lp-bell svg{width:18px;height:18px;}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:#111;border:1.5px solid rgba(255,255,255,0.2);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:1;
+  }
+  .umenu{
+    display:none;position:absolute;top:46px;right:0;
+    background:#ffffff;border:1px solid rgba(0,0,0,0.1);
+    border-radius:10px;min-width:170px;z-index:200;overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.12);
+  }
+  .umenu-item{padding:11px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#1a1000;cursor:pointer;letter-spacing:0.5px;}
+  .umenu-item:active{background:rgba(200,168,75,0.08);}
+  .umenu-sep{border:none;border-top:1px solid rgba(0,0,0,0.06);margin:0;}
+  .umenu-danger{color:#ef4444;}
+
+  /* SECTION LABEL */
+  .sec-label{
+    font-family:'Barlow Condensed',sans-serif;font-size:8px;
+    letter-spacing:3px;color:rgba(255,255,255,0.42);text-transform:uppercase;
+    display:block;margin-bottom:10px;
+  }
+
+  /* HERO PRE-MUNDIAL */
+  .hero-mundial{
+    margin:16px 16px 0;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.45);
+    border-radius:18px;padding:22px 20px 20px;
+    position:relative;overflow:hidden;flex-shrink:0;
+  }
+  .hero-mundial::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(200,168,75,0.06) 0%,transparent 60%);
+    pointer-events:none;
+  }
+  .hero-wc-logo{
+    position:absolute;right:0;top:50%;transform:translateY(-50%);
+    height:90px;width:auto;opacity:0.07;pointer-events:none;
+  }
+  .hero-pre-label{
+    font-family:'Barlow Condensed',sans-serif;font-size:9px;
+    letter-spacing:3px;color:rgba(200,168,75,0.75);text-transform:uppercase;
+    display:block;margin-bottom:4px;position:relative;z-index:1;
+  }
+  .hero-title{
+    font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:30px;
+    color:#fff;letter-spacing:1px;line-height:1;
+    display:block;margin-bottom:12px;position:relative;z-index:1;
+  }
+  .hero-countdown{
+    display:flex;align-items:center;margin-bottom:18px;
+    position:relative;z-index:1;
+  }
+  .cd-chunk{
+    display:flex;align-items:baseline;gap:3px;
+    font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+    color:rgba(255,255,255,0.45);letter-spacing:0.5px;
+  }
+  .cd-num{
+    font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:24px;
+    color:#c8a84b;letter-spacing:0;line-height:1;
+  }
+  .cd-sep{
+    font-family:'Barlow Condensed',sans-serif;font-size:13px;
+    color:rgba(255,255,255,0.2);margin:0 8px;
+  }
+  .hero-cta-wrap{display:flex;gap:8px;position:relative;z-index:1;}
+  .btn-cta-primary{
+    font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+    letter-spacing:2px;text-transform:uppercase;
+    background:#22c55e;color:#0a1628;border:none;border-radius:8px;
+    padding:11px 0;cursor:pointer;text-decoration:none;
+    flex:1;text-align:center;display:block;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn-cta-primary:active{opacity:0.85;}
+  .btn-cta-ghost{
+    font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+    letter-spacing:2px;text-transform:uppercase;
+    background:transparent;color:rgba(255,255,255,0.6);
+    border:1px solid rgba(255,255,255,0.25);border-radius:8px;
+    padding:11px 0;cursor:pointer;text-decoration:none;
+    flex:1;text-align:center;display:block;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn-cta-ghost:active{opacity:0.7;}
+
+  /* SECTION WRAP */
+  .sec-wrap{padding:11px 0 0;flex-shrink:0;}
+  .sec-wrap .sec-label{padding:0 16px;}
+
+  /* MATCHES */
+  .matches-scroll{
+    display:flex;gap:10px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    padding:0 16px 2px;
+  }
+  .matches-scroll::-webkit-scrollbar{display:none;}
+  .match-card{
+    flex-shrink:0;
+    background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.45);
+    padding:6px 10px;display:flex;flex-direction:row;align-items:center;gap:8px;
+  }
+  .match-card.played{opacity:0.5;}
+  .match-shield{width:26px;height:26px;object-fit:contain;flex-shrink:0;}
+  .match-flag{font-size:1.2rem;line-height:1;flex-shrink:0;}
+  .match-info{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:52px;}
+  .match-date{font-family:'Barlow Condensed',sans-serif;font-size:7px;letter-spacing:1px;color:rgba(255,255,255,0.5);text-transform:uppercase;}
+  .match-time{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:16px;color:#ffffff;letter-spacing:1px;line-height:1;}
+  .match-result{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:16px;color:#ffffff;letter-spacing:2px;line-height:1;}
+  .match-card{cursor:pointer;}
+  #xi-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.96);overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  #xi-overlay.open{opacity:1;pointer-events:all;}
+  .xi-inner{width:min(100%,430px);margin:0 auto;padding:16px 0 40px;}
+  .xi-close{position:sticky;top:16px;float:right;margin-right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+  .xi-team-hdr{display:flex;align-items:center;gap:8px;padding:10px 16px 8px;border-bottom:1px solid rgba(255,255,255,0.07);}
+  .xi-team-esc{width:24px;height:24px;object-fit:contain;flex-shrink:0;}
+  .xi-team-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#fff;text-transform:uppercase;flex:1;}
+  .xi-team-form{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:rgba(200,168,75,0.75);}
+  .xi-row{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .xi-row:last-child{border-bottom:none;}
+  .xi-pos{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);width:22px;text-align:center;flex-shrink:0;}
+  .xi-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.5px;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;}
+  .xi-badges{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+  .xi-badge{width:16px;height:16px;object-fit:contain;}
+  .xi-badge[src*="LIGUE 1"]{filter:brightness(0) invert(1);}
+  .xi-ovr{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:15px;color:#f0cc60;line-height:1;flex-shrink:0;width:28px;text-align:right;}
+  .xi-divider{height:1px;background:rgba(255,255,255,0.08);margin:12px 16px;}
+  .xi-no-data{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.3);padding:12px 16px;}
+  .xi-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;padding:0 16px 14px;display:block;}
+
+  /* NOVEDADES — carrusel de mini cartas */
+  .news-cards-scroll{
+    display:flex;gap:8px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    padding:10px 10px 12px 16px;
+  }
+  .news-cards-scroll::-webkit-scrollbar{display:none;}
+  .news-card-wrap{
+    flex-shrink:0;position:relative;overflow:visible;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-block;
+    transition:opacity 0.15s ease;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,0.13));
+  }
+  .news-card-wrap:active{opacity:0.75;}
+
+  /* STATUS BADGES */
+  .player-status-badge{
+    position:absolute;top:-6px;right:-6px;z-index:5;
+    width:21px;height:21px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;line-height:1;
+    background:rgba(0,0,0,0.65);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border:1.5px solid #fff;
+    box-shadow:0 1px 6px rgba(0,0,0,0.4);
+    pointer-events:none;
+  }
+  .player-status-badge svg{display:block;width:62%;height:62%;}
+  .player-status-badge.in-form{background:rgba(0,0,0,0.65);}
+  .player-status-badge.doubt{background:rgba(0,0,0,0.75);}
+  .player-status-badge.injured{background:rgba(0,0,0,0.75);}
+  .player-status-badge.starter{background:rgba(0,0,0,0.65);}
+
+  /* BOTTOM SHEET MODAL */
+  .news-modal-backdrop{
+    position:fixed;inset:0;z-index:200;
+    background:rgba(0,0,0,0.45);
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    opacity:0;pointer-events:none;
+    transition:opacity 0.28s ease;
+  }
+  .news-modal-backdrop.open{opacity:1;pointer-events:all;}
+  .news-modal{
+    position:fixed;bottom:0;left:50%;
+    transform:translateX(-50%) translateY(100%);
+    width:100%;max-width:430px;z-index:201;
+    background:#0d0d0d;border-radius:20px 20px 0 0;
+    padding:0 0 env(safe-area-inset-bottom,20px);
+    transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);
+    max-height:88dvh;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .news-modal.open{transform:translateX(-50%) translateY(0);}
+  .news-modal-handle{
+    width:40px;height:4px;border-radius:2px;
+    background:rgba(255,255,255,0.2);
+    margin:12px auto 4px;flex-shrink:0;
+  }
+  .news-modal-top{
+    padding:0 10px 0 6px;display:flex;
+    align-items:center;gap:4px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .news-modal-close{
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(255,255,255,0.1);border:none;
+    font-size:13px;cursor:pointer;color:#ffffff;
+    display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;flex-shrink:0;
+  }
+  .news-modal-close:active{background:rgba(255,255,255,0.18);}
+  .news-modal-body{padding:12px 16px 28px;transition:opacity 0.15s;}
+  .nmod-nav{display:flex;align-items:center;gap:4px;flex:1;}
+  .nmod-arrow{
+    background:none;border:none;color:#ffffff;
+    font-size:1.15rem;cursor:pointer;padding:6px 10px;
+    opacity:0.55;transition:opacity 0.15s;
+    -webkit-tap-highlight-color:transparent;flex-shrink:0;
+  }
+  .nmod-arrow:active{opacity:1;}
+  .nmod-arrow:disabled{opacity:0.15;pointer-events:none;}
+  .nmod-counter{
+    font-family:'Barlow Condensed',sans-serif;font-size:9px;
+    letter-spacing:2px;color:rgba(255,255,255,0.38);
+    flex:1;text-align:center;
+  }
+  .news-modal-card-large{
+    width:165px;height:255px;
+    position:relative;overflow:visible;
+    margin:10px auto 16px;
+    isolation:isolate;
+  }
+  .news-modal-card-large .player-status-badge{
+    position:absolute;top:2px;right:2px;
+    z-index:100;width:34px;height:34px;font-size:17px;
+  }
+  .news-modal-info-stack{text-align:left;}
+  .news-modal-tag{
+    font-family:'Barlow Condensed',sans-serif;font-size:8px;
+    letter-spacing:2px;color:rgba(255,255,255,0.38);text-transform:uppercase;
+    display:block;margin-bottom:5px;
+  }
+  .news-modal-player{
+    font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:20px;
+    color:#ffffff;line-height:1.05;margin-bottom:6px;display:block;
+  }
+  .news-modal-title{
+    font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
+    color:#ffffff;line-height:1.25;display:block;
+  }
+  .news-modal-summary{
+    font-family:'Barlow Condensed',sans-serif;font-size:14px;
+    color:rgba(255,255,255,0.55);line-height:1.5;
+    display:block;margin-bottom:20px;
+  }
+  .news-modal-btn{
+    display:block;width:100%;
+    font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+    letter-spacing:2.5px;text-transform:uppercase;
+    background:#1a1000;color:#fff;border:none;border-radius:10px;
+    padding:14px;text-align:center;cursor:pointer;text-decoration:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .news-modal-btn:active{opacity:0.78;}
+
+  /* NOTICIAS */
+  .noticias-scroll{
+    display:flex;flex-direction:row;gap:10px;
+    padding:0 16px 6px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .noticias-scroll::-webkit-scrollbar{display:none;}
+  .noticia-card{
+    flex:0 0 72vw;max-width:280px;height:130px;
+    scroll-snap-align:start;
+    position:relative;overflow:hidden;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.45);
+    border-radius:14px;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+    transition:opacity 0.15s;
+  }
+  .noticia-card:active{opacity:0.75;}
+  .noticia-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;}
+  .noticia-body{position:absolute;bottom:0;left:0;right:0;padding:20px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.82));}
+  .noticia-tag{
+    font-family:'Barlow Condensed',sans-serif;font-size:8px;
+    letter-spacing:2px;color:rgba(200,168,75,0.85);text-transform:uppercase;
+    display:block;margin-bottom:4px;
+  }
+  .noticia-title{
+    font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+    color:#fff;line-height:1.25;display:block;
+  }
+
+  /* MODAL NOTICIA IMAGEN */
+  .noticia-modal-overlay{
+    position:fixed;inset:0;z-index:400;
+    background:rgba(0,0,0,0.92);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.25s ease;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  }
+  .noticia-modal-overlay.open{opacity:1;pointer-events:all;}
+  .noticia-modal-img-wrap{
+    position:relative;
+    width:min(92vw, 400px);
+    max-height:92dvh;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .noticia-modal-img-wrap img{
+    width:100%;max-height:92dvh;
+    object-fit:contain;border-radius:14px;
+    display:block;
+  }
+  .noticia-modal-close{
+    position:absolute;top:-14px;right:-14px;
+    width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+    color:#fff;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .noticia-modal-close:active{background:rgba(255,255,255,0.28);}
+
+  /* ALERTAS FANTASY */
+  .alerts-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    padding:0 16px;margin-bottom:96px;
+  }
+  .alert-card{
+    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.45);
+    border-radius:12px;padding:14px 12px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .alert-icon{width:18px;height:18px;margin-bottom:4px;color:#c8a84b;}
+  .alert-label{
+    font-family:'Barlow Condensed',sans-serif;font-size:7px;
+    letter-spacing:2px;color:rgba(255,255,255,0.38);text-transform:uppercase;
+  }
+  .alert-value{
+    font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:17px;
+    color:#ffffff;line-height:1;letter-spacing:0.5px;
+  }
+  .alert-sub{
+    font-family:'Barlow Condensed',sans-serif;font-size:11px;
+    color:rgba(255,255,255,0.45);line-height:1.3;
+  }
+
+  @media(min-width:768px){.app{max-width:100%;}.lp-header{max-width:100%;}}
+  </style>
+  <style>html.ob-done #ob-overlay{display:none!important}</style>
+  <script>if(localStorage.getItem('lp_ob_done_v1'))document.documentElement.classList.add('ob-done');</script>
+</head>
+<body>
+
+<div id="splash" style="position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+  <video id="splash-vid" src="/assets/logo/splash-divieto.mp4" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+</div>
+<script>
+(function(){
+  var vid = document.getElementById('splash-vid');
+  function hideSplash(){
+    var sp = document.getElementById('splash');
+    if(!sp) return;
+    sp.style.transition = 'opacity 0.5s';
+    sp.style.opacity = '0';
+    setTimeout(function(){ sp.remove(); }, 500);
+  }
+  vid.addEventListener('ended', hideSplash);
+  vid.addEventListener('error', hideSplash);
+  setTimeout(hideSplash, 10000);
+  vid.play().catch(function(){ hideSplash(); });
+})();
+</script>
+
+<div class="bg-layer"></div>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="lp-header">
+    <a href="/app/" class="lp-header-logo">
+      <img src="/assets/img/divieto-texto.webp" class="lp-logo-divieto" alt="DIVIETO">
+    </a>
+    <div class="lp-header-right">
+      <button class="lp-bell" aria-label="Notificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <div class="avatar" id="avatar-btn"><img src="/assets/img/divieto-x.webp" style="width:32px;height:32px;object-fit:contain;pointer-events:none;" alt=""></div>
+      <div id="user-menu" class="umenu">
+        <div class="umenu-item" onclick="window.location.href='/app/reglamento'">📖 Reglamento</div>
+        <hr class="umenu-sep">
+        <div class="umenu-item umenu-danger" id="umenu-logout">→ Cerrar sesión</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO PRE-MUNDIAL -->
+  <div class="hero-mundial">
+    <img src="/assets/img/FIFA WORLD CUP LOGO BLANCO.webp" class="hero-wc-logo" alt="">
+    <span class="hero-pre-label">RUMBO AL MUNDIAL 2026</span>
+    <span class="hero-title">FUT DRAFT & FANTASY</span>
+    <div class="hero-countdown">
+      <div class="cd-chunk"><span class="cd-num" id="cd-d">—</span> D</div>
+      <span class="cd-sep">·</span>
+      <div class="cd-chunk"><span class="cd-num" id="cd-h">—</span> H</div>
+      <span class="cd-sep">·</span>
+      <div class="cd-chunk"><span class="cd-num" id="cd-m">—</span> M</div>
+    </div>
+    <div class="hero-cta-wrap">
+      <a href="/app/draft/" class="btn-cta-primary">CREAR MI EQUIPO</a>
+      <button class="btn-cta-ghost" id="btn-reglamento-ob">REGLAMENTO</button>
+    </div>
+  </div>
+
+  <!-- PRÓXIMOS PARTIDOS -->
+  <div class="sec-wrap" style="padding-top:6px;">
+    <div class="matches-scroll" id="matches-scroll"></div>
+  </div>
+  <!-- NOVEDADES -->
+  <div class="sec-wrap">
+    <span class="sec-label" style="font-size:11px;letter-spacing:4px;">ENFERMERÍA</span>
+    <div class="news-cards-scroll" id="news-list"></div>
+  </div>
+
+  <!-- NOTICIAS -->
+  <div class="sec-wrap">
+    <span class="sec-label" style="font-size:11px;letter-spacing:4px;">NOTICIAS</span>
+    <div class="noticias-scroll">
+      <div class="noticia-card" data-img="/assets/img/noticias/egipto-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/egipto-convocatoria-mundial-2026.webp" alt="Egipto convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO A</span>
+          <span class="noticia-title">Egipto convoca a Abdelkarim, 18 años y jugando en el juvenil A del Barça</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/suiza-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/suiza-convocatoria-mundial-2026.webp" alt="Suiza convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO B</span>
+          <span class="noticia-title">Las calles lloran. Shaqiri no estará en la Copa del Mundo. Manzambi, sálvanos.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/portugal-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/portugal-convocatoria-mundial-2026.webp" alt="Portugal convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO K</span>
+          <span class="noticia-title">Medio PSG con un Cristiano que jugará su sexto y ¿último? mundial. Favoritos a todo.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/escocia-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/escocia-convocatoria-mundial-2026.webp" alt="Escocia convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO C</span>
+          <span class="noticia-title">El McTominay mediterráneo contra Brasil y Marruecos.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/brasil-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/brasil-convocatoria-mundial-2026.webp" alt="Brasil convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO C</span>
+          <span class="noticia-title">Neymar Jr. deja fuera a João Pedro en un anuncio de lista surrealista.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/austria-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/austria-convocatoria-mundial-2026.webp" alt="Austria convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO J</span>
+          <span class="noticia-title">Del motín del 2020 a presentar candidatura a sorpresa del Mundial en 2026.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/curazao-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/curazao-convocatoria-mundial-2026.webp" alt="Curaçao convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO E</span>
+          <span class="noticia-title">Curaçao, una isla con 200.000 habitantes se ha clasificado para la Copa del Mundo, ellos ya han ganado.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/rdcongo-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/rdcongo-convocatoria-mundial-2026.webp" alt="R.D. Congo convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO K</span>
+          <span class="noticia-title">La estrella estará en la grada, el aficionado estatua que honra a Patrice Lumumba.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/croacia-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/croacia-convocatoria-mundial-2026.webp" alt="Croacia convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO L</span>
+          <span class="noticia-title">Luka Modrić ante su quinto mundial.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/caboverde-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/caboverde-convocatoria-mundial-2026.webp" alt="Cabo Verde convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO H</span>
+          <span class="noticia-title">Los tubarões do Atlántico van a debutar en un mundial ni más ni menos que con España.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/corea-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/corea-convocatoria-mundial-2026.webp" alt="Corea del Sur convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO A</span>
+          <span class="noticia-title">Heung Min Son y Kang In Lee a por la exoneración del servicio militar.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/belgica-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/belgica-convocatoria-mundial-2026.webp" alt="Bélgica convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO G</span>
+          <span class="noticia-title">Este año menos ojo con Bélgica que nunca.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/costademarfil-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/costademarfil-convocatoria-mundial-2026.webp" alt="Costa de Marfil convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO E</span>
+          <span class="noticia-title">El general Kessié y Yan Diomandé a por todas en el grupo de las sorpresas.</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/tunez-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/tunez-convocatoria-mundial-2026.webp" alt="Túnez convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO F</span>
+          <span class="noticia-title">Una Túnez de completos desconocidos ante el grupo más igualado del torneo, ¿conseguirá sellar su pase a dieciseisavos?</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/francia-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/francia-convocatoria-mundial-2026.webp" alt="Francia convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO F</span>
+          <span class="noticia-title">El Dictador Mbappe sentencia a Camavinga</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/japon-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/japon-convocatoria-mundial-2026.webp" alt="Japón convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO F</span>
+          <span class="noticia-title">Take Kubo comanda el Thousand Sunny japonés</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/nuevazelanda-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/nuevazelanda-convocatoria-mundial-2026.webp" alt="Nueva Zelanda convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO G</span>
+          <span class="noticia-title">Tenemos a los 26 elegidos para hacer la haka. El peor Ranking FIFA del torneo</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/suecia-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/suecia-convocatoria-mundial-2026.webp" alt="Suecia convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO F</span>
+          <span class="noticia-title">Graham Potter se encomienda a Gyökeres e Isak. Roony, Dahl y Larsson de vacances</span>
+        </div>
+      </div>
+      <div class="noticia-card" data-img="/assets/img/noticias/bosnia-convocatoria-mundial-2026.webp">
+        <img class="noticia-img" src="/assets/img/noticias/bosnia-convocatoria-mundial-2026.webp" alt="Bosnia convocatoria Mundial 2026">
+        <div class="noticia-body">
+          <span class="noticia-tag">CONVOCATORIA · GRUPO B</span>
+          <span class="noticia-title">Primera lista del mundial. Dzeko va a jugar un mundial con 40 años. Tremenda leyenda</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTAS FANTASY -->
+  <div class="sec-wrap">
+    <div class="alerts-grid" id="alerts-grid"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- XI OVERLAY -->
+<div id="xi-overlay">
+  <div class="xi-inner" id="xi-inner"></div>
+</div>
+
+<!-- MODAL IMAGEN NOTICIA -->
+<div class="noticia-modal-overlay" id="noticia-modal-overlay">
+  <div class="noticia-modal-img-wrap">
+    <button class="noticia-modal-close" id="noticia-modal-close">✕</button>
+    <img id="noticia-modal-img" src="" alt="">
+  </div>
+</div>
+
+<!-- BOTTOM SHEET NOVEDADES -->
+<div id="news-modal-backdrop" class="news-modal-backdrop"></div>
+<div id="news-modal" class="news-modal" role="dialog" aria-modal="true">
+  <div class="news-modal-handle"></div>
+  <div class="news-modal-top">
+    <div class="nmod-nav">
+      <button class="nmod-arrow" id="nmod-prev" aria-label="Anterior">←</button>
+      <span class="nmod-counter" id="nmod-counter"></span>
+      <button class="nmod-arrow" id="nmod-next" aria-label="Siguiente">→</button>
+    </div>
+    <button class="news-modal-close" id="news-modal-close" aria-label="Cerrar">✕</button>
+  </div>
+  <div class="news-modal-body" id="news-modal-body"></div>
+</div>
+
+<script>
+  document.getElementById('avatar-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const m = document.getElementById('user-menu');
+    m.style.display = m.style.display === 'none' || !m.style.display ? 'block' : 'none';
+  });
+  document.addEventListener('click', () => {
+    document.getElementById('user-menu').style.display = 'none';
+  });
+
+  // Modal imagen noticia
+  const _novOverlay = document.getElementById('noticia-modal-overlay');
+  const _novImg     = document.getElementById('noticia-modal-img');
+
+  document.addEventListener('click', function(e) {
+    const card = e.target.closest('.noticia-card[data-img]');
+    if (!card) return;
+    _novImg.src = card.dataset.img;
+    _novOverlay.classList.add('open');
+  });
+  document.getElementById('noticia-modal-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    _novOverlay.classList.remove('open');
+  });
+  _novOverlay.addEventListener('click', function(e) {
+    if (e.target === _novOverlay) _novOverlay.classList.remove('open');
+  });
+</script>
+
+<script src="/js/club_liga.js"></script>
+<script src="/js/jugadores.js?v=12"></script>
+<script src="/js/fotos.js?v=53"></script>
+<script src="/js/ifs.js"></script>
+<script src="/js/rival.js"></script>
+<script src="/js/cartas.js?v=34"></script>
+
+<script type="module">
+  import { auth, db } from '/js/config.js';
+  import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { collection, onSnapshot, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { PAISES, PARTIDOS, horaMadrid, fechaMadrid, dtUTC } from '/js/mundial2026.js';
+  import { applyOverrides } from '/js/overrides-merge.js';
+  import { ALINEACIONES } from '/js/alineaciones.js';
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── Cuenta atrás D/H/M/S ──
+  const WC_TARGET = new Date('2026-06-11T21:00:00+02:00');
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function updateCountdown() {
+    const diff = Math.max(0, WC_TARGET - new Date());
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = pad2(h);
+    document.getElementById('cd-m').textContent = pad2(m);
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 30000);
+
+  // ── Partidos ──
+  const MESES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  const PARTIDOS_SORTED = [...PARTIDOS].sort((a,b) => dtUTC(a.fecha,a.hora) - dtUTC(b.fecha,b.hora));
+
+  const _ESC = {
+    ARG:'argentina-national-team-footballlogos-org.webp',
+    ALG:'algeria-national-team-footballlogos-org.webp',
+    AUS:'australia-national-team-footylogos.webp',
+    AUT:'austria-national-team-footballlogos-org.webp',
+    BEL:'belgium-national-team-footballlogos-org.webp',
+    BIH:'bosnia_herzegovina_national_team.webp',
+    BRA:'brazil-national-team-footballlogos-org.webp',
+    CAN:'canada-national-team-footballlogos-org.webp',
+    CPV:'cabo-verde-footballlogos-org.webp',
+    CIV:'cote-d-ivoire-national-team-footballlogos-org.webp',
+    COD:'congo national team.webp',
+    COL:'colombia-national-team-footballlogos-org.webp',
+    CRO:'croatia-national-team-footballlogos-org.webp',
+    CUW:'curacao-national-team-footballlogos-org.webp',
+    CZE:'republica checa national team.webp',
+    ECU:'ecuador-national-team-footballlogos-org.webp',
+    EGY:'egypt-national-team-footballlogos-org.webp',
+    ENG:'england-national-team-footballlogos-org.webp',
+    ESP:'spain-national-team-footballlogos-org.webp',
+    FRA:'france-national-team-footballlogos-org.webp',
+    GER:'germany-national-team-footballlogos-org.webp',
+    GHA:'ghana-footballlogos-org.webp',
+    HAI:'haiti-national-team-footylogos.webp',
+    IRN:'iran-national-team-footballlogos-org.webp',
+    IRQ:'iraq national team.webp',
+    JOR:'jordan-footballlogos-org.webp',
+    JPN:'japan-national-team-footballlogos-org.webp',
+    KOR:'south-korea-national-team-footballlogos-org.webp',
+    KSA:'saudi-arabia-national-team-footballlogos-org.webp',
+    MAR:'marruecos national team.webp',
+    MEX:'mexico national team.webp',
+    NED:'netherlands-dutch-national-team-footballlogos-org.webp',
+    NOR:'norway-national-team-footballlogos-org.webp',
+    NZL:'new-zealand-national-team-footballlogos-org.webp',
+    PAN:'panama national team.webp',
+    PAR:'paraguay-national-team-footballlogos-org.webp',
+    POR:'portugal-national-team-footballlogos-org.webp',
+    QAT:'qatar-national-team-footballlogos-org.webp',
+    RSA:'sudafrica national team.webp',
+    SCO:'scotland-national-team-footballlogos-org.webp',
+    SEN:'senegal-national-team-footballlogos-org.webp',
+    SUI:'swiss-national-team-footballlogos-org.webp',
+    SWE:'suecia national team.webp',
+    TUN:'tunisia-national-team-footballlogos-org.webp',
+    TUR:'turquia national team.webp',
+    URU:'uruguay-national-team-footballlogos-org.webp',
+    USA:'usa-national-team-footballlogos-org.webp',
+    UZB:'uzbekistan-national-team-footballlogos-org.webp',
+  };
+
+  function shieldEl(country, pais) {
+    const f = _ESC[country];
+    if (f) return `<img class="match-shield" src="/assets/img/escudos/selecciones/${f}" onerror="this.style.opacity='0'">`;
+    return `<span class="match-flag">${pais ? pais.f : '🏳️'}</span>`;
+  }
+
+  const J1_IDS = new Set([1,2,7,8,13,14,19,20,25,26,31,32,37,38,43,44,49,50,55,56,61,62,67,68]);
+
+  renderMatches({});
+
+  function renderMatches(resultados) {
+    const mostrar = PARTIDOS_SORTED.filter(p => J1_IDS.has(p.id));
+
+    const container = document.getElementById('matches-scroll');
+    if (!mostrar.length) { container.innerHTML = ''; return; }
+
+    container.innerHTML = mostrar.map(p => {
+      const loc = PAISES[p.local], vis = PAISES[p.visit];
+      const r = resultados[String(p.id)];
+      const fmad = fechaMadrid(p.fecha, p.hora);
+      const dmad = new Date(fmad + 'T12:00:00');
+      const fechaStr = `${dmad.getDate()} ${MESES[dmad.getMonth()]}`;
+      const horaStr  = horaMadrid(p.fecha, p.hora);
+      const info = r
+        ? `<span class="match-result">${r.l}–${r.v}</span>`
+        : `<span class="match-date">${fechaStr}</span><span class="match-time">${horaStr}</span>`;
+      return `<div class="match-card${r?' played':''}" data-local="${p.local}" data-visit="${p.visit}">
+        ${shieldEl(p.local,loc)}
+        <div class="match-info">${info}</div>
+        ${shieldEl(p.visit,vis)}
+      </div>`;
+    }).join('');
+  }
+
+  // ── XI Overlay ────────────────────────────────────────────────────────────
+  const _xiOverlay = document.getElementById('xi-overlay');
+  const _xiInner   = document.getElementById('xi-inner');
+
+  function tierColor(tier) {
+    if (!tier) return '#f0cc60';
+    if (tier.startsWith('oro'))    return '#f0cc60';
+    if (tier.startsWith('plata'))  return '#c8c8c8';
+    if (tier.startsWith('bronce')) return '#d4844a';
+    return '#f0cc60';
+  }
+
+  function getJugadorData(nombre) {
+    if (typeof JUGADORES_MUNDIAL === 'undefined') return null;
+    for (const sel of JUGADORES_MUNDIAL) {
+      const j = sel.jugadores.find(x => x.nombre === nombre);
+      if (j) return j;
+    }
+    return null;
+  }
+
+  function xiTeamHtml(iso) {
+    const data = ALINEACIONES[iso];
+    const pais = PAISES[iso];
+    const escF = _ESC[iso];
+    const escImg = escF
+      ? `<img class="xi-team-esc" src="/assets/img/escudos/selecciones/${escF}" onerror="this.style.opacity='0'">`
+      : `<span style="font-size:18px">${pais?.f||'🏳️'}</span>`;
+    if (!data) {
+      return `<div class="xi-team-hdr">${escImg}<span class="xi-team-name">${pais?.n||iso}</span></div><div class="xi-no-data">XI NO DISPONIBLE</div>`;
+    }
+    const rows = data.xi.map(nombre => {
+      const j = getJugadorData(nombre);
+      const pos = j?.posDraft || '—';
+      const ov = j?.overall ?? '';
+      const club = j?.club || '';
+      const ligaF = club && typeof CLUB_LIGA !== 'undefined' ? CLUB_LIGA[club] : null;
+      const clubF = club && typeof CLUB_ESCUDO !== 'undefined' ? CLUB_ESCUDO[club] : null;
+      const badges = (ligaF ? `<img class="xi-badge" src="/assets/img/escudos/ligas/${ligaF}" onerror="this.style.display='none'">` : '')
+                   + (clubF ? `<img class="xi-badge" src="/assets/img/escudos/${clubF}" onerror="this.style.display='none'">` : '');
+      return `<div class="xi-row"><span class="xi-pos">${pos}</span><span class="xi-name">${nombre}</span><div class="xi-badges">${badges}</div><span class="xi-ovr" style="color:${tierColor(j?.tier)}">${ov}</span></div>`;
+    }).join('');
+    return `<div class="xi-team-hdr">${escImg}<span class="xi-team-name">${pais?.n||iso}</span><span class="xi-team-form">${data.f}</span></div>${rows}`;
+  }
+
+  function openXiOverlay(localISO, visitISO) {
+    _xiInner.innerHTML = `<button class="xi-close" id="xi-close-btn">✕</button><span class="xi-title">POSIBLE ALINEACIÓN</span>`
+      + xiTeamHtml(localISO) + '<div class="xi-divider"></div>' + xiTeamHtml(visitISO);
+    _xiOverlay.scrollTop = 0;
+    _xiOverlay.classList.add('open');
+    document.getElementById('xi-close-btn').addEventListener('click', () => _xiOverlay.classList.remove('open'));
+  }
+
+  _xiOverlay.addEventListener('click', e => { if (e.target === _xiOverlay) _xiOverlay.classList.remove('open'); });
+
+  document.getElementById('matches-scroll').addEventListener('click', e => {
+    const card = e.target.closest('.match-card');
+    if (!card) return;
+    const local = card.dataset.local, visit = card.dataset.visit;
+    if (local && visit) openXiOverlay(local, visit);
+  });
+
+  // ── Novedades ──
+  // ── NUEVO aquí arriba ──
+  const NEWS_ITEMS = [
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Fermín se opera y es baja para el Mundial',
+      text:  'El Barça confirma que Fermín López sufrió una fractura en el quinto metatarsiano del pie derecho ante el Betis y será operado. Baja sensible para De la Fuente.',
+      url:   'https://www.fcbarcelona.es',
+      player:{ nombre:'Fermin Lopez', overall:83, tier:'oro-brillante', posicion:'MC', seleccion:'ESPAÑA', club:'FC Barcelona', foto:'https://raw.githubusercontent.com/JepLaGuitlla/tomaquet/main/img/players/31243.avif', estado:'lesion' },
+    },
+    {
+      group: 'dudas',
+      tag:   'LESIÓN MUSCULAR',
+      title: 'Nico Williams, duda para el Mundial',
+      text:  'El extremo del Athletic Club se retiró lesionado en el minuto 34 del partido ante el Valencia en la jornada 35 de LaLiga. Problema muscular sin diagnóstico confirmado. Cedió su puesto a su hermano Iñaki Williams.',
+      url:   '#',
+      player:{ nombre:'Nico Williams', overall:82, tier:'oro-brillante', posicion:'DL', seleccion:'ESPAÑA', club:'Athletic Club', foto:'/assets/img/players/Nico_Williams.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'EXPEDIENTE · LESIÓN',
+      title: 'Valverde, baja 10-14 días tras agresión',
+      text:  'Federico Valverde sufre un traumatismo craneoencefálico tras ser agredido por su compañero Tchouaméni en el entrenamiento. Estará de baja entre 10 y 14 días, descartado para El Clásico.',
+      url:   'https://www.realmadrid.com',
+      player:{ nombre:'Federico Valverde', overall:87, tier:'oro-brillante', posicion:'MC', seleccion:'URUGUAY', club:'Real Madrid CF', foto:'/assets/img/players/Fede_Valverde.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'MASCARA',
+      title: 'Modric llegaría con protección',
+      text:  'El capitán croata sufrió una doble fractura de pómulo con el Milan. Se perderá el cierre de temporada, pero en Croacia confían en que juegue el Mundial con máscara.',
+      url:   'https://www.marca.com/futbol/liga-italiana/2026/04/27/modric-sufre-doble-fractura-pomulo-mundial-mascara.html',
+      player:{ nombre:'Luka Modric', overall:83, tier:'oro-brillante', posicion:'MC', seleccion:'CROACIA', club:'AC Milan', foto:'/assets/img/players/Luka_Modric.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'RECAÍDA MUSCULAR',
+      title: 'Davies, duda con Canada por problemas musculares',
+      text:  'El lateral canadiense recae de sus problemas musculares, una lesión recurrente en su temporada. Kompany no quiso dar plazos tras la eliminación del Bayern ante el PSG: "Veremos cuánto tiempo estará fuera cuando tengamos las imágenes". El club espera los resultados del escáner para determinar la gravedad.',
+      url:   'https://www.bayernmunich.com',
+      player:{ nombre:'Alphonso Davies', overall:83, tier:'oro-brillante', posicion:'DF', seleccion:'CANADA', club:'Bayern Munich', foto:'/assets/img/players/Alphonso_Davies.webp', estado:'duda' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Cardoso se opera y se pierde el Mundial',
+      text:  'El Atlético de Madrid confirma que Johnny Cardoso pasará por quirófano tras el esguince de alto grado con afectación articular sufrido en el entrenamiento. El centrocampista estadounidense queda descartado para el Mundial 2026, que se celebra en su propio país.',
+      url:   'https://www.atleticodemadrid.com',
+      player:{ nombre:'Johnny Cardoso', overall:79, tier:'oro-brillante', posicion:'MC', seleccion:'ESTADOS UNIDOS', club:'Atletico de Madrid', foto:null, estado:'lesion' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Agyemang se pierde el Mundial en casa',
+      text:  'El delantero estadounidense sufrió una rotura del tendón de Aquiles en la victoria del Derby County ante el Stoke. El propio club confirmó que no estará en el Mundial 2026, que se celebra en su país. "En esta fase sería un error dar un plazo de recuperación", señaló el club.',
+      url:   'https://www.derbycounty.com',
+      player:{ nombre:'Patrick Agyemang', overall:70, tier:'plata-brillante', posicion:'DL', seleccion:'ESTADOS UNIDOS', club:'Derby County', foto:'/assets/img/players/Patrick_Agyemang.webp', estado:'lesion' },
+    },
+    {
+      group: 'dudas',
+      tag:   'FRACTURA · ALARMA ARGELIA',
+      title: 'Luca Zidane, fractura de mandíbula y duda para el Mundial',
+      text:  'El portero del Granada fue trasladado en ambulancia tras un choque fortuito ante el Almería. Las pruebas confirmaron conmoción cerebral y fractura de mandíbula y mentón. Su evolución compromete la presencia del portero titular de Argelia en el Mundial.',
+      url:   'https://www.granadacf.es',
+      player:{ nombre:'Luca Zidane', overall:73, tier:'plata-brillante', posicion:'PT', seleccion:'ARGELIA', club:'Granada CF', foto:'/assets/img/players/Luca_Zidane_mask.webp', estado:'duda' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Gnabry confirma su ausencia',
+      text:  'El atacante alemán se perderá el Mundial por una lesión de abductores sufrida con el Bayern Munich en el tramo final de la temporada.',
+      url:   'https://www.espn.com.ar/futbol/alemania/nota/_/id/16610388/serge-gnabry-lesion-fuera-del-mundial-2026-bayern-munich-seleccion-alemania',
+      player:{ nombre:'Serge Gnabry', overall:75, tier:'oro-mate', posicion:'MC', seleccion:'ALEMANIA', club:'Bayern Munich', foto:'/assets/img/players/Serge_Gnabry.webp', estado:'lesion' },
+    },
+    {
+      group: 'dudas',
+      tag:   'EN RECUPERACION',
+      title: 'Merino apunta a llegar',
+      text:  'El centrocampista español se recupera de una fractura en el pie derecho sufrida en enero. Los plazos apuntan a una vuelta en mayo, antes del debut de España.',
+      url:   'https://www.sportingnews.com/es/futbol/news/juega-mikel-merino-mundial-2026-espana/9f9f3e4d958485f77ca35ce0',
+      player:{ nombre:'Mikel Merino', overall:84, tier:'oro-brillante', posicion:'MC', seleccion:'ESPAÑA', club:'Arsenal FC', foto:'/assets/img/players/Mikel_Merino.webp', estado:'duda' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Militao dice adiós al Mundial',
+      text:  'El central brasileño fue operado de una rotura en el tendón proximal del bíceps femoral de la pierna izquierda y no llegará a la cita mundialista.',
+      url:   'https://espndeportes.espn.com/futbol/espana/nota/_/id/16623514/real-madrid-eder-militao-adios-mundial-brasil',
+      player:{ nombre:'Eder Militao', overall:85, tier:'oro-brillante', posicion:'DF', seleccion:'BRASIL', club:'Real Madrid CF', foto:'/assets/img/players/Eder_Militao.webp', estado:'lesion' },
+    },
+    {
+      group: 'dudas',
+      tag:   'ALARMA',
+      title: 'Hakimi preocupa a Marruecos',
+      text:  'El lateral del PSG sufrió un desgarro en el isquiotibial derecho. Su recuperación apunta a tres o cuatro semanas, pero llegaría con poco ritmo al debut ante Brasil.',
+      url:   'https://www.lagaceta.com.ar/nota/1134729/deportes/se-lesiono-achraf-hakimi-enciende-alarmas-mes-mundial.html',
+      player:{ nombre:'Achraf Hakimi', overall:87, tier:'oro-brillante', posicion:'DF', seleccion:'MARRUECOS', club:'Paris Saint-Germain FC', foto:'/assets/img/players/Achraf_Hakimi.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'SERIA DUDA',
+      title: 'Lamine Yamal preocupa a España',
+      text:  'El extremo del Barcelona sufrió una lesión muscular y su presencia en el Mundial 2026 dependerá de su evolución en las próximas semanas.',
+      url:   'https://www.olympics.com/es/noticias/lamine-yamal-lesion-mundial-2026',
+      player:{ nombre:'Lamine Yamal', overall:91, tier:'oro-brillante', posicion:'DL', seleccion:'ESPAÑA', club:'FC Barcelona', foto:'https://raw.githubusercontent.com/JepLaGuitlla/tomaquet/main/img/players/26271.avif', estado:'duda' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Mitoma, fuera del Mundial',
+      text:  'El extremo japonés del Brighton se pierde el Mundial 2026 por lesión. Una de las grandes bajas de Japón para la cita mundialista.',
+      url:   'https://www.brightonandhovealbion.com',
+      player:{ nombre:'Kaoru Mitoma', overall:81, tier:'oro-brillante', posicion:'DL', seleccion:'JAPON', club:'Brighton & Hove Albion', foto:'/assets/img/players/Kaoru_Mitoma.webp', estado:'lesion' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Ekitike se pierde el Mundial',
+      text:  'El delantero francés sufre una rotura del tendón de Aquiles y no estará disponible para la cita de este verano.',
+      url:   'https://www.liverpoolfc.com/es/news/hugo-ekitike-injury-update-1',
+      player:{ nombre:'Hugo Ekitike', overall:82, tier:'oro-mate', posicion:'DL', seleccion:'FRANCIA', club:'Liverpool FC', foto:'/assets/img/players/Hugo_Ekitike.webp', estado:'lesion' },
+    },
+    {
+      group: 'bajas',
+      tag:   'BAJA CONFIRMADA',
+      title: 'Xavi Simons, fuera del Mundial',
+      text:  'El mediocampista neerlandés sufrió una rotura del ligamento cruzado anterior en la rodilla derecha durante un partido del Tottenham ante Wolverhampton.',
+      url:   'https://www.fifa.com/es/tournaments/mens/worldcup/canadamexicousa2026/articles/xavi-simons-por-que-no-juega-el-mundial-lesion',
+      player:{ nombre:'Xavi Simons', overall:82, tier:'oro-mate', posicion:'MC', seleccion:'PAISES BAJOS', club:'Tottenham Hotspur', foto:'/assets/img/players/Xavi_Simons.webp', estado:'lesion' },
+    },
+    {
+      group: 'dudas',
+      tag:   'SERIA DUDA',
+      title: 'De Arrascaeta, al límite',
+      text:  'El mediocampista uruguayo se fracturó la clavícula derecha con Flamengo y fue operado. Los plazos de recuperación lo dejan muy justo para el inicio del Mundial.',
+      url:   'https://www.tycsports.com/mundial/alarma-en-uruguay-de-arrascaeta-se-fracturo-la-clavicula-y-esta-con-un-pie-afuera-del-mundial-id727628.html',
+      player:{ nombre:'Giorgian de Arrascaeta', overall:82, tier:'oro-brillante', posicion:'MC', seleccion:'URUGUAY', club:'CR Flamengo', foto:'/assets/img/players/Giorgian_De_Arrascaeta.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'EN RECUPERACION',
+      title: 'Piquerez acelera su recuperación',
+      text:  'Joaquín Piquerez evoluciona favorablemente de su lesión y en Uruguay hay optimismo con su llegada al Mundial 2026, aunque todavía sigue bajo seguimiento médico.',
+      url:   'https://www.elobservador.com.uy/seleccion/la-buena-noticia-la-recuperacion-joaquin-piquerez-el-mundial-2026-y-las-preocupantes-situaciones-de-arrascaeta-y-caceres-la-seleccion-uruguaya-n6042950',
+      player:{ nombre:'Joaquin Piquerez', overall:73, tier:'plata-brillante', posicion:'DF', seleccion:'URUGUAY', club:'SE Palmeiras', foto:'/assets/img/players/Joaquin_Piquerez.webp', estado:'duda' },
+    },
+    {
+      group: 'dudas',
+      tag:   'LLEGA JUSTO',
+      title: 'Cuti Romero, carrera contra el reloj',
+      text:  'El central argentino sufrió una lesión de grado II en el ligamento colateral de la rodilla derecha. No volverá a jugar con Tottenham esta temporada, pero apunta a llegar al Mundial.',
+      url:   'https://as.com/futbol/internacional/cuti-romero-justo-al-mundial-f202604-n/',
+      player:{ nombre:'Cristian Romero', overall:85, tier:'oro-brillante', posicion:'DF', seleccion:'ARGENTINA', club:'Tottenham Hotspur', foto:'/assets/img/players/Cristian-Romero.webp', estado:'duda' },
+    },
+  ];
+
+  const _SVG_BANDAGE = `<svg viewBox="0 0 24 24"><g transform="rotate(-45 12 12)"><rect x="3" y="9" width="18" height="6" rx="3" fill="#f59e0b"/><rect x="9" y="9.5" width="6" height="5" rx="1.5" fill="rgba(0,0,0,0.25)"/><circle cx="11.2" cy="12" r="0.9" fill="#f59e0b"/><circle cx="12.8" cy="12" r="0.9" fill="#f59e0b"/></g></svg>`;
+  const _SVG_CROSS   = `<svg viewBox="0 0 24 24"><rect x="9.5" y="3" width="5" height="18" rx="2.5" fill="#ef4444"/><rect x="3" y="9.5" width="18" height="5" rx="2.5" fill="#ef4444"/></svg>`;
+  const STATUS_BADGE = {
+    duda:   `<div class="player-status-badge doubt">${_SVG_BANDAGE}</div>`,
+    lesion: `<div class="player-status-badge injured">${_SVG_CROSS}</div>`,
+    forma:  `<div class="player-status-badge in-form">🔥</div>`,
+  };
+
+  function getJugadorLive(nombre) {
+    if (typeof JUGADORES_MUNDIAL === 'undefined') return null;
+    for (const sel of JUGADORES_MUNDIAL) {
+      const j = sel.jugadores.find(x => x.nombre === nombre);
+      if (j) return j;
+    }
+    return null;
+  }
+
+  let _ovMap = {};
+
+  function liveCard(p) {
+    const live = getJugadorLive(p.nombre);
+    const ov   = _ovMap[p.nombre];
+    const foto = (typeof FOTOS_JUGADORES !== 'undefined' && FOTOS_JUGADORES[p.nombre])
+      ? FOTOS_JUGADORES[p.nombre]
+      : p.foto;
+    return {
+      nombre: p.nombre,
+      overall: ov?.overall ?? live?.overall ?? p.overall,
+      tier:    ov?.tier    ?? live?.tier    ?? p.tier,
+      foto,
+      posicion: p.posicion,
+      seleccion: p.seleccion,
+      club:    p.club,
+    };
+  }
+
+  function renderNews() {
+    const CW = 74, CH = Math.round(74 * 99 / 65);
+    document.getElementById('news-list').innerHTML = NEWS_ITEMS.map((n, i) => {
+      const p = n.player;
+      const card = liveCard(p);
+      const badge = STATUS_BADGE[p.estado] || '';
+      return `<div class="news-card-wrap" style="width:${CW}px" onclick="openNewsModal(${i})">
+        ${miniCardSVG(card, CW, CH)}${badge}
+      </div>`;
+    }).join('');
+  }
+  renderNews();
+
+  // ── Bottom sheet modal ──
+  const _backdrop = document.getElementById('news-modal-backdrop');
+  const _modal    = document.getElementById('news-modal');
+  let _currentNewsIdx = 0;
+
+  function _fillModalBody(idx) {
+    const n = NEWS_ITEMS[idx];
+    const p = n.player;
+    const uid = 'nm' + Math.random().toString(36).slice(2,6);
+    const card = liveCard(p);
+    const badge = STATUS_BADGE[p.estado] || '';
+    const badgeOverlay = badge
+      ? `<div style="position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:50;">${badge}</div>`
+      : '';
+    document.getElementById('news-modal-body').innerHTML =
+      `<div class="news-modal-card-large">
+        ${cardSVG(card, uid)}${badgeOverlay}
+      </div>
+      <div class="news-modal-info-stack">
+        <span class="news-modal-player">${esc(n.tag)}</span>
+        <span class="news-modal-title">${esc(n.title)}</span>
+        <p class="news-modal-summary">${esc(n.text)}</p>
+      </div>`;
+    document.getElementById('nmod-counter').textContent = (idx + 1) + ' / ' + NEWS_ITEMS.length;
+    document.getElementById('nmod-prev').disabled = idx === 0;
+    document.getElementById('nmod-next').disabled = idx === NEWS_ITEMS.length - 1;
+  }
+
+  window.openNewsModal = function(idx) {
+    _currentNewsIdx = idx;
+    _fillModalBody(idx);
+    _backdrop.classList.add('open');
+    _modal.classList.add('open');
+  };
+
+  function navigateNews(dir) {
+    const next = _currentNewsIdx + dir;
+    if (next < 0 || next >= NEWS_ITEMS.length) return;
+    const body = document.getElementById('news-modal-body');
+    body.style.opacity = '0';
+    setTimeout(() => {
+      _currentNewsIdx = next;
+      _fillModalBody(next);
+      body.style.opacity = '1';
+    }, 130);
+  }
+
+  function closeNewsModal() {
+    _backdrop.classList.remove('open');
+    _modal.classList.remove('open');
+  }
+
+  _backdrop.addEventListener('click', closeNewsModal);
+  document.getElementById('news-modal-close').addEventListener('click', closeNewsModal);
+  document.getElementById('nmod-prev').addEventListener('click', e => { e.stopPropagation(); navigateNews(-1); });
+  document.getElementById('nmod-next').addEventListener('click', e => { e.stopPropagation(); navigateNews(1); });
+
+  document.addEventListener('keydown', e => {
+    if (!_modal.classList.contains('open')) return;
+    if (e.key === 'ArrowLeft')  navigateNews(-1);
+    if (e.key === 'ArrowRight') navigateNews(1);
+    if (e.key === 'Escape')     closeNewsModal();
+  });
+
+  let _swipeX = 0, _swipeY = 0;
+  _modal.addEventListener('touchstart', e => {
+    _swipeX = e.touches[0].clientX;
+    _swipeY = e.touches[0].clientY;
+  }, { passive:true });
+  _modal.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _swipeX;
+    const dy = e.changedTouches[0].clientY - _swipeY;
+    if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) {
+      closeNewsModal();
+    } else if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      navigateNews(dx < 0 ? 1 : -1);
+    }
+  }, { passive:true });
+
+  // ── Alertas fantasy (mock) ──
+  const FANTASY_ALERTS = [
+    { icon:'trend',    label:'En tendencia',   value:'Vinicius Jr.',  sub:'el más elegido esta semana'    },
+    { icon:'injury',   label:'Bajas al torneo', value:'9 confirmadas', sub:'revisa tu plantilla'           },
+    { icon:'star',     label:'Más fichados',    value:'Lamine Yamal', sub:'elegido por 7 de cada 10'      },
+    { icon:'calendar', label:'Debut inaugural', value:'11 JUN',       sub:'MEX vs RSA · 19:00h Madrid'    },
+    { icon:'flag',     label:'Top selección',   value:'España',       sub:'favorita entre los managers'   },
+    { icon:'clock',    label:'Quedan',          value:`${Math.max(0,Math.floor((WC_TARGET-new Date())/86400000))} días`, sub:'para el partido inicial' },
+  ];
+  const _ICONS = {
+    trend:    '<path d="M22 7L13.5 15.5L8.5 10.5L2 17"/><polyline points="16,7 22,7 22,13"/>',
+    injury:   '<path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+    star:     '<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    flag:     '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    clock:    '<circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>',
+  };
+
+  document.getElementById('alerts-grid').innerHTML = FANTASY_ALERTS.map(a =>
+    `<div class="alert-card">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${_ICONS[a.icon]}</svg>
+      <span class="alert-label">${a.label}</span>
+      <span class="alert-value">${a.value}</span>
+      <span class="alert-sub">${a.sub}</span>
+    </div>`
+  ).join('');
+
+  // ── Overrides (sin requerir auth) ────────────────────────────────────────
+  applyOverrides(db).then(map => { _ovMap = map || {}; renderNews(); });
+
+  // ── Firebase ──
+  onSnapshot(collection(db, 'resultados'), snap => {
+    const res = {};
+    snap.forEach(d => { res[d.id] = d.data(); });
+    renderMatches(res);
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user || !user.email?.endsWith('@divieto.app')) { window.location.href = '/'; return; }
+
+    const userSnap = await getDoc(doc(db, 'users', user.uid));
+    if (!userSnap.exists() || !userSnap.data().nombre) {
+      window.location.href = '/app/setup/';
+      return;
+    }
+    const userData = userSnap.data();
+
+    const avatarBtn = document.getElementById('avatar-btn');
+    avatarBtn.style.opacity = '1';
+  });
+
+  document.getElementById('umenu-logout').addEventListener('click', async () => {
+    try { await signOut(auth); } catch(e) {}
+    window.location.href = '/';
+  });
+</script>
+<script src="/shared/nav.js"></script>
+
+<!-- ── ONBOARDING OVERLAY ───────────────────────────────────────────────── -->
+<style>
+@keyframes ob-in{from{opacity:0}to{opacity:1}}
+#ob-overlay{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none;animation:ob-in 0.25s ease both;}
+.ob-wrap{width:100%;max-width:430px;height:100svh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* SLIDES TRACK */
+.ob-track{display:flex;flex:1;min-height:0;transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);will-change:transform;}
+.ob-slide{flex-shrink:0;width:100%;height:100%;display:flex;flex-direction:column;}
+
+/* SLIDE SIN IMAGEN — bienvenida / final */
+.ob-slide-text{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;gap:16px;}
+.ob-logo{height:56px;width:auto;margin-bottom:10px;}
+.ob-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;}
+.ob-title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:52px;letter-spacing:4px;color:#fff;line-height:1;}
+.ob-body{font-family:'Barlow Condensed',sans-serif;font-size:19px;color:rgba(255,255,255,0.7);line-height:1.5;letter-spacing:0.2px;max-width:320px;}
+.ob-body strong{color:#fff;white-space:nowrap;}
+.ob-caption-body strong{white-space:nowrap;}
+.ob-subtitle{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:22px;letter-spacing:3px;color:rgba(255,255,255,0.45);line-height:1;margin-top:-4px;}
+.ob-title-inline{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:30px;letter-spacing:3px;color:#fff;line-height:1.1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;}
+.ob-title-inline img{height:60px;width:auto;display:inline-block;vertical-align:middle;}
+.ob-divieto-sub{font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:2px;color:rgba(255,255,255,0.45);text-transform:uppercase;margin-top:-8px;}
+.ob-connections{display:flex;flex-direction:column;gap:9px;align-items:flex-start;width:100%;max-width:300px;}
+.ob-conn{display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:17px;color:rgba(255,255,255,0.85);letter-spacing:0.3px;}
+.ob-conn-line{display:inline-block;width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.ob-conn-line.naranja{background:#fb923c;}
+.ob-conn-line.verde{background:#4ade80;}
+
+/* SLIDE CON IMAGEN */
+.ob-slide-img{flex:1;min-height:0;display:flex;flex-direction:column;background:#0c0c0c;}
+.ob-img-stage{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center;padding:20px 24px 10px;overflow:hidden;position:relative;}
+.ob-img-stage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(200,168,75,0.09) 0%,transparent 65%);pointer-events:none;}
+.ob-img-stage img{position:relative;max-height:100%;width:auto;max-width:100%;display:block;border-radius:18px;outline:1px solid rgba(255,255,255,0.08);box-shadow:0 10px 40px rgba(0,0,0,0.75),0 0 0 1px rgba(200,168,75,0.06);-webkit-user-drag:none;user-select:none;}
+.ob-img-pair{display:flex;gap:10px;align-items:flex-start;justify-content:center;width:100%;height:100%;}
+.ob-img-pair img{position:relative;max-height:100%;width:auto;max-width:calc(50% - 5px);display:block;border-radius:18px;outline:1px solid rgba(255,255,255,0.08);box-shadow:0 10px 40px rgba(0,0,0,0.75),0 0 0 1px rgba(200,168,75,0.06);-webkit-user-drag:none;user-select:none;}
+.ob-caption{flex-shrink:0;padding:14px 22px 0;border-top:1px solid rgba(255,255,255,0.07);}
+.ob-caption-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:4px;}
+.ob-caption-title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:32px;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:7px;}
+.ob-caption-body{font-family:'Barlow Condensed',sans-serif;font-size:16px;color:rgba(255,255,255,0.68);line-height:1.48;letter-spacing:0.15px;}
+.ob-caption-body strong{color:#fff;}
+
+/* SLIDE INTRO — Copa + WELCOME TO DIVIETO */
+.ob-slide-intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 28px;text-align:center;gap:20px;background:#000;overflow:hidden;}
+.ob-intro-trophy{flex-shrink:0;}
+.ob-intro-trophy img{width:160px;height:auto;display:block;animation:ob-trophy-in 1s cubic-bezier(0.2,0.8,0.3,1) both;}
+.ob-intro-words{display:flex;flex-direction:column;align-items:center;gap:8px;animation:ob-words-in 0.7s 0.65s ease-out both;flex-shrink:0;}
+.ob-intro-welcome{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+.ob-intro-logo{height:72px;width:auto;}
+.ob-intro-tagline{font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:3px;color:rgba(255,255,255,0.85);text-transform:uppercase;}
+@keyframes ob-trophy-in{from{opacity:0;transform:scale(0.72) translateY(32px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes ob-words-in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* FOOTER */
+.ob-footer{flex-shrink:0;background:#000;padding:14px 24px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px;}
+.ob-dots{display:flex;gap:6px;align-items:center;}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.25s;}
+.ob-dot.active{width:18px;border-radius:3px;background:#c8a84b;}
+.ob-btn{width:100%;max-width:360px;height:48px;border-radius:10px;background:#c8a84b;border:none;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:17px;letter-spacing:3px;color:#000;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity 0.15s;}
+.ob-btn:active{opacity:0.8;}
+.ob-skip{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.25);text-transform:uppercase;cursor:pointer;padding:4px 16px;-webkit-tap-highlight-color:transparent;}
+</style>
+
+<div id="ob-overlay">
+  <div class="ob-wrap">
+    <div class="ob-track" id="ob-track">
+
+      <!-- SLIDE 1 — Welcome to DIVIETO (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-welcome.webp" alt="Welcome to DIVIETO" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 2 — FUT Draft & Fantasy (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide2.webp" alt="FUT Draft & Fantasy" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 3 — La carta (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide3.webp" alt="La carta" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 4 — 900 / DIVIETO (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide4.webp" alt="900 - El límite" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 5 — La química (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide5.webp" alt="La química" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 6 — La química tiene un precio (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide6.webp" alt="La química tiene un precio" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+      <!-- SLIDE 7 — Todo lo demás, descúbrelo tú mismo (imagen) -->
+      <div class="ob-slide">
+        <div style="flex:1;min-height:0;overflow:hidden;">
+          <img src="/assets/img/onboarding/ob-slide7.webp" alt="Todo lo demás, descúbrelo tú mismo" draggable="false" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;-webkit-user-drag:none;user-select:none;">
+        </div>
+      </div>
+
+    </div><!-- /ob-track -->
+
+    <div class="ob-footer">
+      <div class="ob-dots" id="ob-dots"></div>
+      <button class="ob-btn" id="ob-btn">SIGUIENTE</button>
+      <span class="ob-skip" id="ob-skip">Saltar</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOTAL = 7;
+  const OB_KEY = 'lp_ob_done_v1';
+
+  const overlay = document.getElementById('ob-overlay');
+  const track   = document.getElementById('ob-track');
+  const btn     = document.getElementById('ob-btn');
+  const skip    = document.getElementById('ob-skip');
+  const dotsEl  = document.getElementById('ob-dots');
+
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'ob-dot' + (i === 0 ? ' active' : '');
+    dotsEl.appendChild(d);
+  }
+
+  let cur = 0;
+
+  function goTo(n) {
+    cur = n;
+    track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    document.querySelectorAll('.ob-dot').forEach((d,i) => d.className = 'ob-dot' + (i===cur?' active':''));
+    btn.textContent = cur === TOTAL - 1 ? 'EMPEZAR' : 'SIGUIENTE';
+    skip.style.visibility = cur === TOTAL - 1 ? 'hidden' : 'visible';
+  }
+
+  function closeOb() {
+    localStorage.setItem(OB_KEY, '1');
+    overlay.style.display = 'none';
+    document.documentElement.classList.add('ob-done');
+  }
+
+  function openOb() {
+    goTo(0);
+    overlay.style.display = 'flex';
+    document.documentElement.classList.remove('ob-done');
+  }
+
+  btn.addEventListener('click', e => { e.stopPropagation(); cur < TOTAL - 1 ? goTo(cur + 1) : closeOb(); });
+  skip.addEventListener('click', e => { e.stopPropagation(); closeOb(); });
+
+  track.addEventListener('click', e => {
+    if (e.target.closest('button,a,input')) return;
+    e.clientX < window.innerWidth / 2
+      ? (cur > 0 && goTo(cur - 1))
+      : (cur < TOTAL - 1 && goTo(cur + 1));
+  });
+
+  const btnOb = document.getElementById('btn-reglamento-ob');
+  if (btnOb) btnOb.addEventListener('click', openOb);
+
+  let startX = 0, startY = 0;
+  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, {passive:true});
+  track.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && cur < TOTAL - 1) goTo(cur + 1);
+    if (dx > 0 && cur > 0) goTo(cur - 1);
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
