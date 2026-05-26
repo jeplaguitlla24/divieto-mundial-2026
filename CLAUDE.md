@@ -1,4 +1,5 @@
-# LA PAUSA — Contexto maestro para Claude
+# DIVIETO — Contexto maestro para Claude
+> **Última actualización: 2026-05-27**
 > Este archivo es la fuente de verdad del proyecto. Léelo entero antes de tocar cualquier cosa.
 
 ---
@@ -33,9 +34,9 @@
 
 ## CAPA 2 — EL PRODUCTO
 
-### Qué es LA PAUSA
-Fantasy football basado en **cartas coleccionables estilo Ultimate Team**.
-Lanzamiento: **1 junio 2026** · Torneo: **Mundial 2026** (11 junio – 19 julio)
+### Qué es DIVIETO
+Fantasy football mobile-first basado en **cartas coleccionables estilo Ultimate Team**.
+Nombre: **DIVIETO** · Lanzamiento: **1 junio 2026** · Torneo: **Mundial 2026** (11 junio – 19 julio)
 Modo de juego: **Draft por jornada** — cada jornada drafteas tu XI desde cero con cartas de jugadores reales.
 Producto diseñado con **prioridad mobile-first**.
 
@@ -44,9 +45,8 @@ Producto diseñado con **prioridad mobile-first**.
 - Para cada posición aparecen N cartas de jugadores que juegan esa jornada — elige una
 - **Pool independiente por manager** — no hay conflicto entre managers
 - Puntuación basada en **escala Sofascore** con tabla propia (ver más abajo)
-- **Factor Pausa** = media acumulada de puntos LA PAUSA del jugador en el torneo — es el "overall" de la carta
-- **Competición principal:** Liga general de puntos acumulados
-- **H2H por jornada:** previsto — pendiente de cierre final
+- **Overall de la carta** = valor fijo asignado inicialmente, crece con cartas IF al repetir buen rendimiento
+- **Competición principal:** Liga general de puntos acumulados — todos juegan las 8 jornadas, gana quien más acumule
 
 ---
 
@@ -97,10 +97,10 @@ Producto diseñado con **prioridad mobile-first**.
 - Mínimo para puntuar: el jugador debe haber jugado (cualquier minuto registrado)
 - En conflicto sobre un gol o acción, prevalece la decisión del árbitro
 
-**Factor Pausa**
-- Media acumulada de puntos LA PAUSA del jugador en el torneo
-- Se recalcula tras cada jornada
-- Determina el tier: Oro / Plata / Bronce según umbrales por overall (ver sección overalls)
+**Factor Pausa / Overall**
+- El overall de la carta es **fijo** desde el inicio del torneo
+- Sube únicamente mediante cartas **IF** (In Form): cuando un jugador repite en el top 26 de una jornada, su carta IF mejora su overall permanentemente
+- El overall determina el tier visual: Oro / Plata / Bronce (ver sección overalls)
 
 **Multiplicador de puntuación en jornada** ✅
 - Los multiplicadores por tier (Oro/Plata/Bronce) han sido **eliminados** — el tier solo afecta al diseño visual y al overall de la carta
@@ -556,6 +556,8 @@ Cuando se edita un overall desde `/admin` (que escribe en Firestore `/overrides/
 - Splash de entrada: `splash-divieto.mp4` (10s max, fade out al terminar)
 - Flujo: introduce código → valida en `codigos/{codigo}` → `signInAnonymously` → marca código como usado → redirect a `/app/setup/`
 - Si ya hay sesión activa con nombre → redirect a `/app/` · Si sesión sin nombre → redirect a `/app/setup/`
+- **"Recordar sesión" toggle** ✅ implementado 2026-05-26: checkbox marcado por defecto. Si activo → `browserLocalPersistence` (sesión permanente en el dispositivo). Si desactivo → `browserSessionPersistence` (se cierra al cerrar el navegador). Guarda el nombre de usuario en `localStorage('lp_saved_user')` para rellenarlo en la próxima visita.
+- Imports necesarios: `setPersistence, browserLocalPersistence, browserSessionPersistence` desde `firebase-auth`
 
 ---
 
@@ -888,7 +890,7 @@ function flipCarouselCard(item) {
 | `public/shared/nav.js` | Nav compartido | ✅ |
 | `public/app/liga/onboarding.html` | Crear / unirse a liga | ✅ |
 | `public/app/liga/config.html` | Gestión de liga | ✅ |
-| `public/app/jornada/index.html` | Campo read-only · burbujas de puntuación · clasificación liga · topbar estándar con avatar | ✅ |
+| `public/app/jornada/index.html` | Campo read-only · burbujas de puntuación · clasificación liga · topbar estándar con avatar · `JORNADA_IDS` dinámico (J1–J8) · `normalizeName()` + `lookupPts()` para matching de nombres con acentos · solo muestra drafts con `alineacionConfirmada:true` | ✅ |
 | `public/app/liga/index.html` | Dos pestañas: **LIGA PRIVADA** (clasificación de la liga del usuario, nombre editable inline) y **LIGA GENERAL** (todos los managers). Hero con stats. Sticky bar con posición y puntos del usuario. `onSnapshot` en tiempo real. Si el usuario no tiene liga privada → muestra "Sin liga privada" con botón a setup. | ✅ |
 | `public/app/moscas/index.html` | Test visual cartas IF · grid 2 columnas · flip 3D · back button topbar · banner "prueba" · light design · nav.js | ✅ |
 | `public/app/analisis/index.html` | Hub de análisis · pestañas GRUPOS (clasificaciones en tiempo real, click en equipo → `/app/seleccion/?s=`) y **JUGADORES** (antes MOSCAS — `data-view="moscas"` invariante, label UI cambió). Deep-link: `?tab=moscas`. Banderas via `flagcdn.com` con `SELECCIONES_DATA[sel].iso`. Modal flip 3D. Topbar estándar con avatar. | ✅ |
@@ -923,16 +925,18 @@ function flipCarouselCard(item) {
 | `scripts/remove-bg.js` | Elimina fondo blanco de WebPs → guarda `{id}-t.webp` con alpha | ✅ |
 | `scripts/bump.cjs` | Sube `?v=N` en todos los HTML que referencian un JS compartido · uso: `node scripts/bump.cjs cartas` / `node scripts/bump.cjs fotos` | ✅ |
 | `functions/index.js` | Entry point Cloud Functions · `initializeApp()` + re-exporta `pollActive`, `aperturaJ1/J2/J3`, `onResultWrite` | ✅ |
-| `functions/poller.js` | Cloud Function `pollActive` · scheduled cada 2 min · stateless (lee estado de Firestore) · soporta hasta 24 partidos simultáneos · escribe `puntuaciones/` y `resultados/` · auto-avanza jornada cuando todos los partidos terminan | ✅ |
+| `functions/poller.js` | Cloud Function `pollActive` · scheduled cada 2 min · stateless · soporta hasta 24 partidos simultáneos · escribe `puntuaciones/` y `resultados/` · auto-avanza jornada al terminar · **fix 403 Sofascore**: solo sale si `status=notstarted`, intenta lineups aunque el endpoint /event falle | ✅ actualizado 2026-05-27 |
 | `functions/apertura.js` | Cloud Functions `aperturaJ1/J2/J3` · scheduled (cron UTC) · llaman a `setJornada()` · J1: `0 19 8 6 *` · J2: `0 16 14 6 *` · J3: `0 19 21 6 *` | ✅ |
 | `functions/triggers.js` | Cloud Function `onResultWrite` · Firestore trigger `resultados/{matchId}` · al terminar un partido llama `updateEstadisticas()` + `updateClasificacion()` si estamos en fase de grupos | ✅ |
 | `scripts/scoring.js` | Lógica de puntuación compartida (local + Cloud): `ratingToPoints`, `goalBonus`, `calcPoints`, `processLineups`, `calcFairPlay` · Fair Play: amarilla −1 · doble amarilla −3 · roja directa −4 · amarilla+roja −5 | ✅ |
 | `scripts/set-jornada.js` | `SCHEDULE` (timestamps de J1–J8: apertura/deadline/cierre/label/fase) + `setJornada(jornada, db)` · escribe `config/jornada` · uso CLI: `node scripts/set-jornada.js J1` | ✅ |
 | `scripts/clasificacion.js` | `calcGrupos(resultados, vivo)` + `updateClasificacion(db)` · calcula clasificación de grupos del Mundial real y escribe `clasificacion/grupos` · criterios FIFA: pts → GD → GF → FP | ✅ |
 | `scripts/estadisticas.js` | `calcEstadisticas(jornadasData)` + `updateEstadisticas(db)` · agrega `_detalle` de todas las jornadas y escribe `estadisticas/jugadores` | ✅ |
-| `scripts/partidos/J1.json` | IDs de Sofascore para los partidos de J1–J3 · formato `[{ sofaId, matchId, local, visit, grp }]` · J4–J8 se rellenan cuando se confirmen los equipos | ✅ (J1–J3) |
+| `scripts/partidos/J1.json` | IDs de Sofascore para los 104 partidos del Mundial · formato `[{ sofaId, matchId, local, visit, grp }]` · J1–J8 todos presentes · **verificados contra Sofascore 2026-05-27: 104/104 IDs correctos** | ✅ (J1–J8) |
 | `firebase.json` | Config Firebase · functions `source: "."` (raíz) con `runtime: nodejs22` · hosting con predeploy `convert-to-webp.js` · reglas CORS y caché por tipo de asset | ✅ |
-| `firestore.rules` | Reglas de seguridad Firestore · `drafts/{uid}`: write solo si `apertura ≤ request.time < deadline` (leído de `config/jornada`) · `config/jornada`: solo lectura pública · Admin SDK bypasea todas las reglas | ✅ |
+| `firestore.rules` | Reglas de seguridad Firestore · `drafts/{uid}`: write solo si `apertura ≤ request.time < deadline` + cuando `alineacionConfirmada=true` valida server-side: 11 slots correctos según formación, OVR total ≤ 900, sin jugadores duplicados · Admin SDK bypasea todas las reglas | ✅ actualizado 2026-05-27 |
+| `scripts/server.js` | Servidor HTTP wrapper para Railway · escucha `config/jornada` via onSnapshot · arranca `node scripts/poller.js {jornada}` como subprocess · health check en `PORT` o 8080 · credenciales desde `SA_JSON` (base64) o ruta local | ✅ |
+| `Procfile` | `web: node scripts/server.js` — entrada para Railway | ✅ |
 | `.funcignore` | Excluye assets, tests y secretos del bundle de Cloud Functions (limitación: Firebase CLI v2 con `source: "."` no lo respeta totalmente → bundle ~411 MB incluyendo `node_modules`) | ✅ |
 | `package.json` | `type:module` · `main: functions/index.js` · `firebase-admin ^13.8.0` · `firebase-functions ^7.2.5` (Node 22) · `sharp` movido a devDependencies | ✅ |
 
@@ -1057,7 +1061,17 @@ C:\Users\Jepii\.secrets\la-pausa-mundial-serviceAccount.json
 
 ---
 
-### Backend — Cloud Functions ✅ desplegadas 2026-05-21
+### Backend — Railway (poller) + Cloud Functions ✅
+
+**Railway (poller en tiempo real):**
+- Repo: `github.com/jeplaguitlla24/divieto-mundial-2026`
+- URL: `divieto-mundial-2026-production.up.railway.app`
+- Arranca con `Procfile` → `node scripts/server.js`
+- Variable de entorno: `SA_JSON` = service account en base64
+- `server.js` escucha `config/jornada` y arranca/reinicia el poller al cambiar de jornada
+- Logs en Railway dashboard → Deployments → Logs
+
+### Cloud Functions ✅ desplegadas 2026-05-21 · actualizadas 2026-05-27
 
 **Runtime:** Node.js 22 · `firebase-functions ^7.2.5` · `firebase-admin ^13.8.0`
 **Entry point:** `functions/index.js` · `package.json → "main": "functions/index.js"` · `source: "."` en `firebase.json`
@@ -1347,7 +1361,7 @@ node scripts/cleanup-ligas.js
 
 ---
 
-## SISTEMA DE JUEGO — DISEÑO COMPLETO ✅ cerrado 2026-05-18
+## SISTEMA DE JUEGO — DISEÑO COMPLETO ✅ cerrado 2026-05-27
 
 ### Acceso — códigos de invitación
 
@@ -1356,38 +1370,16 @@ node scripts/cleanup-ligas.js
 - Flujo de entrada: manager introduce su código → Firebase crea cuenta anónima → elige nombre y liga en setup
 - Sin email — solo código + nombre elegido
 - La sesión anónima persiste en el dispositivo; en siguientes visitas va directamente a `/app/`
+- **"Recordar sesión"** toggle en login: activo (por defecto) = sesión permanente · desactivado = sesión de ventana
 
 ---
 
-### Dos líneas de competición
+### Línea de competición: LIGA ACUMULADA ✅
 
-**1. TORNEO (réplica del Mundial)**
-
-- 48 managers en 12 grupos de 4, asignados por sorteo aleatorio al inicio
-- Fase de grupos (J1–J3): cada manager juega un duelo por jornada contra uno de los otros 3 de su grupo
-- Un duelo = quien hace más puntos Sofascore (con química aplicada) esa jornada
-- Resultado del duelo: victoria = 3 pts · empate (mismos puntos) = 1 pt cada uno · derrota = 0 pts
-- **Desempate en clasificación de grupo** (por este orden):
-  1. Puntos en la fase de grupos
-  2. Duelo directo entre los empatados (quién ganó el enfrentamiento entre ellos)
-  3. Mayor puntuación Sofascore total acumulada en la fase de grupos
-  4. Mayor puntuación recibida por los rivales (equivalente a "goles en contra" — más = peor)
-  5. Overall medio del XI más bajo (máximo 900)
-  6. Sorteo
-- Clasifican: 1º y 2º de cada grupo (24) + 8 mejores terceros = **32 managers a dieciseisavos**
-- Fase eliminatoria: cuadro réplica exacta del Mundial 2026
-  - J4: Dieciseisavos (32 → 16)
-  - J5: Octavos (16 → 8)
-  - J6: Cuartos (8 → 4)
-  - J7: Semis (4 → 2) + Tercer y cuarto puesto
-  - J8: Final
-
-**2. LIGA (acumulada)**
-
-- Los mismos 48 managers, compiten en paralelo al torneo
+- **Sin torneo H2H** — solo liga de puntos acumulados
+- Los mismos managers compiten las 8 jornadas, nadie se elimina
 - Se suman los puntos Sofascore (con química) de las 8 jornadas
-- No hay eliminación — todos juegan las 8 jornadas
-- Gana quien más puntos acumule al final
+- Gana quien más puntos acumule al final de J8
 
 ---
 
@@ -1467,13 +1459,15 @@ Decisiones de producto que faltan. Cuando se cierren, mover a CAPA 2 con ✅.
 - [ ] Aplicar valores definitivos de miniCardSVG a CARTA_MINI_9.html (foto: `left:38% top:10.5% width:51% height:49%`) — pendiente de confirmar que el diseño actual es definitivo
 - [x] **Química A vs B** — Cerrado 2026-05-06: Opción A. ≥1 verde o ≥2 naranjas → ×1.50 · 1 naranja → ×1.25. Toggle eliminado del código.
 - [ ] **Visual química en campo** — Validar tratamiento B2 (banda sólida + contorno de carta en color química) en campo real con jugadores reales antes de implementar. Test: `chem-test.html`
-- [ ] **Pantalla Jornada con datos reales** — Implementar según estrategia documentada en CAPA 2 y SISTEMA DE JUEGO: `onSnapshot(puntuaciones/{jornada})` + `drafts/{uid}/{jornada}` + química client-side
-- [ ] **`scripts/poller.js`** — Script multi-partido para automatizar puntuaciones en vivo. Config: `scripts/partidos/{jornada}.json`. Extiende `live-scoring.js`. Hasta 24 partidos simultáneos.
+- [x] **Pantalla Jornada con datos reales** — ✅ implementado: `onSnapshot(puntuaciones/{jornada})` + `alineacionConfirmada` + `normalizeName()` para matching + `JORNADA_IDS` dinámico
+- [x] **`scripts/poller.js`** — ✅ implementado. Corre en Railway via `server.js`. Fix 403 Sofascore aplicado.
+- [ ] **J4–J8 partidos en pantalla** — `mundial2026.js` solo tiene matchIds 1-72. Los partidos de J4–J8 (73-104) no se pueden añadir hasta saber los equipos clasificados (post-grupos).
+- [ ] **CHEM_CONNS duplicado** — la constante está copiada en `draft/index.html` y `jornada/index.html`. Si se desincroniza, los puntos del draft no coinciden con los de jornada. Mover a un archivo compartido.
 - [ ] **Lista debajo de GUARDAR** — Sección scrolleable debajo del botón GUARDAR ALINEACIÓN con el XI completo y el multiplicador de química de cada jugador
 - [x] Criterio exacto de activación IF — cerrado: top 26 por jornada (3 PT · 8 DF · 8 MC · 7 DL), subida inversamente proporcional al overall actual
 - [x] Número de managers — cerrado: 48 en total, mismos para torneo y liga
 - [x] Formato eliminatoria — cerrado: réplica exacta cuadro Mundial 2026
-- [x] H2H por jornada — cerrado: más puntos Sofascore (con química) gana el duelo. Empate → 1 pt cada uno. Ver desempate en SISTEMA DE JUEGO.
+- [x] H2H por jornada — **eliminado**. Solo liga acumulada (cerrado 2026-05-27).
 - [ ] Colores cartas IF para fases J4–J8 (badge de Dieciseisavos, Octavos, Cuartos, Semis, Final) — diseño a cargo del autor
 - [ ] Umbral INFRAS (¿top N fuera de los 26 convocados?)
 - [x] **Ajuste fórmula aleatoriedad draft** — Implementado 2026-05-26. Contexto completo:
@@ -1525,6 +1519,9 @@ Writable solo via Admin SDK (en la Cloud Function). Readable públicamente para 
 ---
 
 ## CAPA 6 — CONTEXTO HISTÓRICO
+
+### Torneo H2H managers (descartado 2026-05-27)
+Diseño original: 48 managers en 12 grupos de 4, duelos por jornada, réplica del cuadro del Mundial. Descartado en favor de liga acumulada simple (menos gestión, más foco en puntuación individual).
 
 Decisiones descartadas. No mezclar con lo vigente.
 
